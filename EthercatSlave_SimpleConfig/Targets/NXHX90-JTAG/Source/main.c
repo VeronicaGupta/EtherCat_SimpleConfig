@@ -1,4 +1,6 @@
 #include "main.h"
+#include <stdio.h>
+DRV_UART_HANDLE_T tUART = { 0 };
 void dioChaseLights(void);
 void delay(size_t ulMiliseconds);
 /*!
@@ -7,6 +9,20 @@ void delay(size_t ulMiliseconds);
 int main(void)
   {
     DRV_DIO_Init();
+
+    tUART.tConfiguration.eDeviceID = DRV_UART_DEVICE_ID_UART2;
+    tUART.tConfiguration.eOperationMode = DRV_OPERATION_MODE_POLL;
+    tUART.tConfiguration.eBaudrate = DRV_UART_BAUDRATE_115200;
+    tUART.tConfiguration.eWordLength = DRV_UART_WORD_LENGTH_8_BITS;
+    tUART.tConfiguration.eLineControl =
+  DRV_UART_LINE_CONTROL_MASK_FIFO_ENABLE;
+    tUART.tConfiguration.eLoopBack = DRV_UART_LOOP_BACK_INACTIVE;
+    DRV_UART_Init(&tUART);
+    /** Deactivate all buffering */
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+    printf("\n\r**** Application started ****\n\r");
+
     while(1)
     {
       dioChaseLights();
@@ -45,4 +61,17 @@ void delay(size_t ulMiliseconds)
       ns += ulCalibrationValue;
     }
   }
+}
+
+/*!
+ * \brief Retargets the C library printf function to the UART.
+ * \param iFile File handle
+ * \param pvBuffer Data to write to file
+ * \param iBytes number of bytes to write
+ * \return number of bytes successfully written
+ */
+uint32_t _write(int iFile, const void* pvBuffer, uint32_t iBytes)
+{
+  DRV_UART_Transmit(&tUART, pvBuffer, iBytes);
+  return iBytes;
 }

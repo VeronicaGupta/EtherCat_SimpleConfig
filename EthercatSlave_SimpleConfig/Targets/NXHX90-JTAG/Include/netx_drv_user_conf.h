@@ -113,12 +113,12 @@ extern "C"
  * Define that enables the compilation of the dmac driver and its inclusion into the
  * headers.
  */
-//#define DRV_DMAC_MODULE_ENABLED
+#define DRV_DMAC_MODULE_ENABLED
 /*!
  * The length of the dmac linked list used in the driver.
  * One element is capable of 4095 transfers.
  */
-//#define DRV_DMAC_LIST_LENGTH 4u
+#define DRV_DMAC_LIST_LENGTH 4u
 
 #ifdef __cplusplus
 }

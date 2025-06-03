@@ -1,3 +1,5 @@
+armv7em-none-eabi/4.9.3/netx90_app_iflash/DEBUG_ADAPTER=nrpeb_h90_re_onboard
+armv7em-none-eabi/4.9.3/netx90_app_iflash/TARGET_BOARD=nrpeb_h90_re
 armv7em-none-eabi/4.9.3/netx90_app_intram/DEBUG_ADAPTER=nrpeb_h90_re_onboard
 armv7em-none-eabi/4.9.3/netx90_app_intram/TARGET_BOARD=nrpeb_h90_re
 eclipse.preferences.version=1

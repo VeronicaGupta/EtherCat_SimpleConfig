@@ -32,17 +32,17 @@ def build(bld):
         comp_prefix + "netx_drv"
         ]
     
-    bld.program(
-        target           = "netx90_app_intram",
-        name             = comp_prefix + "netx90_app_intram",
-        platform         = platform,
-        toolchain        = toolchain,
-        use              = uses,
-        source           = sources,
-        includes         = includes,
-        defines          = defines,
-        linkerscript     = ["Linker/netx90_app_intram.ld"],
-    )
+#     bld.program(
+#         target           = "netx90_app_intram",
+#         name             = comp_prefix + "netx90_app_intram",
+#         platform         = platform,
+#         toolchain        = toolchain,
+#         use              = uses,
+#         source           = sources,
+#         includes         = includes,
+#         defines          = defines,
+#         linkerscript     = ["Linker/netx90_app_intram.ld"],
+#     )
     
     bld.program(
         target           = "netx90_app_sdram",

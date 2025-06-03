@@ -1,0 +1,3 @@
+STARTUP_TARGET/PROJECT=EthercatSlave_SimpleConfig
+STARTUP_TARGET/TARGET=armv7em-none-eabi/4.9.3/netx90_app_iflash
+eclipse.preferences.version=1

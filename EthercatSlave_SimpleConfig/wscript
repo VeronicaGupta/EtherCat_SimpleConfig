@@ -14,7 +14,7 @@ def cmpVersions(versionA, versionB):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
     return cmp(normalize(versionA), normalize(versionB))
 
-project_toolchains = 'hilscher_toolchain_gccarmemb'
+REQUIRED_TOOLCHAINS = ["gccarmemb"]
 HILSCHER_VERSION_COMPATIBILITY = '1.10.1.0'
 
 def options(ctx):
@@ -37,23 +37,15 @@ def options(ctx):
 def configure(conf):
     try:
         conf.load("hilscher_netx hilscher_firmware hilscher_extras", tooldir="WAF")
-        conf.load(project_toolchains, tooldir="WAF/tools")
         print("Loaded WAF configuration from project.")
     except:            
         conf.load("hilscher_netx hilscher_firmware hilscher_extras")
         print("Loaded WAF configuration from netX Studio.")
-    
-    conf.setenv("")
-    conf.env["UsedToolchain"] = "gccarmemb"
-    conf.env["UsedPlatform"]  = "netx90_app"
-    
     sys.stdout.flush()
-    conf.autorecurse(mandatory = False, excl= ["dist", "build"])
-
+    conf.autorecurse(mandatory = False)
 
 def dist(bld):
     pass
 
 def build(bld):
-    bld.autorecurse(excl= ["dist", "build"])
-
+    bld.autorecurse() 

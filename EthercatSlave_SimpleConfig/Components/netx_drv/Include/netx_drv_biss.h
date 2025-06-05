@@ -5,7 +5,7 @@
  * WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * The BISS does not work out of the box or via hardware config!
  * $Revision: 6027 $
- * $Date: 2019-08-09 15:15:52 +0300 (Fri, 09 Aug 2019) $
+ * $Date: 2019-08-09 14:15:52 +0200 (Fr, 09 Aug 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an

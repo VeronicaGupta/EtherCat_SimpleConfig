@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    netx_drv_dmac.h
  * \brief   Header file of DMAC DRV module.
- * $Revision: 11377 $
- * $Date: 2024-06-12 16:34:59 +0300 (Wed, 12 Jun 2024) $
+ * $Revision: 4538 $
+ * $Date: 2018-11-22 17:26:55 +0100 (Do, 22 Nov 2018) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -81,7 +81,7 @@ typedef enum __ALIGNED(4) DRV_DMAC_BURST_TRANSFER_SIZE_Etag
 /*!
  * \brief The width of a dmac transfer.
  */
-typedef enum __ALIGNED(4) DRV_DMAC_TRANSFER_WIDTH_Etag
+typedef enum DRV_DMAC_TRANSFER_WIDTH_Etag
 {
   DRV_DMAC_TRANSFER_WIDTH_8b = 0u, /*!< DMAC transfer of one byte. */
   DRV_DMAC_TRANSFER_WIDTH_16b = 1u, /*!< DMAC transfer of a half word. */
@@ -115,8 +115,8 @@ typedef enum DRV_DMAC_INCREMENTATION_Etag
  */
 typedef enum DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_Etag
 {
-  DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_INACTIVE = 0x0u, /*!< No interrupt is generated. */
-  DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_ACTIVE = 0x1u /*!< An interrupt is generated at the end. */
+  DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_INACTIVE = 0x0u, /*!< An interrupt is generated at the end. */
+  DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_ACTIVE = 0x1u /*!< No interrupt is generated. */
 } DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_E;
 
 /*!
@@ -129,6 +129,7 @@ typedef enum DRV_DMAC_ARM_EQ_Etag
   DRV_DMAC_ARM_EQ_DEFAULT = DRV_DMAC_ARM_EQ_BURST_REQUESTS /*!< The defaul value of the field. */
 } DRV_DMAC_ARM_EQ_E;
 
+
 /*!
  * \brief Defines the control structure for a list item, defining a transfer element.
  *
@@ -137,17 +138,17 @@ typedef enum DRV_DMAC_ARM_EQ_Etag
  */
 typedef __PACKED_STRUCT DRV_DMAC_CONTROL_Ttag
 {
-  uint32_t ulTransferSize             :12; /*!< The ammount of transfers to be performed (depends on source byte size). */
-  uint32_t eSourceBurstSize           :3;  /*!< How large the burst access on the source shall be. */
-  uint32_t eDestBurstSize             :3;  /*!< How large the burst access on the target shall be. */
-  uint32_t eSourceTransferWidth       :3;  /*!< How many bytes shall be read from the source address. */
-  uint32_t eDestTransferWidth         :3;  /*!< How many bytes shall be read from the destination address. */
-  uint32_t eArmEq                     :1;  /*!< The burst access mode. */
-  uint32_t reserved1                  :1;  /*!< Reserved bit. */
-  uint32_t eSourceIncrementation      :1;  /*!< Shall the source address pointer be incremented? */
-  uint32_t eDestIncrementation        :1;  /*!< Shall the destination address pointer be incremented? */
-  uint32_t ulProtection               :3;  /*!< Has the burst transfer to be protected? */
-  uint32_t eGenerateTerminalInterrupt :1;  /*!< Shall an interrupt be generated at the end? */
+  uint32_t ulTransferSize :12; /*!< The ammount of transfers to be performed (depends on source byte size). */
+  DRV_DMAC_BURST_TRANSFER_SIZE_E eSourceBurstSize :3; /*!< How large the burst access on the source shall be. */
+  DRV_DMAC_BURST_TRANSFER_SIZE_E eDestBurstSize :3; /*!< How large the burst access on the target shall be. */
+  DRV_DMAC_TRANSFER_WIDTH_E eSourceTransferWidth :3; /*!< How many bytes shall be read from the source address. */
+  DRV_DMAC_TRANSFER_WIDTH_E eDestTransferWidth :3; /*!< How many bytes shall be read from the destination address. */
+  DRV_DMAC_ARM_EQ_E eArmEq :1; /*!< The burst access mode. */
+  uint32_t reserved1 :1; /*!< Reserved bit. */
+  DRV_DMAC_INCREMENTATION_E eSourceIncrementation :1; /*!< Shall the source address pointer be incremented? */
+  DRV_DMAC_INCREMENTATION_E eDestIncrementation :1; /*!< Shall the destination address pointer be incremented? */
+  uint32_t ulProtection :3; /*!< Has the burst transfer to be protected? */
+  DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_E eGenerateTerminalInterrupt :1; /*!< Shall an interrupt be generated at the end? */
 } DRV_DMAC_CONTROL_T;
 
 /*!
@@ -208,7 +209,7 @@ typedef struct DRV_DMAC_HANDLE_Ttag
 {
   DRV_DMAC_CH_DEVICE_T* ptDevice; /*!< \private The DMAC device register as bitfield and value unions.*/
   DRV_DMAC_CONFIGURATION_T tConfiguration; /*!< Contains the dmacs configuration attributes. */
-  DRV_DMAC_LINKED_LIST_ELEMENT_T atLinkedList[DRV_DMAC_LIST_LENGTH]; /*!< \private list of linked elements for transmitting more than 4092 ticks (8b 16b or 32b depending on source size)*/
+  DRV_DMAC_LINKED_LIST_ELEMENT_T atLinkedList[DRV_DMAC_LIST_LENGTH]; /*!< \private list of linked elements for transmitting more than 4095 ticks (8b 16b or 23b depending on source size)*/
   DRV_LOCK_T tLock; /*!< \private The drivers locking variable used as internal mutex*/
 } DRV_DMAC_HANDLE_T;
 

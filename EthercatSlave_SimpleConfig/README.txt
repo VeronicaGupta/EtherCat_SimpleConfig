@@ -1,10 +1,9 @@
 /**********************************************************************************//**
 Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 **************************************************************************************//*
-$Id: README.txt 11652 2024-10-18 08:44:33Z Jknorr $:
+$Id: README.txt 7982 2020-06-25 10:27:57Z stefanneumann $:
 **************************************************************************************//**
-DISCLAIMER
-----------
+<H2>DISCLAIMER</H2>
   Exclusion of Liability for this demo software:
   The following software is intended for and must only be used for reference and in an
   evaluation laboratory environment. It is provided without charge and is subject to
@@ -13,143 +12,84 @@ DISCLAIMER
   other parties provide the software "as is" without warranty of any kind, either
   expressed or implied.
 \note
-  Please refer to the Agreement in \ref disclaimer "README_DISCLAIMER.txt", provided 
-  together with this file! By installing or otherwise using the software, you accept 
-  the terms of this Agreement. If you do not agree to the terms of this Agreement, 
-  then do not install or use the software!
+  Please refer to the Agreement in \ref disclaimer "README_DISCLAIMER.txt", provided together with this file!
+  By installing or otherwise using the software, you accept the terms of this Agreement.
+  If you do not agree to the terms of this Agreement, then do not install or use the
+  Software!
 **************************************************************************************//**
 
 \mainpage
 
-Introduction
-------------
+<H2>Introduction</H2>
+This example is delivered with a **limited evaluation version** firmware - LFW, which must **not be used for production**
+Please refer to \ref lfw "LFW/readme.txt" for some more information, related to the LFW.
+The LFW (*.nxi file) must be programmed into the flash memory of netx 90
 
-This is a template containing the vendor specific CMSIS implementation and a driver package.
-It supports netX 90 chips. The corresponding hardware_config_xxx.hwc file for your device should be
-flashed accordingly. If try to debug the example in sdram (netx90_app_sdram), the extension board
-with SDRAM and the corresponding hardware_config_idpm_flash_sdram.hwc must be flashed accordingly.
+Depending on the use case A,B or C, a matching flash structure must be prepared. I.e. a matching Hardware Configuration HWC (*.hwc file), Flash Device Label FDL (*.fdl file) and the proper Maintancen Firmware MTF must be programmed into the flash internal memory. 
 
-Both netX90 Rev.1 and Rev.2 are supported, for more information about chip revisions and evaluation 
-board revisions, please refer to the following FAQ page.
-https://hilscher.atlassian.net/l/cp/U7voWryU
+Please check netX 90 documentation and the FAQ section for more information
 
-Changelog
---------- 
+netX 90 page:         https://kb.hilscher.com/x/dYJ3B
+netX 90 FAQ section:  https://kb.hilscher.com/x/KXQWBg
 
-Version     | Date       | Who  | Description
-------------|------------|------|------------------------------------------------------------
-V0.0.1.0    | 2018-01-26 | AGR  | Pre Release
-V0.0.2.0    | 2018-08-01 | JZ   | updated components and hardware_config files
-V0.0.3.0    | 2018-11-26 | JZ   | updated components and hardware_config files (netX90 final)
-V0.0.4.0    | 2019-01-21 | JZ   | updated components and hardware_config files
-V0.0.5.0    | 2019-05-23 | JZ   | updated components, hardware_config files and linker files
-V0.0.6.0    | 2019-10-08 | JZ   | updated components, folder structure changed
-V0.0.7.0    | 2020-01-24 | AGR  | updated components, folder structure changed
-V0.1.0.0    | 2020-11-11 | JZ   | updated components, hardware_config files and linker files
-V0.1.1.0    | 2022-01-27 | JZ   | updated hardware_config files and waf extension
-V0.1.2.0    | 2022-01-28 | JZ   | updated components, hardware_config files and wscript
-V0.1.3.0    | 2022-02-11 | JZ   | updated components and waf extension
-V0.1.3.1    | 2022-09-19 | JZ   | updated hardware_config files and FDL files
-V0.1.4.0    | 2023-10-26 | JK   | updated components, HWC and FDL files, and Hilscher waf extension
-V0.1.4.1    | 2023-12-01 | JZ   | updated HWC and FDL files, added WFP in the template
-V0.1.4.2    | 2024-01-15 | JZ   | updated HWC files
-V0.1.4.3    | 2024-02-20 | JK   | updated components
-V0.1.4.4    | 2024-10-18 | JK   | updated components, HWC files, WFP and linker scripts
+HWC templates for different use cases are provided under the directory HWC.
 
-### V0.1.4.4 Pre Release
-- updated component CMSIS V0.1.5.3
-- updated component netx_drv V0.1.5.3
-- updated HWC files (hwconfig_tool V4.1.8)
-- updated WFP files
-- updated INTRAM and SDRAM linker scripts with fixes for alignment issues that occured in certain situations
+FDL templates for different use case are provided under the directory FDL, the device
+number, serial number and MAC address must be changed accordingly.
 
-### V0.1.4.3 Pre Release
-- updated component CMSIS V0.1.5.0
-- updated component netx_drv V0.1.5.0
+### Common functions supported by the firmware:
+- netX Diagnostic and Remote Access: \n
+    Interface for Hilscher diagnosis and configuration tools via Serial Line (UART) on 
+    netX90 /FTDI USB bridge on NXHX90
+- DPM Channel 0 - RTE Protocol Specific and FW Generic Services
+- DPM Channel 1 - Network Services: \n
+    Network Services are included in all Real-Time Ethernet firmware variants and provide following functionality: \n
+    Socket Interface API
+        allows to use socket communication via netX integrated TCP/IP stack and same MAC address \n
+    Ethernet Interface API (disabled by default, can be enabled via Firmware TagListEditor)
+        allows to send / receive raw ethernet frames using dedicated own MAC address \n
+    Web Interface API
+        allows to forward specific URL requests (HTTP GET / POST) to user application to build custom web page content by the user
+- Integrated Webserver: \n
+    Use case A - Basic Web Server: \n
+    Basic Webserver is included in all Real-Time Ethernet firmware variant and provides following built-in functionality: \n
+    "URL\netx"
+        provides simple grafical interface to other functions (diag, fw update, reset) \n
+    "URL\netx\diag"
+        delivers plain basic information about the netX device ( current uptime, MAC address, device number, serial number etc.) \n
+    "URL\netx\firmware"
+        allows to upload a new firmware update file to netX flash. Firmware install can be forced via Maintenance Firmware \n
+    "URL\netx\reset"
+        allows to trigger a netX reset i.e. to install the new uploaded firmware \n
+    "URL\"
+        URL requests are forwarded to the user application via DPM Channel 1(see Web Interface API) \n
+    Use case C (netX with external SPI Flash and external SDRAM) - Extended Web Server: \n
+    Provides the functions same as Basic Webserver, but extended with handling of local flash file system (external SPI Flash) \n
+    "URL/netx/files"
+        allows to stream the customer web content according to media type (i.e. txt, js, htm, xhtml, jpeg, json etc) located in the netX Flash File System \n
+    Note: actual FW / tools do not provide yet convinient possibility to upload web server content files to netX file system. This will be improved in the next version
 
-### V0.1.4.2 Pre Release
-- updated HWC files
+netx90_app_iflash_dummy.nai is a dummy file to be flashed on app iflash, if "netx90_app_usecase_X_sdram.elf" is used to debug the 
+application instead of "netx90_app_usecase_X_iflash.nai". Because the firmware X090F000.nxi on com side will start, only if 
+it has detected a valid application code on the app iflash.
 
-### V0.1.4.1 Pre Release
-- updated HWC files
-- updated FDL files
-- added WFP in the template
+There are other hardware config files of dpm or spm available under the folder HWC, if a companion chip is 
+used as a host instead of netX90 app or external sdram is used on the host interface.
 
-### V0.1.4.0 Pre Release
-- updated component CMSIS V0.1.4.0
-- updated component netx_drv V0.1.4.0
-- updated HWC files
-- updated FDL files
-- updated Hilscher waf extension V1.13.0.1
+The following picture shows the application software structure. The application depends on a generic part and
+a protocol specific one. The protocol specific code is in component <EM>cifXApplicationDemoECS</EM>
 
-### V0.1.3.1 Pre Release
-- updated hwc files (hwconfig_tool V4.0.1)
-- updated FDL templates, which support NXE/NAE(use case C) and NAE(use case B)
+Process data is handled in an interrupt service routine and is independend from used protocol stack.
+\image html "LFW structure generic.png"
 
-### V0.1.3.0 Pre Release
-- updated Hilscher waf extension
-- updated component CMSIS V0.1.3.0
-- updated component netx_drv V0.1.3.0
+<H2>Protocol specific part</H2>
+The protocol specific part is covered by the component cifXApplicationdemoXXX, XXX is a placeholder for PNS (PROFINET slave), EIS (EthernetIP slave), ECS (EtherCAT slave), etc.
 
-### V0.1.2.0 Pre Release
-- updated component CMSIS V0.1.2.0
-- updated component netx_drv V0.1.2.0
-- updated hwc files (hwconfig_tool V4.0.0)
-- updated wscript
-
-### V0.1.1.0 Pre Release
-- updated hwc files (hwconfig_tool V3.0.23)
-- updated Hilscher waf extension
-
-### V0.1.0.0 Pre Release
-- updated component CMSIS V0.1.0.2
-- updated component netx_drv V0.1.0.3
-- moved netx_drv_user_conf.h from Components/netx_drv to Targets/NXHX90-JTAG/Include
-- updated wscript and linker files accordingly
-- updated hwc files (hwconfig_tool V3.0.17)
-- added Hilscher waf extension in the project
-- added Doc folder
-
-### V0.0.7.0 New Structure
-- updated component netx_drv V0.0.5.0
-- updated component CMSIS V0.0.5.0
-- FDL, HWC and LFW folder structure
-- boot headers and docs
-
-### V0.0.6.0 Pre Release
-- updated component netx_drv V0.0.4.8
-- updated component CMSIS V0.0.4.8
-- FDL, HWC and LFW folder structure
-
-### V0.0.5.0 Pre Release
-- separate hardware_config files for netX90 and netX90 rev.0 (hwconfig tool V3.0.8)
-- updated component netx_drv V0.0.4.7
-- updated component CMSIS V0.0.4.7
-- updated linker files
-- added fdl template file for use case A
-
-### V0.0.4.0 Pre Release
-- updated hardware_config files (hwconfig tool V3.0.4)
-- updated component netx_drv V0.0.4.3
-- updated component CMSIS V0.0.4.3
-
-### V0.0.3.0 Pre Release
-- updated wscript and linker files for netX90 final
-- updated hardware_config files(hwconfig tool V3.0.2)
-- updated component netx_drv V0.0.4.2
-- updated component CMSIS V0.0.4.2
-
-### V0.0.2.0 Pre Release
-- updated component netx_drv V0.0.3.0
-- updated component CMSIS V0.0.3.0 (CMSIS 5.3.0)
-- updated hardware_config.xml (hwconfig tool V2.0.0)
-
-### V0.0.1.0 Pre Release
-- Created the template from scratch
+Protocol specific startup begins in function Protocol_StartConfiguration(). 
+All responses and indications are handled in Protocol_PacketHandler().
 
 
-Documentation
--------------
+<H2>Documentation</H2>
 Documentation in HTML-format can be generated by using <B>doxygen</B>.
 A respective <EM>Doxyfile</EM> is part of this example. You can run doxygen from command line
 or from inside <EM>netX Studio CDT</EM>. The output will be created in folder <EM>Doc</EM>.
@@ -166,11 +106,11 @@ the documentation contains visual dependency diagrams.
 Due to a bug in dogygen, it is necessary to specify the path to dot.exe (Graphviz)
 in the "Doxyfile" -> DOT_PATH parameter
 
-\note The doxygen documentation requires doxygen version 1.8.0. or higher in order to 
-support Markdown plain text formatting
-\note The doxygen tag INCLUDE_PATH has to be set to include the correct user_drv_conf.h to 
-generate the documentation properly.
+<H3>Notes</H3>
+- If new source code is added to the project, it might be necessary to add new source code directories or files to the INPUT statement in the doxygen configuration file Doxyfile.
+- The doxygen documentation requires doxygen version 1.8.0. or higher in order to support Markdown plain text formatting
+- It is recommended to edit Doxyfile using doxywizard to make a diff of two Doxyfiles easier.
 
 
 **************************************************************************************/
-**************************************************************************************/
+

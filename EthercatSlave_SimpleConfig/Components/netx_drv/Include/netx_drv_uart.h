@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file     netx_drv_uart.h
  * \brief     peripheral module driver.
- * $Revision: 11353 $
- * $Date: 2024-05-20 18:54:32 +0300 (Mon, 20 May 2024) $
+ * $Revision: 5205 $
+ * $Date: 2019-04-17 16:05:00 +0200 (Mi, 17 Apr 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -45,8 +45,8 @@ extern "C"
 typedef enum DRV_UART_BAUDRATEMODE_Etag
 {
   DRV_UART_BAUDRATEMODE_RESET = 0x00u, /*!< Reset value */
-  DRV_UART_BAUDRATEMODE_0 = 0x01u, /*!< Obsolete, as it gives inaccuracies at higher baudrates */
-  DRV_UART_BAUDRATEMODE_1 = 0x02u,  /*!< Calculate BaudDiv by BAUDDIV = (Baud Rate * 16 * 65536) / 100 MHz */
+  DRV_UART_BAUDRATEMODE_0 = 0x01u, /*!< Calculate BaudDiv by BAUDDIV = ( (Baud Rate • 16) / 100 MHz ) • 2^16 */
+  DRV_UART_BAUDRATEMODE_1 = 0x02u,  /*!< Calculate BaudDiv by BAUDDIV = ( 100 MHz / (16 • BaudRate) ) – 1 */
   DRV_UART_BAUDRATEMODE_DEFAULT = DRV_UART_BAUDRATEMODE_1,  /*!< Default maps to mode 1 */
   DRV_UART_BAUDRATEMODE_MIN = 0x01u,  /*!< Minimal value */
   DRV_UART_BAUDRATEMODE_MAX = 0x02u  /*!< Maximum value */
@@ -57,7 +57,6 @@ typedef enum DRV_UART_BAUDRATEMODE_Etag
  */
 typedef enum DRV_UART_BAUDRATE_Etag
 {
-  DRV_UART_BAUDRATE_DEFAULT = 0ul,/*!< Baudrate of 0 */
   DRV_UART_BAUDRATE_300 = 3ul,/*!< Baudrate of 300 */
   DRV_UART_BAUDRATE_600 = 6ul,/*!< Baudrate of 600 */
   DRV_UART_BAUDRATE_1200 = 12ul,/*!< Baudrate of 1200 */
@@ -69,16 +68,7 @@ typedef enum DRV_UART_BAUDRATE_Etag
   DRV_UART_BAUDRATE_57600 = 576ul,/*!< Baudrate of 57600 */
   DRV_UART_BAUDRATE_115200 = 1152ul,/*!< Baudrate of 115200 */
   DRV_UART_BAUDRATE_460800 = 4608ul,/*!< Baudrate of 460800 */
-  DRV_UART_BAUDRATE_921600   = 9216ul,  /*!< Baudrate of 921600 */
-  DRV_UART_BAUDRATE_1000000  = 10000ul, /*!< Baudrate of 1000000 */
-  DRV_UART_BAUDRATE_2000000  = 20000ul, /*!< Baudrate of 2000000 */
-  DRV_UART_BAUDRATE_3000000  = 30000ul, /*!< Baudrate of 3000000 */
-  DRV_UART_BAUDRATE_3125000  = 31250ul, /*!< Baudrate of 3125000 */
-  DRV_UART_BAUDRATE_4000000  = 40000ul, /*!< Baudrate of 4000000 */
-  DRV_UART_BAUDRATE_5000000  = 50000ul, /*!< Baudrate of 5000000 */
-  DRV_UART_BAUDRATE_6000000  = 60000ul, /*!< Baudrate of 6000000 */
-  DRV_UART_BAUDRATE_6250000  = 62500ul, /*!< Baudrate of 6250000 */
-  DRV_UART_BAUDRATE_MAX      = DRV_UART_BAUDRATE_6250000,/*!< Baudrates over 6250000 are not allowed */
+  DRV_UART_BAUDRATE_DEFAULT = 0/*!< Baudrate of 0 */
 } DRV_UART_BAUDRATE_E;
 
 /*!
@@ -206,10 +196,9 @@ typedef struct Drv_UART_CONFIGURATION_Ttag
   DRV_UART_TX_MODE_MASK_E eTxMode; /*!< What mode is chosen. */
   DRV_UART_BAUDRATE_E eBaudrate; /*!< The baudrate to be used. */
   DRV_UART_BAUDRATEMODE_E Baud_Rate_Mode; /*!< Kind of baud div.
-                                           0: BAUDDIV = ( 100 MHz / (16 * BaudRate) ) – 1
-                                              This formula is obsolete, as it gives inaccuracies at higher baudrates
-                                           1: BAUDDIV = ( (Baud Rate * 16) / 100 MHz ) * 2^16
-                                              This formula is better, so it will be used in all the cases */
+                                           0: BAUDDIV = ( 100 MHz / (16 • BaudRate) ) – 1,
+                                           1: BAUDDIV = ( (Baud Rate • 16) / 100 MHz ) • 2^16. */
+  
   DRV_UART_WORD_LENGTH_E eWordLength; /*!< The length of the words transmitted. */
   DRV_UART_LINE_CONTROL_MASK_E eLineControl; /*!< The line control options. */
   DRV_UART_LOOP_BACK_E eLoopBack; /*!< If a loopback will be performed. */
@@ -228,7 +217,7 @@ typedef struct Drv_UART_CONFIGURATION_Ttag
   void* pTxCompleteCallbackHandle; /*!< The handle associated with the complete callback.*/
   DRV_CALLBACK_F fnRxCallback; /*!< The callback used if the rx has received data, but no buffer is specified.*/
   void* pRxCallbackHandle; /*!< The handle associated with the rx callback.*/
-  uint32_t ulDriverTimeout; /*!< Timeout limit, used in the driver for polling contexts. A software counter is used. */
+  uint32_t ulDriverTimeout; /*!< Timeout used in the driver for polling contexts. */
 } DRV_UART_CONFIGURATION_T;
 
 /*!
@@ -237,15 +226,13 @@ typedef struct Drv_UART_CONFIGURATION_Ttag
  * The configuration SHALL be changed before initializing the device and shall not be changed
  * afterwards.
  * The rest of it SHALL not be modified outside of the driver, even if it appears to be possible.
- * \struct DRV_UART_HANDLE_T
- * \struct DRV_UART_HANDLE_Ttag
  */
 typedef struct DRV_UART_HANDLE_Ttag
 {
   DRV_UART_DEVICE_T* ptDevice; /*!< \private The UART device register as bitfield and value unions. */
   DRV_UART_CONFIGURATION_T tConfiguration; /*!< \private Contains the configuration of the device. */
   DRV_LOCK_T tLock; /*!< \private The drivers locking variable used as internal mutex*/
-  uint64_t ullFrameStartTick;/*!< \private Used for timeout detection. It is a software counter, not a timer related one. */
+  uint64_t ullFrameStartTick;/*!< \private Used for timeout detection. */
   void * volatile TxBuffer;/*!< \private Transmit buffer */
   size_t volatile TxBufferSize;/*!< \private Transmit size */
   size_t volatile TxBufferCounter;/*!< \private Transmit counter */
@@ -313,7 +300,9 @@ DRV_STATUS_E DRV_UART_GetTxState(DRV_UART_HANDLE_T * const ptDriver, DRV_UART_ST
 /*!
  * \brief This function returns the amount of bytes received.
  * \details The function is defined as inline. It only returns the RxBufferCounter located in the handle.
- * The RxBufferCounter is the number of bytes received in the last transaction.
+ * The RxBufferCounter is 0 if it is full or empty. The complete callback was issued in case it is full.
+ * Because while the complete callback is called, the counter is not reset, one is able to get the amount
+ * of data received.
  * \memberof DRV_UART_HANDLE_T
  * \param[in,out] ptDriver The given handle of the drivers class
  * \return Bytes received
@@ -332,7 +321,9 @@ __STATIC_FORCEINLINE uint32_t DRV_UART_GetRxCounter(DRV_UART_HANDLE_T * const pt
 /*!
  * \brief This function returns the amount of bytes transmitted.
  * \details The function is defined as inline. It only returns the TxBufferCounter located in the handle.
- * The TxBufferCounter is the number of bytes transmitted in the last transaction.
+ * The TxBufferCounter is 0 if it is full or empty. The complete callback was issued in case it is full.
+ * Because while the complete callback is called, the counter is not reset, one is able to get the amount
+ * of data received.
  * \memberof DRV_UART_HANDLE_T
  * \param[in,out] ptDriver The given handle of the drivers class
  * \return Bytes transmitted

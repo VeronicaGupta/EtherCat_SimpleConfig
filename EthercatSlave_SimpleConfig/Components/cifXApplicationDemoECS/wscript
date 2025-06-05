@@ -1,0 +1,46 @@
+def build(bld):
+    
+    toolchain = bld.toolchain
+    comp_prefix = bld.get_name_prefix(
+        toolchain = toolchain,
+        platform  = bld.platform)
+
+# Component cifXApplicationDemoECS ---------------------------------------------------------
+    netx_studio_sources = [
+        "Sources/AppECS_DemoApplication.c", 
+        "Sources/AppECS_DemoApplicationFunctions.c", 
+        ]
+
+    includes = [
+        "Includes",
+        ]
+
+    bld.stlib( 
+        target          = "cifXApplicationDemoECS",
+        name            = comp_prefix + "cifXApplicationDemoECS",
+        description     = "cifX Application Demo - ETHERCAT",
+        displaygroup    = "Libraries",
+        platform        = "netx90",
+        toolchain       = toolchain, 
+        use             = [
+                           "Hil_Definition_cifXApi_sdk",
+                           "ECSDefinitions_sdk",
+                           "Hil_Definition_netXFirmware_sdk",
+                           "hostabstractionlayer_sdk",
+                           "cifXApplicationDemo_sdk",
+                           "cifXToolkit_sdk",
+                           "cifXApplicationDemoConfig_sdk",
+                          ],
+        source          = netx_studio_sources,
+        includes        = includes,
+        defines         = [
+                           #"HOST_APPLICATION_SETS_MAC_ADDRESS",
+                           #"HOST_APPLICATION_STORES_REMANENT_DATA",
+                           ],
+        export_includes = includes,
+        )
+    
+    bld.sdkcomponent(
+        name            = comp_prefix + "cifXApplicationDemoECS_sdk",
+        export_includes = includes,
+        )

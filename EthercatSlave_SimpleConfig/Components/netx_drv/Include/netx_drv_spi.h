@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    netx_drv_spi.h
  * \brief   Header file of GPIO DRV module.
- * $Revision: 11377 $
- * $Date: 2024-06-12 16:34:59 +0300 (Wed, 12 Jun 2024) $
+ * $Revision: 6914 $
+ * $Date: 2020-03-03 10:20:25 +0100 (Di, 03 Mrz 2020) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -161,9 +161,8 @@ typedef enum DRV_SPI_SPO_Etag
  */
 typedef struct DRV_SPI_MODE_Ttag
 {
-  uint32_t eSPH       : 1;  /*!< [0..0]  Is phase shifted.        */
-  uint32_t eSPO       : 1;  /*!< [1..1]  Is clock inverted.       */
-  uint32_t ulBfAlign0 : 30; /*!< [31..2] bitField alignment value */
+  DRV_SPI_SPH_E eSPH:1;/*!< Is phase shifted.*/
+  DRV_SPI_SPO_E eSPO:1;/*!< Is clock inverted.*/
 } DRV_SPI_MODE_T;
 
 /*!
@@ -193,7 +192,7 @@ typedef enum DRV_SPI_FSS_STATIC_Etag
 {
   DRV_SPI_FSS_STATIC_HARDWARE = 0x0u,/*!< FSS is Hardware controlled. Master in Motorola mode will toggle fss after every word. Slave feels addressed if fss matches.*/
   DRV_SPI_FSS_STATIC_DRIVER = 0x1u, /*!< FSS is driver controlled. It is low while IO is performed. Otherwise a DIO should been used. */
-  DRV_SPI_FSS_STATIC_CALLER = 0x11u /*!< FSS is controlled manually by the caller (DRV_SPI_ChangeFss, eFFS has to be NONE). Driver will not initialize or alter FSS on its own. */
+  DRV_SPI_FSS_STATIC_CALLER = 0x11u /*!< FSS is controlled manually by the caller. Driver will not alter FSS on its own. */
 } DRV_SPI_FSS_STATIC_E;
 
 /*!
@@ -260,7 +259,7 @@ typedef enum DRV_SPI_DUMMYPATTERN_Etag
 
 /*!
  * \brief Enumeration of the data size of a word transmitted.
- * When the device is SQI, some modes ignore this setting
+ * Has no impact on SQI devices
  */
 typedef enum DRV_SPI_DATA_SIZE_SELECT_Etag
 {
@@ -334,7 +333,6 @@ typedef struct DRV_SPI_CONFIGURATION_Ttag
   DRV_SPI_FSS_STATIC_E eFSSStatic;/*!< Is fss static.*/
   DRV_SPI_FIFO_WM_E eRxFiFoWm;/*!< Receive FiFo watermark. [0..0b1111] (0b1000)*/
   DRV_SPI_FIFO_WM_E eTxFiFoWm;/*!< Tranmit FiFo watermark. [0..0b1111] (0b1000)*/
-  DRV_SPI_FIFO_WM_E eTxFiFoRefillLevel;/*!< Tranmit FiFo Refill Level. [0..0b1111] (0b1000)*/
   DRV_SPI_LOOP_BACK_MODE_E eLoopBackMode;/*!< Is loop back mode active.*/
   DRV_SPI_DATA_SIZE_SELECT_E eDataSize;/*!< Size of a word.*/
   DRV_SPI_DUMMYPATTERN_E uDummyPattern;/*!< Pattern used as dummy in empty Tx paths.*/
@@ -353,8 +351,6 @@ typedef struct DRV_SPI_CONFIGURATION_Ttag
  * The configuration SHALL be changed before initializing the device and shall not be changed
  * afterwards.
  * The rest of it SHALL not be modified outside of the driver, even if it appears to be possible.
- * \struct DRV_SPI_HANDLE_T
- * \struct DRV_SPI_HANDLE_Ttag
  */
 typedef struct DRV_SPI_HANDLE_Ttag
 {

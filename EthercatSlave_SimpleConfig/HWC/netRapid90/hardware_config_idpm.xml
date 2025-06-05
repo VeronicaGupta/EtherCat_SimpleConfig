@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<hwconfig tool_version="4.1.9" peripherals_version="1.4.0.0" chip_type="netx90_rev1" board="nrp_h90-re_fxdx">
+<hwconfig tool_version="3.0.17" peripherals_version="1.4.0.0" chip_type="netx90_rev1" board="nrp_h90-re_fxdx">
     <peripherals>
         <peripheral id="general">
             <config id="default">
@@ -11,7 +11,7 @@
                 <parameter id="firewall_eth_mac" value="app_only"/>
                 <parameter id="firewall_madc" value="app_only"/>
                 <parameter id="firewall_sdram" value="com_and_app"/>
-                <parameter id="firewall_uart" value="app_only"/>
+                <parameter id="firewall_uart" value="com_only"/>
                 <parameter id="firewall_debug_slave" value="no_access"/>
                 <parameter id="idpm_enable" value="true"/>
                 <parameter id="file_text" value=""/>

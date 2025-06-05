@@ -1,8 +1,8 @@
 /**************************************************************************//**
  * \file     netx_drv_mled.c
  * \brief    MLED module driver.
- * $Revision: 10355 $
- * $Date: 2023-02-02 13:44:10 +0200 (Thu, 02 Feb 2023) $
+ * $Revision: 6251 $
+ * $Date: 2019-10-07 09:27:10 +0200 (Mo, 07 Okt 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -52,12 +52,6 @@ static DRV_MLED_DEVICE_T * const s_apChannelDeviceAddressTable[DRV_MLED_DEVICE_C
 #endif
 
 /*!
- * \brief This function initializes the mled context object.
- *
- * In case of an error during initialization, the function returns an error value, but the lock for the handle, will not be released.
- * Together with the return value, this will ensure that the driver can only be interacted with if it has been correctly initialized.
- * Since the lock is initialized when this function is called, this function can still be called again with other parameters after a failed initialization.
- *
  * \memberof DRV_MLED_HANDLE_T
  */
 DRV_STATUS_E DRV_MLED_Init(DRV_MLED_HANDLE_T * const ptDriver)

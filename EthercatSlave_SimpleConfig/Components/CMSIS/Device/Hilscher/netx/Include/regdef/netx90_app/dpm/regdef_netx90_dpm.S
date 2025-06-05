@@ -1,5 +1,6 @@
 /*********************************************************************/
-/* SVN Revision: $Rev: 1175 $        release-1.5.0.4 2023-09-28      */
+/* Based on verilog file from: 190308_0616                           */
+/* SVN Revision: $Rev: 1158 $        release-1.4.0.1                 */
 /* from regdef.v by regdef2h auto-generated C-header file            */
 /* please see the regdef.html file for detailed register description */
 /*********************************************************************/

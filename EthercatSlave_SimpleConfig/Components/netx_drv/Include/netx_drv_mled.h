@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    netx_drv_mled.h
  * \brief   Header file of MLED DRV module.
- * $Revision: 11200 $
- * $Date: 2024-03-15 18:01:34 +0200 (Fri, 15 Mar 2024) $
+ * $Revision: 4538 $
+ * $Date: 2018-11-22 17:26:55 +0100 (Do, 22 Nov 2018) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -120,8 +120,6 @@ typedef struct DRV_MLED_CONFIGURATION_Ttag
  * The configuration SHALL be changed before initializing the device and shall not be changed
  * afterwards.
  * The rest of it SHALL not be modified outside of the driver, even if it appears to be possible.
- * \struct DRV_MLED_HANDLE_T
- * \struct DRV_MLED_HANDLE_Ttag
  */
 typedef struct DRV_MLED_HANDLE_Ttag
 {

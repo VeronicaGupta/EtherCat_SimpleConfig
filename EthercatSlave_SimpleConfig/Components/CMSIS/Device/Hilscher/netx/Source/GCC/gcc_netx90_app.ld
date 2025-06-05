@@ -1,28 +1,23 @@
-/**************************************************************************//**
- * @file     gcc_netx90_app.ld
- * @brief    netX 90 inker file for the gcc compiler as part of CMSIS
- * @version  V5.00
- * @date     02. March 2016
- ******************************************************************************/
-/*
- * Copyright (c) 2009-2016 ARM Limited. All rights reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Licensed under the Apache License, Version 2.0 (the License); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an AS IS BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/***************************************************************************
+ *   Copyright (C) 2017, Hilscher Gesellschaft fuer Systemautomation mbH   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
  
- /* Linker script to configure memory regions. */
+/* Linker script to configure memory regions. */
 MEMORY
 {
   FLASH     (rx)  : ORIGIN = 0x00000000, LENGTH = 512K
@@ -93,22 +88,6 @@ SECTIONS
         *(.text.PageFlasher);
         *(.rodata.PageFlasher);
     } > INTRAM AT > FLASH
-    
-    /* Section prepared for the external SQI Flash content, not evaluated yet. */
-    .nae_header : 
-    {
-        __qspi_flash_start__ = .;
-        /* KEEP(*(.app_cpu_hboot_boot_header_nae)) is put here by waf automatically*/
-        KEEP(*(.app_cpu_header_nae))
-    } > SDRAM
-    
-    .nae_data : 
-    {
-        KEEP(*(.QFlash*))
-        . = ALIGN(4);
-        KEEP(*(.app_cpu_secure_boot_header))
-        __qspi_flash_end__ = .;
-    } > SDRAM
     
     .text :
     {
@@ -270,4 +249,20 @@ SECTIONS
 
 	/* Check if data + heap + stack exceeds RAM limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+	
+	/* Section prepared for the external SQI Flash content, not evaluated yet. */
+    .nae_header (NOLOAD) : 
+    {
+        __qspi_flash_start__ = .;
+        KEEP(*(.app_cpu_hboot_boot_header_nae))
+        KEEP(*(.app_cpu_header_nae))
+    } > SQIFLASH
+    
+    .nae_data (NOLOAD) : 
+    {
+        KEEP(*(.QFlash*))
+        . = ALIGN(4);
+        KEEP(*(.app_cpu_secure_boot_header))
+        __qspi_flash_end__ = .;
+    } > SDRAM AT > SQIFLASH
 }

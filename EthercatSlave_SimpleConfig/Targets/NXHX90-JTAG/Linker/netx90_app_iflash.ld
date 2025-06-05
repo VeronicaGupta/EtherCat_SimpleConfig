@@ -74,6 +74,7 @@ SECTIONS
         __end__ = .;
                 
         KEEP(*(.app_cpu_hboot_boot_header_nai))
+        KEEP(*(.app_cpu_header_nai))
     } > FLASH
     
     .text.pagereader :

@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    csp/driver_csp_netx90_app.h
  * \brief   Header file supporting the final netX90 chip.
- * $Revision: 11365 $
- * $Date: 2024-05-28 10:23:45 +0300 (Tue, 28 May 2024) $
+ * $Revision: 6914 $
+ * $Date: 2020-03-03 10:20:25 +0100 (Di, 03 Mrz 2020) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -40,38 +40,9 @@ extern "C"
  * \{
  */
 
-/* Register definition file netx90_app.h is dedicated to replace regdef_netx90_arm_app.h.
- * The two files are not intended to be used together.
- * regdef_netx90_arm_app.h is included only in the c files of the following legacy drivers:
- * netx_drv_biss.c, netx_drv_canctrl.c, netx_drv_eth_xpic.c, netx_drv_xpic.c.
- * There is no conflict in these files, because regdef_netx90_arm_app.h is always included before netx90_app.h.
- * */
-
 /*lint -save -esym(18,*) */
 #include "netx90_app.h"
 /*lint -restore */
-
-/* If the former regdef_netx90_arm_app.h file needs to be included after netx90_app.h,
- * the user must be aware of possible definition collisions.
- * One known issue is the gpio_app define, which collides with regdef_netx90_arm_app.h
- * structures NX90_SYSTIME_GPIO_APP_CTRL_BIT_T,
- *            NX90_SYSTIME_GPIO_APP_CTRL_MASK_BIT_T, which both have member named gpio_app.
- *
- * A possible solution follows /the order of the lines is important/: */
-#ifdef NETX90_APP__AND__REGDEF_NETX90_ARM_APP__COMBINED_USE
-#undef gpio_app                                                /* No longer defined as ((gpio_app_Type*) gpio_app_BASE) */
-#include "regdef_netx90_arm_app.h"
-#define netx90_drv_gpio_app ((gpio_app_Type*) gpio_app_BASE)   /* Define using a new name netx90_drv_gpio_app */
-#endif
-
-/* In order to use netx90_app.h with c++, some additional measures are necessary,
- * due to conflicts between defines in netx90_app.h and standard c++ libraries:
- * Known issues are the hash and the random defines, as described in netx_drv_cpp_undefs.h file.
- * If further similar issues appear, they can be treated by adding corresponding lines in the netx_drv_cpp_undefs.h file accordingly. */
-#ifdef __cplusplus
-#include "netx_drv_cpp_undefs.h"
-#endif
-
 #define DRV_CORTEX_MODULE_SUPPORTED
 #define DRV_BISS_MODULE_SUPPORTED
 #define DRV_CANCTRL_MODULE_SUPPORTED
@@ -543,7 +514,6 @@ typedef union DRV_SPI_DEVICE_Utag
 #define DRV_SPI_DEVICE_DMA_LIST { DRV_DMAC_PERIPHERAL_SPI0_APP_RX, DRV_DMAC_PERIPHERAL_SPI1_APP_RX, DRV_DMAC_PERIPHERAL_SPI2_APP_RX, DRV_DMAC_PERIPHERAL_SPI_XPIC_APP_RX, DRV_DMAC_PERIPHERAL_SQI_RX, DRV_DMAC_PERIPHERAL_SQI0_APP_RX, DRV_DMAC_PERIPHERAL_SQI1_APP_RX }
 
 #define DRV_I2C_MODULE_SUPPORTED
-
 /*!
  * The I2C device IDs.
  *
@@ -551,10 +521,10 @@ typedef union DRV_SPI_DEVICE_Utag
  */
 typedef enum DRV_I2C_Device_ID_Etag
 {
-  DRV_I2C_DEVICE_ID_I2C0 = 0x01ul,/*!< The I2C drivers internal id for I2C 0.*/
-  DRV_I2C_DEVICE_ID_I2C1 = 0x02ul,/*!< The I2C drivers internal id for I2C of the XPIC.*/
-  DRV_I2C_DEVICE_ID_MIN = DRV_I2C_DEVICE_ID_I2C0, /*!< The I2C drivers last device ID.*/
-  DRV_I2C_DEVICE_ID_MAX = DRV_I2C_DEVICE_ID_I2C1 /*!< The I2C drivers last device ID.*/
+  DRV_I2C_DEVICE_ID_I2C0 = 0x1ul,/*!< The UART drivers internal id for UART 0.*/
+  DRV_I2C_DEVICE_ID_I2C1 = 0x02ul,/*!< The UART drivers internal id for UART of the XPIC.*/
+  DRV_I2C_DEVICE_ID_MIN = DRV_I2C_DEVICE_ID_I2C0, /*!< The UART drivers last device ID.*/
+  DRV_I2C_DEVICE_ID_MAX = DRV_I2C_DEVICE_ID_I2C1 /*!< The UART drivers last device ID.*/
 } DRV_I2C_DEVICE_ID_E;
 typedef i2c_app_Type DRV_I2C_DEVICE_T;
 #define I2C_DEVICE_APP0              ((DRV_I2C_DEVICE_T*)          i2c_app_BASE)
@@ -620,8 +590,6 @@ typedef enum DRV_MCP_CPU_ID_Etag
   DRV_MCP_CPU_ID_MAX
 } DRV_MCP_CPU_ID_E;
 typedef mcp_app_Type DRV_MCP_DEVICE_T;
-
-#define DRV_MCP_CPU_COUNT 8
 
 #define DRV_MCP_DEVICE            ((DRV_MCP_DEVICE_T*)           mcp_app_BASE)
 

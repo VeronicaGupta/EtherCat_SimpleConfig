@@ -2,8 +2,8 @@
  * \file    netx_drv.h
  * \brief   This file contains all the functions prototypes for the peripheral
  *          module driver.
- * $Revision: 11374 $
- * $Date: 2024-06-10 11:07:37 +0300 (Mon, 10 Jun 2024) $
+ * $Revision: 6124 $
+ * $Date: 2019-08-28 19:41:54 +0200 (Mi, 28 Aug 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -144,39 +144,6 @@ __STATIC_FORCEINLINE void DRV_MUTEX_UNLOCK(DRV_MUTEX_T* mutex)
   __DMB();
   mutex->eState = DRV_MUTEX_STATE_UNLOCKED;
   __SEV();
-}
-
-/*!
- * \brief   Try to lock the given mutex
- * \details Checks if the mutex is locked and acquires it. Interrupts are disabled before trying to
- *  acquire the mutex and enabled again afterwards.
- * \memberof DRV_MUTEX_T
- * \param [in]  ptMutex  ptMutex to be locked
- * \return DRV_LOCKED The mutex was locked
- *         DRV_OK  The mutex is locked
- */
-__STATIC_FORCEINLINE DRV_STATUS_E DRV_MUTEX_TRYLOCK_IDE(DRV_MUTEX_T* ptMutex)
-{
-  DRV_STATUS_E result = DRV_LOCKED;
-  (void) DRV_IRQ_Disable();
-  if(DRV_MUTEX_STATE_UNLOCKED == ptMutex->eState)
-  {
-    ptMutex->eState = DRV_MUTEX_STATE_LOCKED;
-    result = DRV_OK;
-  }
-  (void) DRV_IRQ_Enable(); /* DRV_IRQ_Enable() was used instead of __enable_irq() to prevent unwanted behavior when the lock function was called after the interrupts had already been disabled */
-  return result;
-}
-
-/*!
- * \brief   Unlocks the mutex given.
- * \memberof DRV_MUTEX_T
- * \param [in]  ptMutex  ptMutex to be locked
- * \return void
- */
-__STATIC_FORCEINLINE void DRV_MUTEX_UNLOCK_IDE(DRV_MUTEX_T* mutex)
-{
-  mutex->eState = DRV_MUTEX_STATE_UNLOCKED;
 }
 
 /*!

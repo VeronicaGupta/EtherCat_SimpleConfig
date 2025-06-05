@@ -1,17 +1,11 @@
 def build(bld):
-    
-    toolchain = bld.env["UsedToolchain"]
-    if not toolchain:
-        bld.fatal('Environment parameter "UsedToolchain" is not available! Make sure to provide the environment parameter "UsedToolchain" in the root wscript file of your project. e.g.: conf.env["UsedToolchain"] = "gccarmemb"')
-    
-    platform  = bld.env["UsedPlatform"]
-    if not platform:
-        bld.fatal('Environment parameter "UsedPlatform" is not available! Make sure to provide the environment parameter "UsedPlatform" in the root wscript file of your project. e.g.: conf.env["UsedPlatform"]  = "netx90"')
-    
+
+    toolchain   = "gccarmemb"
     comp_prefix = bld.get_name_prefix(
         toolchain = toolchain,
-        platform  = platform)
+        platform  = "netx90")
     
+
 # Component netx_drv ------------------------------------------------------------    
     netx_studio_sources = [
         "Source/netx_drv_dio.c",
@@ -39,23 +33,22 @@ def build(bld):
         name            = comp_prefix + "netx_drv",
         description     = "netx_drv",
         displaygroup    = "Libraries",
-        platform        = platform,
-        toolchain       = toolchain,
+        platform        = "netx90",
+        toolchain       = toolchain, 
         use             = [
                            "CMSIS_sdk",
-                           "netx_drv_configuration_sdk",
+                           "netx90_HostAbstractionLayer_sdk",
                           ],
         source          = netx_studio_sources,
         includes        = includes,
         export_includes = includes,
-        version         = "0.1.5.2"
     )
     
     bld.sdkcomponent(
         name            = "netx_drv_sdk",
         use             = [ 
                            "CMSIS_sdk",
-                           "netx_drv_configuration_sdk",
+                           "netx90_HostAbstractionLayer_sdk"
                            ],
         export_includes = includes,
     )

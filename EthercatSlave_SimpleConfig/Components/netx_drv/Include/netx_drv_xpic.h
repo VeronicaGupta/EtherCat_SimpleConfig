@@ -2,7 +2,7 @@
  * \file     netx_drv_xpic.h
  * \brief     peripheral module driver.
  * $Revision: 4646 $
- * $Date: 2018-12-19 09:47:36 +0200 (Wed, 19 Dec 2018) $
+ * $Date: 2018-12-19 08:47:36 +0100 (Mi, 19 Dez 2018) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an

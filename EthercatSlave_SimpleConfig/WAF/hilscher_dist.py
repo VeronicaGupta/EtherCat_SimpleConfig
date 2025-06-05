@@ -3,19 +3,18 @@
 ########################################################################################
 # Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ########################################################################################
-# $Id: hilscher_dist.py 883 2023-10-24 07:37:36Z AMesser $:
+# $Id:  $:
 #
 # Description:
 # Distribution generation functions
 ########################################################################################
-import waflib.Task
-import waflib.TaskGen
-import waflib.Build
-from waflib import Node, Logs, Utils
+from waflib import Task, Logs, Context, Options, Node, Errors, Utils
 from waflib.Configure import conf
-from waflib.TaskGen import feature, after_method, before_method, taskgen_method
-import os, string
-import time
+from waflib.Build import BuildContext
+from waflib.TaskGen import feature, after_method, before_method
+from waflib.Context import WSCRIPT_FILE
+import shutil
+import time, os, re, sys, string
 
 template_wscript_header = string.Template('''\
 def configure(conf):
@@ -53,26 +52,17 @@ template_wscript_extlib = string.Template('''\
     )
 ''')
 
-class strip(waflib.Task.Task):
-    u''' Strip sections from a file '''
-    color   = 'PINK'
-    log_str = '[STRIP] $SOURCES $TARGETS'
-    run_str = '${STRIP} -o ${TGT} ${STRIPFLAGS} ${SRC}'
-
-
-@waflib.TaskGen.taskgen_method
-def create_strip_debug_task(self, tgen, source, target):
-    ''' Creates a task which will strip debug information from a compiled file '''
-    tsk = tgen.create_task('strip', source, target)
-    tsk.env.STRIPFLAGS = ['--strip-debug']
-    return tsk
-
 @conf
 def distribute_lib(bld, install_path, use , **kw):
     if not getattr(bld,'is_install', False):
         return
 
-    kw.setdefault('wscript_name', 'wscript')
+
+    kw.setdefault('wscript_name',        'wscript')
+    kw.setdefault('include_folder_name', 'Includes')
+    kw.setdefault('lib_folder_name',     'Lib')
+    kw.setdefault('lib_ltd_folder_name', 'Lib_Ltd')
+
     kw.setdefault('dist_includes', [])
 
     # mandatory parameters:
@@ -87,23 +77,27 @@ def distribute_lib(bld, install_path, use , **kw):
     use_usedlibs = Utils.to_list(use)[:] + use_ltd
 
     # generate distribution folder
-    bld(features = 'distribute distribute_lib',
-        hidden_from_list = "Internal",
+    bld(features = ['distribute_lib'],
+        hidden_from_list = True,
         **kw)
 
     # generate libsused file
     bld(name     = '%s/libsused' % install_path,
         target   = 'libsused.txt',
-        features = 'libsused_explicit',
+        features = 'libsused',
         use      = use_usedlibs,
         include_SDK = True,
-        hidden_from_list = "Internal",
+        hidden_from_list = True,
         install_path = '%s/ReleaseNotes/' % install_path)
 
 @conf
 def distribute_firmware(bld, install_path, use , **kw):
     if not getattr(bld,'is_install', False):
         return
+
+    kw.setdefault('include_folder_name', 'Includes')
+    kw.setdefault('firmware_folder_name',     'Firmware')
+    kw.setdefault('firmware_ltd_folder_name', 'Firmware_Ltd')
 
     kw.setdefault('dist_includes', [])
 
@@ -118,142 +112,21 @@ def distribute_firmware(bld, install_path, use , **kw):
     use_usedlibs = list(x for x,p in (use + use_ltd))
 
     # generate distribution folder
-    bld(features = 'distribute distribute_firmware',
-        hidden_from_list = "Internal",
+    bld(features = ['distribute_firmware'],
+        hidden_from_list = True,
         **kw)
 
     # generate libsused file
     bld(name     = '%s/libsused' % install_path,
         target   = 'libsused.txt',
-        features = 'libsused_explicit',
+        features = 'libsused',
         use      = use_usedlibs,
-        hidden_from_list = "Internal",
+        hidden_from_list = True,
         install_path = '%s/ReleaseNotes/' % install_path)
 
-@conf
-def distribute_doc(bld, install_path, use_doc , **kw):
-    if not getattr(bld,'is_install', False):
-        return
-
-    kw.setdefault('dist_includes', [])
-
-    # mandatory parameters:
-    kw['use_doc']      = use_doc[:]
-    kw['install_path'] = install_path
-    kw['name']         = install_path
-
-    bld.check_args(**kw)
-
-    # Do not use Documentation subfolder by default
-    kw.setdefault('doc_folder_name', '')
-
-    # generate distribution folder
-    bld(features = 'distribute',
-        hidden_from_list = "Internal",
-        **kw)
-
-@conf
-def distribute_source(bld, install_path, use_source , **kw):
-    if not getattr(bld,'is_install', False):
-        return
-
-    kw.setdefault('dist_includes', [])
-
-    # mandatory parameters:
-    kw['use_source']   = use_source[:]
-    kw['install_path'] = install_path
-    kw['name']         = install_path
-
-    bld.check_args(**kw)
-
-    # generate distribution folder
-    bld(features = 'distribute_source',
-        hidden_from_list = "Internal",
-        **kw)
-@conf
-def distribute_debug(bld, install_path, use_source , **kw):
-    if not getattr(bld,'is_install', False):
-        return
-
-    kw.setdefault('dist_includes', [])
-
-    # mandatory parameters:
-    kw['use_source']   = use_source[:]
-    kw['install_path'] = install_path
-    kw['name']         = install_path
-
-    bld.check_args(**kw)
-
-    features = ['distribute_source']
-
-    if 'use_debug' in kw:
-        features.append('distribute_debug')
-
-    # generate distribution folder
-    bld(features = features, hidden_from_list = "Internal", **kw)
-
-@feature('distribute', 'distribute_lib', 'distribute_firmware', 'distribute_source')
-def set_default_dist_folders(self):
-    ''' Configure default values for all subfolder names if not provided '''
-    dct = self.__dict__
-
-    dct.setdefault('doc_folder_name',          'Documentation')
-    dct.setdefault('include_folder_name',      'Includes')
-    dct.setdefault('lib_folder_name',          'Lib')
-    dct.setdefault('lib_ltd_folder_name',      'Lib_Ltd')
-    dct.setdefault('firmware_folder_name',     'Firmware')
-    dct.setdefault('firmware_ltd_folder_name', 'Firmware_Ltd')
-    dct.setdefault('source_archive_name',      'Source.zip')
-    dct.setdefault('debug_archive_name',       'Debug.zip')
-
-known_flags = set(Utils.to_list('no_debug_info'))
-
-@taskgen_method
-def dist_iterate_use(self, use):
-    for x in use:
-        subdir_path = None
-        flags = ""
-
-        if isinstance(x,(tuple,list)):
-            try:
-                name, subdir_path, flags = tuple(x)
-            except ValueError:
-                name, subdir_path = tuple(x)
-        else:
-            name = x
-
-        flags = Utils.to_list(flags)
-        tgen = self.bld.get_tgen_by_name(name)
-
-        if not getattr(tgen, 'posted', None):
-            tgen.post()
-
-        unknown_flags = set(flags) - known_flags
-        if unknown_flags:
-            self.wscript_error('Unkown dist flags %r' % (tuple(unknown_flags)))
-
-        yield x, name, subdir_path, tgen, flags
-
-@taskgen_method
-def add_dist_nodes(self, nodes):
-    try:
-        iter(nodes)
-    except TypeError:
-        nodes = [nodes]
-
-    dist_nodes = getattr(self, 'dist_nodes', [])
-    dist_nodes.extend(nodes)
-    self.dist_nodes = dist_nodes
-
-@feature('cprogram', 'cxxprogram')
-@before_method('dist_binary')
-def distribute_program(self):
-    self.add_dist_nodes(self.link_task.outputs[0])
-
 @feature('distribute_lib', 'distribute_firmware')
-@after_method('set_default_dist_folders')
 @before_method('check_tgen_availability')
-def dist_binary(self):
+def distribute_generate_distribution(self):
     bld = self.bld
 
     install_path = Utils.split_path(self.install_path)
@@ -292,13 +165,18 @@ def dist_binary(self):
 
     include_search_paths = []
 
-    for x, name, subdir_path, tgen, flags in self.dist_iterate_use(use + use_ltd):
-        ltd = x in use_ltd
+    for i, x in enumerate(use + use_ltd):
+        ltd = i >= len(use)
 
-        tgen_disabled = getattr(tgen,'tgen_disabled', None)
+        if isinstance(x,(tuple,list)):
+            name, subdir_path = tuple(x)
+        else:
+            name, subdir_path  = x, None
 
-        if tgen_disabled:
-            bld.fatal(u'Target %r not available for distribution: %r' % (tgen.name, tgen_disabled))
+        tgen = self.bld.get_tgen_by_name(name)
+
+        if not getattr(tgen, 'posted', None):
+            tgen.post()
 
         # build list of used task generators
         include_tgen     = [tgen]
@@ -322,28 +200,20 @@ def dist_binary(self):
 
         parts    = tgen.name.split('/')
 
-        # get nodes to distribute
-        dist_nodes   = getattr(tgen,'dist_nodes', [])
-        # init list of destination file names
-        dist_targets = dict( ((x, x.name) for x in dist_nodes))
+        # get distribution nodes
+        dist_nodes = getattr(tgen,'dist_nodes', [])
 
         if getattr(tgen,'SDK', False):
             dst_subdir_parts       = None
         elif set(tgen.features) & set(['fake_lib', 'shlib', 'stlib', 'cshlib', 'cstlib']):
-            link_task = tgen.link_task
-            lib_node = link_task.outputs[0]
+            try:
+                link_task = tgen.link_task
+            except AttributeError:
+                reason = getattr(tgen,'tgen_disabled', None)
+                bld.fatal(u'Library distribution target %r not available or disabled. reason: %r' % (tgen.name, reason))
 
-            if 'no_debug_info' in flags:
-                _, ext = os.path.splitext(lib_node.name)
-                lib_node_stripped = lib_node.change_ext('.stripped' + ext)
-
-                dist_nodes = [lib_node_stripped]
-                dist_targets[lib_node_stripped] = lib_node.name
-
-                self.create_strip_debug_task(tgen, lib_node, lib_node_stripped)
-            elif not dist_nodes:
-                dist_nodes.append(lib_node)
-                dist_targets[lib_node] = lib_node.name
+            if not hasattr(tgen, 'dist_nodes'):
+                dist_nodes.append(link_task.outputs[0])
 
             if ltd:
                 dst_subdir_parts = install_path + [self.lib_ltd_folder_name]
@@ -351,11 +221,7 @@ def dist_binary(self):
                 dst_subdir_parts = install_path + [self.lib_folder_name]
         else:
             if not hasattr(tgen, 'dist_nodes'):
-                Logs.warn('hilscher: trying to distribute tgen %s without dist_nodes' % tgen.name)
-                tgen_target_node = tgen.path.find_or_declare(tgen.target)
-
-                dist_nodes.append(tgen_target_node)
-                dist_targets[tgen_target_node] = tgen_target_node.name
+                dist_nodes.append(tgen.path.find_or_declare(tgen.target))
 
             if ltd:
                 dst_subdir_parts = install_path + [self.firmware_ltd_folder_name]
@@ -363,6 +229,9 @@ def dist_binary(self):
                 dst_subdir_parts = install_path + [self.firmware_folder_name]
 
             include_dist_paths.add(tuple(dst_subdir_parts[:]))
+
+        # init list of destination file names
+        dst_names   = list(x.name for x in dist_nodes)
 
         if 'fake_lib' in tgen.features:
             # an external library is to be distributed with this distribution, extract
@@ -387,7 +256,6 @@ def dist_binary(self):
                 if subdir_path.endswith('/') or subdir_path.endswith('\\'):
                     # subdir_path is a directory:
                     dst_subdir_parts.extend(Utils.split_path(subdir_path))
-                    dst_name = dist_targets[dist_nodes[0]]
                 else:
                     # subdir_path is a file
 
@@ -397,9 +265,9 @@ def dist_binary(self):
                     p = Utils.split_path(subdir_path)
 
                     dst_subdir_parts.extend(p[0:-1])
-                    dst_name = dist_targets[dist_nodes[0]] = p[-1]
+                    dst_names[0] = p[-1]
 
-                    _, ext = os.path.splitext(dst_name.lower())
+                    base, ext = os.path.splitext(dst_names[0].lower())
 
                     if ext not in '.nxi .nxf .nxo .rom'.split():
                         Logs.warn(u'Missing file extension for distribution %s. (Check for missing trailing slash sub-path?)' % ('/'.join(p)))
@@ -408,23 +276,23 @@ def dist_binary(self):
                 libsused_task = getattr(tgen, 'libsused_task', None)
 
                 if libsused_task is not None:
-                    bld.install_as('/'.join( dst_subdir_parts + ['%s_usedlibs.txt' % dst_name]),
+                    bld.install_as('/'.join( dst_subdir_parts + ['%s_usedlibs.txt' % dst_names[0]]),
                                    libsused_task.outputs[0])
 
             elif 'distribute_lib' in self.features:
-                target_triple         = tgen.env['TARGET_TRIPLE'] or 'unkown-none-unknown'
-                toolchain_version = '.'.join(tgen.env['CC_VERSION']) or 'x.x.x'
+                toolchain, toolchain_version, dummy = bld.get_name_prefix(
+                  toolchain = tgen.toolchain,platform  = tgen.platform).split('/', 2)
 
                 if len(parts) not in (3,4):
                     bld.fatal(u'Invalid generator name %s' % tgen.name)
 
-                if parts[0] != target_triple:
+                if parts[0] != toolchain:
                     Logs.warn(u'Unexpected toolchain in generator %s' % tgen.name)
 
                 if parts[1] != toolchain_version:
                     Logs.warn(u'Unexpected toolchain version in generator %s' % tgen.name)
 
-                dst_subdir_parts.extend([target_triple, toolchain_version])
+                dst_subdir_parts.extend([toolchain, toolchain_version])
 
                 if len(parts) == 4:
                     os_label = parts[2]
@@ -440,8 +308,8 @@ def dist_binary(self):
 
         dst_subdir = '/'.join(dst_subdir_parts or [])
 
-        for node in dist_nodes:
-            bld.install_as(dst_subdir + '/' + dist_targets[node], node)
+        for node, n in zip(dist_nodes,dst_names):
+            bld.install_as(dst_subdir + '/' + n, node)
 
         if 'distribute_lib' in self.features:
             tsk.set_inputs(dist_nodes)
@@ -476,134 +344,7 @@ def dist_binary(self):
             dst_path_parts = list(y) +  [self.include_folder_name] + Utils.split_path(subdir_path)
             bld.install_files('/'.join(dst_path_parts), [include_node])
 
-@feature('distribute')
-@after_method('set_default_dist_folders')
-@before_method('check_tgen_availability')
-def dist_doc(self):
-    bld = self.bld
-    use_doc = self.to_list(getattr(self, 'use_doc', []))
-
-    install_path = Utils.split_path(self.install_path)
-
-    for x, name, subdir_path, tgen, flags in self.dist_iterate_use(use_doc):
-        dist_nodes = getattr(tgen,'dist_nodes', [])
-
-        dst_subdir_parts = install_path + [self.doc_folder_name]
-
-        # init list of destination file names
-        dst_names   = list(x.name for x in dist_nodes)
-
-        if subdir_path is not None:
-            if subdir_path.endswith('/') or subdir_path.endswith('\\'):
-                # subdir_path is a directory:
-                dst_subdir_parts.extend(Utils.split_path(subdir_path))
-            else:
-                # subdir_path is a file
-                if len(dist_nodes) > 1:
-                    bld.fatal(u'Can not distribute multiple targets to single filename for %r' % tgen.name)
-
-                p = Utils.split_path(subdir_path)
-
-                dst_subdir_parts.extend(p[0:-1])
-                dst_names[0] = p[-1]
-
-        dst_subdir = '/'.join(dst_subdir_parts or [])
-
-        for node, n in zip(dist_nodes, dst_names):
-            bld.install_as(dst_subdir + '/' + n, node)
-
-@feature('distribute_source')
-@after_method('set_default_dist_folders')
-@before_method('check_tgen_availability')
-def dist_source(self):
-    bld = self.bld
-
-    use_source = self.to_list(self.use_source)
-
-    install_path = Utils.split_path(self.install_path)
-
-    source_nodes = []
-
-    scanned_deps = []
-
-    for x, name, subdir_path, tgen, flags in self.dist_iterate_use(use_source):
-        compiled_tasks = getattr(tgen,'compiled_tasks',[])[:]
-
-        for _, _, _, tgen2, _ in self.dist_iterate_use(tgen.use):
-            compiled_tasks.extend(getattr(tgen2,'compiled_tasks',[]))
-
-        # Add c-files to zip
-        source_nodes.extend(t.inputs[0] for t in compiled_tasks)
-
-        # remind the tasks to scan later for dependencies
-        # of the c files
-        scanned_deps.append((tgen, compiled_tasks))
-
-
-    source_paths = dict((n, n.path_from(bld.srcnode)) for n in source_nodes)
-
-    tsk = self.install_zip(self.source_archive_name, source_paths)
-
-    if tsk:
-        def scan_deps_late(scanned_deps = scanned_deps):
-            ''' Scan for header files after the compiled tasks had been run'''
-            source_nodes = []
-
-            for tgen, compiled_tasks in scanned_deps:
-                deps = set()
-
-                # Get a list of all dependencies of compiled objects (e.g. header files)
-                for x in compiled_tasks:
-                    deps.update(set(bld.node_deps[x.uid()]))
-
-                # Add headers in component to zip
-                source_nodes.extend([n for n in deps if n.is_child_of(tgen.path)])
-
-            tsk.inputs.extend(source_nodes)
-
-            for n in source_nodes:
-                tsk.install_paths[n] = n.path_from(bld.srcnode)
-
-            return (source_nodes, time.time())
-
-        tsk.scan = scan_deps_late
-
-@feature('distribute_debug')
-@after_method('set_default_dist_folders')
-@before_method('check_tgen_availability')
-def dist_debug(self):
-    bld = self.bld
-
-    use_debug = self.to_list(self.use_debug)
-
-    debug_nodes = []
-
-    for _, _, _, tgen, _ in self.dist_iterate_use(use_debug):
-        debug_tgen     = [tgen]
-
-        for y in Utils.to_list(getattr(tgen,'use',[])):
-            debug_tgen.append(bld.get_tgen_by_name(y))
-
-        for y in debug_tgen:
-            # collect debug nodes for distribution
-            debug_nodes.extend(getattr(y, 'dist_debug_nodes', []))
-
-    debug_paths = dict((n, n.path_from(bld.bldnode)) for n in debug_nodes)
-
-    self.install_zip(self.debug_archive_name, debug_paths)
-
-@taskgen_method
-def install_zip(self, dest, srcmap):
-    install_path = Utils.split_path(self.install_path)
-
-    ''' Install a zip file generated from provided source mapping '''
-    if self.bld.is_install:
-        tsk = self.create_task('inst_zip', srcmap.keys(), [])
-        tsk.dest = '/'.join(install_path + [dest])
-        tsk.install_paths = srcmap
-        return tsk
-
-class distribute_generate_wscript(waflib.Task.Task):
+class distribute_generate_wscript(Task.Task):
     u''' Generate wscript in distribution folder '''
     log_str   = "[WSCRIPT] $TARGET"
     color     = 'PINK'
@@ -659,33 +400,7 @@ class distribute_generate_wscript(waflib.Task.Task):
                 fh.write(separator + tmpl.substitute(dct))
                 separator = '\n'
 
-class inst_zip(waflib.Build.inst):
-    u''' Generate a zip file during install '''
-    color     = 'PINK'
-    inst_to   = None
-    cmdline   = None
-
-    def run(self):
-        import zipfile
-
-        input_nodes   = self.inputs
-        install_paths = self.install_paths
-
-        zip_path = self.get_install_path()
-
-        d = os.path.dirname(zip_path)
-        try:
-            os.makedirs(d)
-        except:
-            pass
-
-        Logs.info('+ install_zip %s' % (os.path.relpath(zip_path, self.generator.bld.srcnode.abspath())))
-
-        with zipfile.ZipFile(self.get_install_path(), mode = 'w', compression=zipfile.ZIP_DEFLATED) as zfile:
-            for i in input_nodes:
-                zfile.write(i.abspath(), install_paths[i])
-
-class distribute_generate_debug(waflib.Task.Task):
+class distribute_generate_debug(Task.Task):
     u''' Generate debug information in distribution folder '''
     log_str   = "[DEBUGZIP] $TARGETS"
     color     = 'PINK'
@@ -704,54 +419,3 @@ class distribute_generate_debug(waflib.Task.Task):
         with zipfile.ZipFile(output_node.abspath(), mode = 'w', compression=zipfile.ZIP_DEFLATED) as zfile:
             for i in input_nodes:
                 zfile.write(i.abspath(), install_paths[i])
-
-class HilscherInstallContext(waflib.Build.InstallContext):
-    def install_files(self, dest, files, env=None, chmod=Utils.O644, relative_trick=False, cwd=None, add=True, postpone=True):
-        """
-        Create a task to install files on the system::
-
-            def build(bld):
-                bld.install_files('${DATADIR}', self.path.find_resource('wscript'))
-
-        :param dest: absolute path of the destination directory
-        :type dest: string
-        :param files: input files
-        :type files: list of strings or list of nodes
-        :param env: configuration set for performing substitutions in dest
-        :type env: Configuration set
-        :param relative_trick: preserve the folder hierarchy when installing whole folders
-        :type relative_trick: bool
-        :param cwd: parent node for searching srcfile, when srcfile is not a :py:class:`waflib.Node.Node`
-        :type cwd: :py:class:`waflib.Node.Node`
-        :param add: add the task created to a build group - set ``False`` only if the installation task is created after the build has started
-        :type add: bool
-        :param postpone: execute the task immediately to perform the installation
-        :type postpone: bool
-        """
-        tsk = waflib.Build.inst(env=env or self.env)
-        tsk.bld = self
-        tsk.path = cwd or self.path
-        tsk.chmod = chmod
-
-        if isinstance(files, Node.Node):
-            files =  [files]
-        else:
-            files = Utils.to_list(files)
-
-            for f in files:
-                if not isinstance(f, Node.Node):
-                    node = self.path.find_node(f)
-
-                    if not node:
-                        self.fatal("File %s does not exist (%s/wscript)" % (f,self.path.relpath()));
-
-            files = list((f if isinstance(f, Node.Node) else self.path.find_node(f)) for f in files)
-
-        tsk.source = files
-        tsk.dest = dest
-        tsk.exec_task = tsk.exec_install_files
-        tsk.relative_trick = relative_trick
-        if add: self.add_to_group(tsk)
-        self.run_task_now(tsk, postpone)
-        return tsk
-

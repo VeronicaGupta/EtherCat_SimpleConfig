@@ -1,12 +1,12 @@
 /*!************************************************************************//*!
  * \file     netx_drv_cortex.c
  * \brief    CORTEX peripheral module driver.
- *           This file provides firmware functions to manage the following
+ *           This file provides firmware functions to manage the following 
  *           functionalities of the CORTEX:
  *            + Initialization and de-initialization functions
- *            + Peripheral Control functions
- * $Revision: 11376 $
- * $Date: 2024-06-12 15:33:14 +0300 (Wed, 12 Jun 2024) $
+ *            + Peripheral Control functions 
+ * $Revision: 6914 $
+ * $Date: 2020-03-03 10:20:25 +0100 (Di, 03 Mrz 2020) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -79,7 +79,7 @@ void DRV_NVIC_DisableIRQ(IRQn_Type IRQn)
 /*!
  * Semaphore value for nested enabling/disabling of all interrupts.
  */
-unsigned int ulIrqSemaphore = 0;
+int ulIrqSemaphore = 0;
 
 /*!
  *
@@ -210,7 +210,7 @@ int32_t DRV_ITM_CheckChar(void)
  */
 uint32_t DRV_ITM_SendChar(uint32_t ch)
 {
-  return ITM_SendChar(ch);
+  return DRV_ITM_SendChar(ch);
 }
 
 /*! Change CPU state to running.
@@ -227,14 +227,16 @@ DRV_STATUS_E DRV_MCP_ChangeState(DRV_MCP_CPU_ID_E eCpuId, DRV_MCP_CPU_STATE_E fR
   }
   switch (fRunning)
   {
-  case DRV_MCP_CPU_STATE_RESET:
-    DRV_MCP_DEVICE->hs_irq_reset_raw |= 0x1u << (eCpuId * 3);
-    break;
   case DRV_MCP_CPU_STATE_RUNNING:
-    DRV_MCP_DEVICE->hs_irq_set_raw |= 0x1u << (eCpuId * 3);
-    break;
+    (void) DRV_IRQ_Disable();
+    DRV_MCP_DEVICE->hs_irq_reset_raw &= ~(0x3u << (eCpuId * 3));
+    DRV_MCP_DEVICE->hs_irq_reset_raw |= 0x1u << (eCpuId * 3);
+    (void) DRV_IRQ_Enable();
   case DRV_MCP_CPU_STATE_RESET_REQUEST:
-    DRV_MCP_DEVICE->hs_irq_set_raw |= 0x2u << (eCpuId * 3);
+    (void) DRV_IRQ_Disable();
+    DRV_MCP_DEVICE->hs_irq_reset_raw &= ~(0x3u << (eCpuId * 3));
+    DRV_MCP_DEVICE->hs_irq_reset_raw |= 0x2u << (eCpuId * 3);
+    (void) DRV_IRQ_Enable();
     break;
   default:
     return DRV_ERROR_PARAM;
@@ -243,56 +245,25 @@ DRV_STATUS_E DRV_MCP_ChangeState(DRV_MCP_CPU_ID_E eCpuId, DRV_MCP_CPU_STATE_E fR
   return DRV_OK;
 }
 
-static DRV_CALLBACK_F s_afnMCPCallbacks[DRV_MCP_CPU_COUNT];
-static void* s_apMCPCallbacksUserPointer[DRV_MCP_CPU_COUNT];
-
-void MCP_IRQHandler(void)
-{
-  uint32_t ulIRQRegister = DRV_MCP_DEVICE->hs_irq_set_raw;
-  for(size_t index = 0; index < DRV_MCP_CPU_COUNT; index++)
-  {
-    if((ulIRQRegister & (0x1u << (index * 3u))) == 1)
-    {
-      s_afnMCPCallbacks[index](NULL, s_apMCPCallbacksUserPointer[index]);
-    }
-  }
-}
-
 /*! Get CPU state information.
  *
  *  \return Current MCP value
  */
-DRV_STATUS_E DRV_MCP_GetState(DRV_MCP_CPU_ID_E eCpuId, DRV_MCP_CPU_STATE_E* epState)
+DRV_MCP_CPU_STATE_E DRV_MCP_GetState(DRV_MCP_CPU_ID_E eCpuId)
 {
   if(eCpuId >= DRV_MCP_CPU_ID_MAX || eCpuId < DRV_MCP_CPU_ID_COM)
   {
     return DRV_ERROR_PARAM;
   }
-  *epState = (DRV_MCP_CPU_STATE_E)(DRV_MCP_DEVICE->hs_irq_reset_raw >> (eCpuId * 3) & 0x7u);
-  return DRV_OK;
-}
-
-/*! Attaches the given values as interrupt callback and user pointer.
- *
- * If a NULL pointer is given, the interrupt is masked out.
- * A call to this function will mask in the MCP IRQ.
- * The MCP interrupt is never disabled again.
- *
- *  \return void
- */
-void DRV_MCP_IRQAttach(DRV_MCP_CPU_ID_E eCpuId, DRV_CALLBACK_F pfnUserClb, void* pvUser)
-{
-  DRV_NVIC_EnableIRQ(mcp_app_IRQn);
-  s_afnMCPCallbacks[eCpuId] = pfnUserClb;
-  s_apMCPCallbacksUserPointer[eCpuId] = pvUser;
-  if(pfnUserClb != NULL)
+  if(DRV_MCP_DEVICE->hs_irq_reset_raw & 0x1u << (eCpuId * 3))
   {
-    DRV_MCP_DEVICE->hs_irq_set_mask = 0x2u << (eCpuId * 3);
+    return DRV_MCP_CPU_STATE_RUNNING;
   }
-  else
+  if(DRV_MCP_DEVICE->hs_irq_reset_raw & 0x2u << (eCpuId * 3))
   {
-    DRV_MCP_DEVICE->hs_irq_reset_mask = 0x2u << (eCpuId * 3);
+    return DRV_MCP_CPU_STATE_RESET_REQUEST;
   }
+  return DRV_MCP_CPU_STATE_UNDEFINED;
 }
 
 /*! \} *//* End of group CORTEX */

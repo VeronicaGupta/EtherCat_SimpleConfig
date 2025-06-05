@@ -5,8 +5,8 @@
  *           functionalities of timer peripheral:
  *            + Initialization and de-initialization functions
  *            + Timer operation functions
- * $Revision: 11390 $
- * $Date: 2024-06-27 17:45:36 +0300 (Thu, 27 Jun 2024) $
+ * $Revision: 5388 $
+ * $Date: 2019-05-02 09:43:11 +0200 (Do, 02 Mai 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -101,10 +101,6 @@ static volatile uint32_t s_apTIMIrqCntr[DRV_TIM_IRQ_COUNT] = { 0 };
  * The device specified in the handle will be initialized and configured after the given attributes.
  * If the interrupt or dma method is chosen, the nvic and dmac is also configured.
  *
- * In case of an error during initialization, the function returns an error value, but the lock for the handle, will not be released.
- * Together with the return value, this will ensure that the driver can only be interacted with if it has been correctly initialized.
- * Since the lock is initialized when this function is called, this function can still be called again with other parameters after a failed initialization.
- *
  * \param[in,out] ptTim pointer to a DRV_TIM_HANDLE_T structure.
  * \return Driver status
  */
@@ -123,7 +119,7 @@ DRV_STATUS_E DRV_TIM_Init(DRV_TIM_HANDLE_T * const ptTim)
   {
     ret = DRV_NSUPP;
   }
-  else if(ptTim->tConfiguration.eOperationMode > DRV_OPERATION_MODE_DMA)
+  if(ptTim->tConfiguration.eOperationMode > DRV_OPERATION_MODE_DMA)
   {
     ret = DRV_ERROR_PARAM;
   }
@@ -143,8 +139,8 @@ DRV_STATUS_E DRV_TIM_Init(DRV_TIM_HANDLE_T * const ptTim)
     {
       return DRV_ERROR_PARAM;
     }
-    ptTim->ulSubID = (uint32_t) ptTim->tConfiguration.eDeviceID - (uint32_t) DRV_TIM_DEVICE_ID_GPIOCNTR_MIN;
     s_apTIMIrqCntr[DRV_TIM_IRQ_GPIOTIM0 + ptTim->ulSubID] = 0;
+    ptTim->ulSubID = (uint32_t) ptTim->tConfiguration.eDeviceID - (uint32_t) DRV_TIM_DEVICE_ID_GPIOCNTR_MIN;
     ptTim->ptDevice.ptGpio = DRV_GPIO_DEVICE;
     ptTim->ptDevice.ptGpio->gpio_app_counter_ctrl_b[ptTim->ulSubID].event_act = ptTim->tConfiguration.eExternalEventMode;
     ptTim->ptDevice.ptGpio->gpio_app_counter_ctrl_b[ptTim->ulSubID].gpio_ref = ptTim->tConfiguration.eDioIdInputReference;
@@ -187,8 +183,8 @@ DRV_STATUS_E DRV_TIM_Init(DRV_TIM_HANDLE_T * const ptTim)
     {
       return DRV_ERROR_PARAM;
     }
-    ptTim->ulSubID = (uint32_t) ptTim->tConfiguration.eDeviceID - (uint32_t) DRV_TIM_DEVICE_ID_TIMER_MIN;
     s_apTIMIrqCntr[DRV_TIM_IRQ_TIMER0 + ptTim->ulSubID] = 0;
+    ptTim->ulSubID = (uint32_t) ptTim->tConfiguration.eDeviceID - (uint32_t) DRV_TIM_DEVICE_ID_TIMER_MIN;
     ptTim->ptDevice.ptTimer = DRV_TIMER_DEVICE;
     if(ptTim->tConfiguration.eOperationMode == DRV_OPERATION_MODE_POLL && ptTim->tConfiguration.eCountingMode == DRV_TIM_COUNTING_MODE_CONTINUOUS)
     {
@@ -229,7 +225,6 @@ DRV_STATUS_E DRV_TIM_Init(DRV_TIM_HANDLE_T * const ptTim)
   }
   else if(ptTim->tConfiguration.eDeviceID == DRV_TIM_DEVICE_ID_SYSTICK)
   {
-    ptTim->ulSubID = 0;
     s_apTIMIrqCntr[DRV_TIM_IRQ_SYSTICK + ptTim->ulSubID] = 0;
     if((ptTim->tConfiguration.tPreloadValue - 1UL) > 0x00FFFFFF)
     {
@@ -253,7 +248,6 @@ DRV_STATUS_E DRV_TIM_Init(DRV_TIM_HANDLE_T * const ptTim)
   }
   else if(ptTim->tConfiguration.eDeviceID >= DRV_TIM_DEVICE_ID_SYSTIME_MIN && ptTim->tConfiguration.eDeviceID <= DRV_TIM_DEVICE_ID_SYSTIME_MAX)
   {
-    ptTim->ulSubID = 0;
     s_apTIMIrqCntr[DRV_TIM_IRQ_SYSTICK + ptTim->ulSubID] = 0;
     ptTim->ptDevice.ptSystimlt = (DRV_SYSTIME_LT_DEVICE_T*) DRV_SYSTIME_LT_DEVICE;
     ret = DRV_OK;
@@ -763,7 +757,6 @@ DRV_STATUS_E DRV_TIM_Wait(DRV_TIM_HANDLE_T * const ptTim, uint32_t ulTickCnt)
   }
   if(ptTim->eState != DRV_TIM_STATE_RUNNING)
   {
-    DRV_UNLOCK(ptTim);
     return DRV_ERROR;
   }
   if(ulTickCnt == 0)
@@ -967,14 +960,14 @@ DRV_STATUS_E DRV_TIM_ChannelSetThreshold(DRV_TIM_HANDLE_T * const ptTim, DRV_DIO
 }
 
 /*!
- * This function gets the threshold/capture of a digital input output channel. It is used if the
+ * This function sets the threshold capture of a digital input output channel. It is used if the
  * specified channel is in Blink, PWM, PWM2 or capture mode.
  *
  * \memberof DRV_TIM_HANDLE_T
  * \public
  * \param[in,out] ptTim pointer to a DRV_TIM_HANDLE_T structure.
- * \param[in] ulChannelID  The id of the channel to be read
- * \param[out] ulValue     The captured counter value used as reference
+ * \param[in] ulChannelID  The id of the channel to be configured
+ * \param[in] ulValue     The counter used as reference
  * \return An error code describing the current status of the driver.
  */
 DRV_STATUS_E DRV_TIM_ChannelGetCapture(DRV_TIM_HANDLE_T * const ptTim, DRV_DIO_ID_T ulChannelID, uint32_t * const ulValue)
@@ -1525,7 +1518,7 @@ __WEAK void DRV_TIM_SYSTIME_COMPARE_Callback(void)
  * \brief  This function handles interrupts requests.
  * \return None
  */
-void DRVSysTick_Handler(void)
+void SysTick_Handler(void)
 {
   s_apTIMIrqCntr[DRV_TIM_IRQ_SYSTICK]++;
   DRV_TIM_ARMSYSTICK_Callback();

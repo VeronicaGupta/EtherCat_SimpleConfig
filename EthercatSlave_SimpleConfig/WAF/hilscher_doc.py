@@ -8,23 +8,12 @@
 # Description:
 # waf support for building documentations
 ########################################################################################
-from waflib.TaskGen import feature, after_method, before_method
-from waflib.Configure import conf
-from waflib import Utils, Task, Logs
-from waflib import Build, Context
 
+from waflib.Configure import conf
+from waflib import Utils, Task
 import re
 import os
 import shlex
-
-# Define a flag property to control if documentation shall be build
-def build_documentation(self):
-    return self.is_install or self.cmd == 'doc'
-Context.Context.build_documentation = property(build_documentation)
-
-class DocumentationContext(Build.BuildContext):
-  '''Build & Generate documentation'''
-  cmd = 'doc'
 
 def configure(conf):
     # change to parent environment object
@@ -54,26 +43,6 @@ def configure(conf):
     if ret:
         conf.env['PLANTUML'] = ret
 
-def get_doxygen_boolean(doxygen_params, key):
-    val = doxygen_params.get(key,'NO').lower()
-    return val in ('true', 'yes')
-
-def get_doxygen_outputs(doxyfile_node, doxygen_params):
-    doxygen_output_nodes = []
-
-    output_dir_node = doxyfile_node.parent.declare_node(doxygen_params['OUTPUT_DIRECTORY'])
-
-    if get_doxygen_boolean(doxygen_params, 'GENERATE_HTMLHELP'):
-        # add chm node to outputs
-        chm_node = output_dir_node.declare_node(doxygen_params['HTML_OUTPUT']).declare_node(doxygen_params['CHM_FILE'])
-        doxygen_output_nodes.append(chm_node)
-
-    if get_doxygen_boolean(doxygen_params, 'GENERATE_XML'):
-        # add xml node to outputs
-        xml_node = output_dir_node.declare_node(doxygen_params['XML_OUTPUT']).declare_node('index.xml')
-        doxygen_output_nodes.append(xml_node)
-
-    return doxygen_output_nodes
 
 
 re_match_doxysetting = re.compile(r'^\s*(?P<parameter>\S+)\s*(?P<operator>[+]?=)\s+(?P<value>\S.*)$').match
@@ -120,29 +89,28 @@ class doxygen(Task.Task):
         RTF_STYLESHEET_FILE
         TAGFILES
         WARN_LOGFILE
-        USE_MDFILE_AS_MAINPAGE
     '''.split())
 
-
     def translate_paths(self, parameter, value):
+        bld           = self.bld
         doxyfile_node = self.inputs[0]
 
         for p in shlex.split(value, posix=False):
             node = doxyfile_node.parent.find_node(p)
 
             if node is None:
-                raise self.generator.bld.fatal('Path %r given in parameter %s not found' % (p, parameter))
+                bld.fatal('Path %r given in parameter %s not found' % (p, parameter))
 
             yield node.abspath()
 
     def run(self):
+        bld     = self.bld
         env     = self.env
         inputs  = self.inputs
         outputs = self.outputs
 
         doxyfile_node                           = inputs[0]
         mangled_doxyfile_node, output_dir_node  = outputs[0:2]
-        doxygen_output_nodes = outputs[2:]
 
         doxyfile_content = doxyfile_node.read()
 
@@ -158,7 +126,9 @@ class doxygen(Task.Task):
                 parameter, operator, value = m.group('parameter', 'operator', 'value')
 
                 if value.strip():
-                    if parameter in self.path_parameter_names:
+                    if parameter == 'OUTPUT_DIRECTORY':
+                        doxyfile_content += '\nOUTPUT_DIRECTORY = "%s"\n' % output_dir_node.abspath()
+                    elif parameter in self.path_parameter_names:
 
                         # enforce the first parameter occurence to be an '=' to clear all old settings
                         if parameter not in first:
@@ -168,12 +138,8 @@ class doxygen(Task.Task):
                         paths = list(self.translate_paths(parameter, value))
                         doxyfile_content += '\n%s %s %s\n' % (parameter, operator, ' '.join('"%s"' % x for x in paths))
 
-        # enforce output directory
-        doxyfile_content += '\nOUTPUT_DIRECTORY = "%s"\n' % output_dir_node.abspath()
-
         # enforce hhc enabled
-        if env['HTMLHELPC']:
-            doxyfile_content += '\nHHC_LOCATION = "%s"\n' % env['HTMLHELPC']
+        doxyfile_content += '\nHHC_LOCATION = "%s"\n' % env['HTMLHELPC']
 
         # set plantuml if found
         if env['PLANTUML']:
@@ -184,9 +150,6 @@ class doxygen(Task.Task):
 
         env.stash()
         try:
-            for x in doxygen_output_nodes:
-                x.parent.mkdir()
-
             self.inputs = [mangled_doxyfile_node]
             self.run_doxygen()
         finally:
@@ -206,103 +169,8 @@ pattern_doxygen_input = """
 
 
 @conf
-def parse_doxyfile(bld, doxyfile_node, base_path):
-    doxyfile_content = doxyfile_node.read()
-
-    doxygen_params = {
-        'OUTPUT_DIRECTORY' : base_path.path_from(doxyfile_node)
-    }
-
-    for line in doxyfile_content.splitlines():
-        lhs, _, _ = line.partition('#')
-
-        m = re_match_doxysetting(lhs)
-
-        if m:
-            parameter, operator, value = m.group('parameter', 'operator', 'value')
-            doxygen_params[parameter] = value
-
-    return doxygen_params
-
-@feature('doxygen')
-def process_source_doxygen(self):
-    bld = self.bld
-
-    doxyfile_nodes = [self.find_resource(x) for x in self.source_doxygen]
-
-    if not self.env['DOXYGEN']:
-        bld.fatal(u'Doxygen not available')
-
-    targets_doxygen = self.targets_doxygen = []
-
-    for doxyfile_node in doxyfile_nodes:
-        # Dont create a new task if we already have a generator
-        if hasattr(doxyfile_node, '_doxygen_output_nodes'):
-            targets_doxygen.extend(doxyfile_node._doxygen_output_nodes)
-            continue
-
-        doxygen_input_nodes  = []
-
-        # parse doxyfile
-        doxygen_params = bld.parse_doxyfile(doxyfile_node, base_path = self.path)
-
-        input = doxygen_params.pop('INPUT')
-        for x in shlex.split(input, posix=False):
-            n = doxyfile_node.parent.find_node(x)
-
-            if n is None:
-                self.file_error(u'Doxygen include path %r not found' % x, doxyfile_node)
-
-            doxygen_input_nodes.append(n)
-
-        # build-dir must be declared before output_dir_node (Don't ask me why)
-        build_dir_node = bld.root.make_node(bld.out_dir).make_node('Documentation')
-
-        output_dir_node = doxyfile_node.parent.make_node(doxygen_params['OUTPUT_DIRECTORY'])
-
-        doxygen_output_nodes = get_doxygen_outputs(doxyfile_node, doxygen_params)
-
-        # Lets check if another documentation command was issued with same
-        # output directory
-        doxygen_output_dirs = bld._doxygen_output_dirs = getattr(bld,'_doxygen_output_dirs', {})
-
-        for x in doxygen_output_nodes:
-            if x in doxygen_output_dirs:
-                self.file_error(u'doxygen output directory %r already defined in %r' %
-                        (x.nice_path(), doxygen_output_dirs[x].nice_path()), doxyfile_node)
-
-            doxygen_output_dirs[x] = doxyfile_node
-
-        mangled_doxyfile_node = doxyfile_node.get_bld()
-
-        if not output_dir_node.is_child_of(build_dir_node):
-            self.warn(u'Doxygen output directory not below build/Documentation', doxyfile_node)
-
-        # make a list of files which might regarded as input by doxygen
-        patterns = list('**/%s' % x for x in pattern_doxygen_input)
-
-        def get_file_list(x):
-            if os.path.isdir(x.abspath()):
-                return x.ant_glob(patterns)
-            else:
-                return [x]
-
-        potential_source_nodes = sum((get_file_list(n) for n in doxygen_input_nodes),[])
-
-        self.create_task('doxygen',
-          [doxyfile_node] + potential_source_nodes,
-          [mangled_doxyfile_node, output_dir_node] + doxygen_output_nodes,
-        )
-
-        doxyfile_node._doxygen_output_nodes = doxygen_output_nodes
-        targets_doxygen.extend(doxygen_output_nodes)
-
-        if bld.is_install and ('install_path' in self.__dict__):
-            bld.install_files(self.install_path, doxygen_output_nodes)
-
-@conf
 def generate_doxygen_documentation(bld, doxyfile, **kw):
-    doxyfile_node = bld.path.find_node(doxyfile)
+    doxyfile_node = bld.path.find_resource(doxyfile)
 
     if not doxyfile_node:
         bld.fatal('Doxyfile %r not found' % doxyfile)
@@ -310,8 +178,62 @@ def generate_doxygen_documentation(bld, doxyfile, **kw):
     if not bld.env['DOXYGEN']:
         return
 
-    bld(features='doxygen',
-        source_doxygen = [doxyfile_node],
-        **kw
-    )
+    doxyfile_content = doxyfile_node.read()
+    doxygen_input_nodes  = []
+    doxygen_output_nodes = []
+
+    # parse doxyfile and fix paths
+    doxygen_params = {}
+    for line in doxyfile_content.splitlines():
+        lhs, _, _ = line.partition('#')
+
+        m = re_match_doxysetting(lhs)
+
+        if m:
+            parameter, operator, value = m.group('parameter', 'operator', 'value')
+
+            if parameter == 'INPUT':
+                nodes = []
+                for x in shlex.split(value, posix=False):
+                    n = doxyfile_node.parent.find_node(x)
+
+                    if n is None:
+                        bld.fatal(u'Doxygen include path %r not found' % x)
+
+                    doxygen_input_nodes.append(n)
+            else:
+                doxygen_params[parameter] = value
+
+    output_dir_node = doxyfile_node.parent.find_or_declare(doxygen_params['OUTPUT_DIRECTORY']).get_src()
+
+    def get_doxygen_boolean(key):
+        val = doxygen_params.get(key,'NO').lower()
+        return val in ('true', 'yes')
+
+    if get_doxygen_boolean('GENERATE_HTMLHELP'):
+        # add chm node to outputs
+        chm_node = output_dir_node.find_or_declare(doxygen_params['HTML_OUTPUT']).find_or_declare(doxygen_params['CHM_FILE']).get_src()
+        doxygen_output_nodes.append(chm_node)
+
+    # doxyfile will be mangled for processing to contain proper paths when called by waf
+    mangled_doxyfile_node = output_dir_node.find_or_declare('Doxyfile').get_src()
+
+    # make a list of files which might regarded as input by doxygen
+    patterns = list('**/%s' % x for x in pattern_doxygen_input)
+
+    def get_file_list(x):
+        if os.path.isdir(x.abspath()):
+            return x.ant_glob(patterns)
+        else:
+            return [x]
+
+    potential_source_nodes = sum((get_file_list(n) for n in doxygen_input_nodes),[])
+
+    tsk = doxygen(env=bld.env)
+    tsk.set_inputs([doxyfile_node] + potential_source_nodes)
+    tsk.set_outputs([mangled_doxyfile_node, output_dir_node] + doxygen_output_nodes)
+    bld.add_to_group(tsk)
+
+    if bld.is_install and ('install_path' in kw):
+        bld.install_files(kw['install_path'], doxygen_output_nodes)
 

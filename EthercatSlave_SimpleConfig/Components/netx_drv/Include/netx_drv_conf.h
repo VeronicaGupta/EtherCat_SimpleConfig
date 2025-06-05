@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    netx_drv_conf.h
  * \brief   DRV configuration file.
- * $Revision: 11367 $
- * $Date: 2024-06-04 14:42:49 +0300 (Tue, 04 Jun 2024) $
+ * $Revision: 6592 $
+ * $Date: 2019-12-17 14:14:57 +0100 (Di, 17 Dez 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -64,7 +64,7 @@ extern "C"
 
 #ifndef DRV_DMAC_LIST_LENGTH
 /*!
- * \brief Length of the list used for dma. For 4092 copys by 1 or 4 byte an element is needed.
+ * \brief Length of the list used for dma. For 4095 copys by 1 or 4 byte an element is needed.
  */
 #define DRV_DMAC_LIST_LENGTH 1u
 #endif
@@ -78,7 +78,7 @@ extern "C"
  "is responsible to ensure that the locking mechanism is functional. This"\
  "warning can be ignored by defining RTOS_ERROR_IGNORE."
 #endif
-void DRVSysTick_Handler(void);
+
 #else
 
 /*!
@@ -104,27 +104,12 @@ void DRVSysTick_Handler(void);
 /*!
  * \brief A function calling the trylock of the mutex and returning locked in case it is blocked.
  */
-#ifdef DRV_LOCK_USE_LDREX_STREX
-/* Use lock implementation with LDREX/STREX instructions */
 #define DRV_LOCK(__HANDLE__) if(DRV_MUTEX_TRYLOCK(&(__HANDLE__)->tLock)!=DRV_OK){return DRV_LOCKED;}
-#else
-/* Use lock implementation with interrupt disabling and without LDREX/STREX instructions */
-#define DRV_LOCK(__HANDLE__) if(DRV_MUTEX_TRYLOCK_IDE(&(__HANDLE__)->tLock)!=DRV_OK){return DRV_LOCKED;}
-#endif
 
 /*!
  * \brief The release function used.
  */
-#ifdef DRV_LOCK_USE_LDREX_STREX
 #define DRV_UNLOCK(__HANDLE__) DRV_MUTEX_UNLOCK(&(__HANDLE__)->tLock)
-#else
-#define DRV_UNLOCK(__HANDLE__) DRV_MUTEX_UNLOCK_IDE(&(__HANDLE__)->tLock)
-#endif
-
-/*!
- * \brief Use the CMSIS standard systick handler in case no RTOS is used.
- */
-#define DRVSysTick_Handler SysTick_Handler
 
 #endif /* RTOS_USED */
 

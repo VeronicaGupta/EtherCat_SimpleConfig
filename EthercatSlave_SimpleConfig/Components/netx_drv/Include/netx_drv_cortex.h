@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    netx_drv_cortex.h
  * \brief   Header file of CORTEX module.
- * $Revision: 11494 $
- * $Date: 2024-08-14 13:30:42 +0300 (Wed, 14 Aug 2024) $
+ * $Revision: 6914 $
+ * $Date: 2020-03-03 10:20:25 +0100 (Di, 03 Mrz 2020) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -43,7 +43,7 @@ extern "C"
  */
 typedef enum DRV_MCP_CPU_STATE_Etag
 {
-  DRV_MCP_CPU_STATE_RESET = 0,/*!< Defines the state that the core is running.*/
+  DRV_MCP_CPU_STATE_UNDEFINED = 0,/*!< Defines the state where the device is in reset.*/
   DRV_MCP_CPU_STATE_RUNNING,/*!< Defines the state that the core is running.*/
   DRV_MCP_CPU_STATE_RESET_REQUEST,/*!< Defines the state that the core is ready for reset.*/
 } DRV_MCP_CPU_STATE_E;
@@ -52,7 +52,7 @@ typedef enum DRV_MCP_CPU_STATE_Etag
 /*!
  * \brief Semaphore value for nested enabling/disabling of all interrupts.
  */
-extern unsigned int ulIrqSemaphore;
+extern int ulIrqSemaphore;
 
 /*!
  * \brief This method sets the priority grouping.
@@ -81,7 +81,7 @@ void DRV_NVIC_DisableIRQ(IRQn_Type IRQn);
 /*!
  * \brief This is a semaphore function for nested enabling the interrupts.
  */
-__STATIC_INLINE unsigned int DRV_IRQ_Enable(void);
+__STATIC_INLINE int DRV_IRQ_Enable(void);
 /*!
  * \brief This is a semaphore function for nested disabling the interrupts.
  */
@@ -137,11 +137,7 @@ DRV_STATUS_E DRV_MCP_ChangeState(DRV_MCP_CPU_ID_E eCpuId, DRV_MCP_CPU_STATE_E fR
 /**
  \brief  Driver function for finding out the MCP State
  */
-DRV_STATUS_E DRV_MCP_GetState(DRV_MCP_CPU_ID_E eCpuId, DRV_MCP_CPU_STATE_E* epState);
-/**
- \brief  Driver function for attaching an interrupt to the reset request of another core
- */
-void DRV_MCP_IRQAttach(DRV_MCP_CPU_ID_E eCpuId, DRV_CALLBACK_F pfnUserClb, void* pvUser);
+DRV_MCP_CPU_STATE_E DRV_MCP_GetState(DRV_MCP_CPU_ID_E eCpuId);
 
 /*!
  * \brief Enables the IRQ recursively.
@@ -149,24 +145,19 @@ void DRV_MCP_IRQAttach(DRV_MCP_CPU_ID_E eCpuId, DRV_CALLBACK_F pfnUserClb, void*
  * Enables and disables were counted. Transition between 0 and 1 lead to state change.
  * From 1 to 0 Enables the Interrupt. Enabling reduces the lock (disable) counter.
  * The used Semaphore is not protected against overflow!
- * [0] IRQ is enabled
- * [1..UINT_MAX] IRQ is disabled
+ * [0..INT_MIN] IRQ is enabled
+ * [INT_MAX..1] IRQ is disabled
  *
  * \return the counting semaphore
  */
-__STATIC_FORCEINLINE unsigned int DRV_IRQ_Enable(void)
+__STATIC_FORCEINLINE int DRV_IRQ_Enable(void)
 {
-  if(ulIrqSemaphore > 0)
+  // Because the interupts should be disabled this is atomic
+  ulIrqSemaphore-=1;
+  if(ulIrqSemaphore == 0)
   {
-    /* Because the interrupts should be disabled this is atomic. */
-    ulIrqSemaphore-=1;
-
-    if(ulIrqSemaphore == 0)
-    {
-      __enable_irq();
-    }
+    __enable_irq();
   }
-
   return ulIrqSemaphore;
 }
 

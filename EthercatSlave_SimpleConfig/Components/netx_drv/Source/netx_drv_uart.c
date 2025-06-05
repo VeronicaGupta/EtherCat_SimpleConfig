@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    netx_drv_uart.c
  * \brief   UART peripheral module driver.
- * $Revision: 11353 $
- * $Date: 2024-05-20 18:54:32 +0300 (Mon, 20 May 2024) $
+ * $Revision: 6914 $
+ * $Date: 2020-03-03 10:20:25 +0100 (Di, 03 Mrz 2020) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -21,13 +21,14 @@
 /*  Includes                                                                 */
 /*!***************************************************************************/
 #include "netx_drv.h"
-#ifdef DRV_UART_MODULE_ENABLED /* NOTE: needs 'PREDEFINED = DRV_UART_MODULE_ENABLED' in Doxygen-Config-File if not enabled */
+#ifdef DRV_UART_MODULE_ENABLED
 #include <string.h>
-
 /*!
- * \addtogroup UART
+ * \addtogroup UART UART
  * \{
  * \brief The UART driver, defined by DRV_UART_HANDLE_T
+ *
+ * \details The UART
  */
 
 /*!
@@ -55,17 +56,6 @@ static IRQn_Type const s_apHandleIRQnTable[DRV_UART_DEVICE_COUNT] = DRV_UART_DEV
  */
 static DRV_UART_HANDLE_T * s_apHandleAddressTable[DRV_UART_DEVICE_COUNT] = { 0 };
 
-/*!***************************************************************************/
-/*  enum Definitions                                                         */
-/*!***************************************************************************/
-
-/*!
- * \brief Baudrate limit value for oversampling 16
- *
- * Baudrates up to 3.125 MBaud are achieved with oversampling 16
- * Baudrates over 3.125 MBaud need oversampling 8 */
-#define DRV_UART_MAX_BAUDRATE_AT_OVERSAMPL16 DRV_UART_BAUDRATE_3125000
-
 #ifndef DRV_HANDLE_CHECK_INACTIVE
 /*!
  * Define for checking the consistency of the handle or static representation of the driver.
@@ -84,19 +74,6 @@ static DRV_UART_HANDLE_T * s_apHandleAddressTable[DRV_UART_DEVICE_COUNT] = { 0 }
 #define DRV_HANDLE_CHECK(handle)
 #endif
 
-
-/*!***************************************************************************/
-/*  Static function Prototypes                                               */
-/*!***************************************************************************/
-
-__STATIC_INLINE DRV_STATUS_E drv_UART_Init_VerifyParameters(DRV_UART_HANDLE_T* ptDriver);
-
-__STATIC_INLINE void drv_UART_Init_SetUninitializedParametersToDefault(DRV_UART_HANDLE_T* ptDriver);
-
-__STATIC_INLINE void drv_UART_Init_CalculateBaudDiv(DRV_UART_HANDLE_T* ptDriver);
-
-__STATIC_INLINE void drv_UART_Init_SetLineControlParameters(DRV_UART_HANDLE_T* ptDriver);
-
 /*!***************************************************************************/
 /* Definitions                                                               */
 /*!***************************************************************************/
@@ -109,6 +86,7 @@ static void DRV_UART_Flush_DMA_Callback_Rx(void * ptDriverHandle, DRV_UART_HANDL
 {
   ptDriver->RxBuffer = 0;
   ptDriver->RxBufferSize = 0;
+  ptDriver->RxBufferCounter = 0;
   if(ptDriver->tConfiguration.fnRxCompleteCallback != 0)
   {
     ptDriver->tConfiguration.fnRxCompleteCallback(ptDriver, ptDriver->tConfiguration.pRxCompleteCallbackHandle);
@@ -123,6 +101,7 @@ static void DRV_UART_Flush_DMA_Callback_Tx(void * ptDriverHandle, DRV_UART_HANDL
 {
   ptDriver->TxBuffer = 0;
   ptDriver->TxBufferSize = 0;
+  ptDriver->TxBufferCounter = 0;
   if(ptDriver->tConfiguration.fnTxCompleteCallback != 0)
   {
     ptDriver->tConfiguration.fnTxCompleteCallback(ptDriver, ptDriver->tConfiguration.pTxCompleteCallbackHandle);
@@ -137,10 +116,6 @@ static void DRV_UART_Flush_DMA_Callback_Tx(void * ptDriverHandle, DRV_UART_HANDL
  * The driver lock is set and the given parameters in the DRV_UART_CONFIGURATION_T structure are checked if there are parameter combinations not feasible.
  * If everything is ok, the Buffers will be reset and the configuration registers are written, regarding the given attributes. At last the lock will be released.
  *
- * In case of an error during initialization, the function returns an error value, but the lock for the handle, will not be released.
- * Together with the return value, this will ensure that the driver can only be interacted with if it has been correctly initialized.
- * Since the lock is initialized when this function is called, this function can still be called again with other parameters after a failed initialization.
- *
  * \public
  * \memberof DRV_UART_HANDLE_T
  * \param[out] ptDriver The ptDriver to be
@@ -150,22 +125,52 @@ static void DRV_UART_Flush_DMA_Callback_Tx(void * ptDriverHandle, DRV_UART_HANDL
  */
 DRV_STATUS_E DRV_UART_Init(DRV_UART_HANDLE_T * const ptDriver)
 {
-  DRV_STATUS_E eRet = DRV_OK;
   if(ptDriver == 0)
   {
     return DRV_ERROR_PARAM;
   }
   ptDriver->tLock = DRV_LOCK_INITIALIZER;
   DRV_LOCK(ptDriver);
-
-  eRet = drv_UART_Init_VerifyParameters(ptDriver);
-  if(DRV_OK != eRet)
+  if((uint32_t) ptDriver->tConfiguration.eLineControl & (uint32_t) DRV_UART_LINE_CONTROL_MASK_SEND_BREAK
+    || (uint32_t) ptDriver->tConfiguration.eRTSControl & (uint32_t) DRV_UART_RTS_CONTROL_MASK
+    || (uint32_t) ptDriver->tConfiguration.eTxMode & (uint32_t) DRV_UART_TX_MODE_MASK_RECEIVE_ONLY)
   {
-    return eRet;
+    return DRV_NSUPP;
   }
-
-  drv_UART_Init_SetUninitializedParametersToDefault(ptDriver);
-
+  if(((ptDriver->tConfiguration.eWordLength < DRV_UART_WORD_LENGTH_MIN || ptDriver->tConfiguration.eWordLength > DRV_UART_WORD_LENGTH_MAX)
+    && ptDriver->tConfiguration.eWordLength != DRV_UART_WORD_LENGTH_RESET) || ptDriver->tConfiguration.eRxFifoWatermark > DRV_UART_WATERMARK_MAX
+    || ptDriver->tConfiguration.eTxFifoWatermark > DRV_UART_WATERMARK_MAX || ptDriver->tConfiguration.Baud_Rate_Mode > DRV_UART_BAUDRATEMODE_MAX)
+  {
+    return DRV_ERROR_PARAM;
+  }
+  if(ptDriver->tConfiguration.eDeviceID >= DRV_UART_DEVICE_ID_MIN && ptDriver->tConfiguration.eDeviceID <= DRV_UART_DEVICE_ID_MAX)
+  {
+    ptDriver->ptDevice = s_apDeviceAddressTable[(unsigned int) ptDriver->tConfiguration.eDeviceID - (unsigned int) DRV_UART_DEVICE_ID_MIN];
+  }
+  else
+  {
+    return DRV_ERROR_PARAM;
+  }
+  if(ptDriver->tConfiguration.Baud_Rate_Mode == DRV_UART_BAUDRATEMODE_RESET)
+  {
+    ptDriver->tConfiguration.Baud_Rate_Mode = DRV_UART_BAUDRATEMODE_DEFAULT;
+  }
+  if(ptDriver->tConfiguration.eBaudrate == DRV_UART_BAUDRATE_DEFAULT)
+  {
+    ptDriver->tConfiguration.eBaudrate = DRV_UART_BAUDRATE_9600;
+  }
+  if(ptDriver->tConfiguration.eWordLength == DRV_UART_WORD_LENGTH_RESET)
+  {
+    ptDriver->tConfiguration.eWordLength = DRV_UART_WORD_LENGTH_DEFAULT;
+  }
+  if(ptDriver->tConfiguration.eRxFifoWatermark == DRV_UART_WATERMARK_UNINITIALIZED)
+  {
+    ptDriver->tConfiguration.eRxFifoWatermark = DRV_UART_WATERMARK_DEFAULT;
+  }
+  if(ptDriver->tConfiguration.eTxFifoWatermark == DRV_UART_WATERMARK_UNINITIALIZED)
+  {
+    ptDriver->tConfiguration.eTxFifoWatermark = DRV_UART_WATERMARK_DEFAULT;
+  }
   // Configure DMA (channel, IRQ, priority and so on)
   if(ptDriver->tConfiguration.eOperationMode == DRV_OPERATION_MODE_DMA)
   {
@@ -226,25 +231,35 @@ DRV_STATUS_E DRV_UART_Init(DRV_UART_HANDLE_T * const ptDriver)
 
   /* First of all disable everything */
   ptDriver->ptDevice->uartcr = 0u;
+  /* Set the bit for the second baud rate mode */
+  ptDriver->ptDevice->uartcr_2 = ptDriver->tConfiguration.Baud_Rate_Mode - (unsigned int) DRV_UART_BAUDRATEMODE_MIN;
 
-  /* Calculate the bauddiv and load the values in the corresponding uartlcr registers. */
-  drv_UART_Init_CalculateBaudDiv(ptDriver);
-
+  /* Adjust the baud rate register */
+  /* DEV_BAUDRATE is 100 times to small -> multiply with 100 (or divide by DEV_FREQUENCY/100) */
+#define DEV_BAUDRATE_DIV_LO(baud) (((baud*16ull*65536ull)/(SystemCoreClock/100ull)) & 0xff)
+#define DEV_BAUDRATE_DIV_HI(baud) (((baud*16ull*65536ull)/(SystemCoreClock/100ull))>>8)
+  ptDriver->ptDevice->uartlcr_l = DEV_BAUDRATE_DIV_LO((uint64_t )ptDriver->tConfiguration.eBaudrate);
+  ptDriver->ptDevice->uartlcr_m = DEV_BAUDRATE_DIV_HI((uint64_t )ptDriver->tConfiguration.eBaudrate);
   ptDriver->ptDevice->uartcr_b.TX_RX_LOOP = ptDriver->tConfiguration.eLoopBack;
-
-  /* Set UART Line control parameters in the uartlcr_h register : */
-  drv_UART_Init_SetLineControlParameters(ptDriver);
-
+  /* set UART to 8 bits, 1 stop bit, no parity, FIFO enabled */
+  ptDriver->ptDevice->uartlcr_h = (uint32_t) ptDriver->tConfiguration.eLineControl & (uint32_t) DRV_UART_LINE_CONTROL_MASK;
+  ptDriver->ptDevice->uartlcr_h_b.WLEN = (ptDriver->tConfiguration.eWordLength & 3u);
+  if(ptDriver->tConfiguration.eTxFifoWatermark > 1 && ptDriver->tConfiguration.eRxFifoWatermark > 1)
+  {
+    ptDriver->ptDevice->uartlcr_h_b.FEN = 1;
+  }
+  else
+  {
+    ptDriver->ptDevice->uartlcr_h_b.FEN = 0;
+  }
   /* Set TX-Driver to enabled */
   ptDriver->ptDevice->uartdrvout = (ptDriver->tConfiguration.eTxMode ^ 0x1ul) & DRV_UART_TX_MODE_MASK;
-
   /* Finally enable the UART */
   ptDriver->ptDevice->uartcr_b.uartEN = 1;
-
-  /* Configure nvic (activate IRQ, define priority and so on) */
+  // Configure nvic (activate IRQ, define priority and so on)
   if(ptDriver->tConfiguration.eOperationMode == DRV_OPERATION_MODE_IRQ)
   {
-    if(ptDriver->tConfiguration.fnRxCallback != 0)  // enable IRQ only if we have 'fnRxCallback' defined
+    if(ptDriver->tConfiguration.fnRxCallback != 0)
     {
       ptDriver->ptDevice->uartcr_b.RIE = 1;
       ptDriver->ptDevice->uartcr_b.RTIE = 1;
@@ -315,11 +330,11 @@ __STATIC_INLINE void DRV_UART_Flush_Buffers(DRV_UART_HANDLE_T * const ptDriver)
     }
   }
   else
-  { /* if there is no buffer defined */
-    if(ptDriver->tConfiguration.fnRxCallback != 0) /* but a receive callback is defined */
+  { // if there is no buffer defined
+    if(ptDriver->tConfiguration.fnRxCallback != 0) // but a receive callback is defined
     {
-      ptDriver->RxBufferSize = 16;                      /* set to DRV_UART_WATERMARK_MAX */
-      while(ptDriver->ptDevice->uartfr_b.RXFE != 1u)    /* copy into RxBufferStatic[] */
+      ptDriver->RxBufferSize = 16;
+      while(ptDriver->ptDevice->uartfr_b.RXFE != 1u)
       {
         if(ptDriver->RxBufferCounter != ptDriver->RxBufferSize)
         {
@@ -380,20 +395,15 @@ DRV_STATUS_E DRV_UART_Transmit(DRV_UART_HANDLE_T * const ptDriver, uint8_t const
 {
   DRV_HANDLE_CHECK(ptDriver);
   DRV_LOCK(ptDriver);
-
-  if((NULL == data) ||
-     (0 == size))
+  if(data == 0)
   {
     DRV_UNLOCK(ptDriver);
     return DRV_ERROR_PARAM;
   }
-
   DRV_STATUS_E ret = DRV_ERROR;
   uint32_t ulExclusiveRead = 0xFFFFFFFFul;
   ptDriver->ullFrameStartTick = 0;
-
-  if((NULL != ptDriver->TxBuffer)  ||
-     (0 != ptDriver->TxBufferSize))
+  if(ptDriver->TxBuffer != 0 || ptDriver->TxBufferSize != 0 || ptDriver->TxBufferCounter != 0)
   {
     ret = DRV_BUSY;
   }
@@ -413,18 +423,17 @@ DRV_STATUS_E DRV_UART_Transmit(DRV_UART_HANDLE_T * const ptDriver, uint8_t const
         }
         DRV_UART_Flush_Buffers(ptDriver);
       }
-
-      if(DRV_TOUT != ret)
+      if(ptDriver->ullFrameStartTick < ptDriver->tConfiguration.ulDriverTimeout)
       {
+        ptDriver->TxBuffer = 0;
+        ptDriver->TxBufferCounter = 0;
+        ptDriver->TxBufferSize = 0;
         if(ptDriver->tConfiguration.fnTxCompleteCallback != 0)
         {
           ptDriver->tConfiguration.fnTxCompleteCallback(ptDriver, ptDriver->tConfiguration.pTxCompleteCallbackHandle);
         }
         ret = DRV_OK;
       }
-
-      ptDriver->TxBuffer = NULL;
-      ptDriver->TxBufferSize = 0;
     }
     else if(ptDriver->tConfiguration.eOperationMode == DRV_OPERATION_MODE_IRQ)
     {
@@ -457,7 +466,7 @@ DRV_STATUS_E DRV_UART_Transmit(DRV_UART_HANDLE_T * const ptDriver, uint8_t const
     }
     else
     {
-      ptDriver->TxBuffer = NULL;
+      ptDriver->TxBuffer = 0;
       ptDriver->TxBufferCounter = 0;
       ptDriver->TxBufferSize = 0;
       ret = DRV_ERROR_PARAM;
@@ -486,20 +495,15 @@ DRV_STATUS_E DRV_UART_Receive(DRV_UART_HANDLE_T * const ptDriver, uint8_t * cons
 {
   DRV_HANDLE_CHECK(ptDriver);
   DRV_LOCK(ptDriver);
-
-  if((NULL == data) ||
-     (0 == size))
+  if(data == 0)
   {
     DRV_UNLOCK(ptDriver);
     return DRV_ERROR_PARAM;
   }
-
   DRV_STATUS_E ret = DRV_ERROR;
   uint32_t ulExclusiveRead = 0xFFFFFFFFul;
   ptDriver->ullFrameStartTick = 0;
-
-  if((NULL != ptDriver->RxBuffer) ||
-     (0 != ptDriver->RxBufferSize))
+  if(ptDriver->RxBuffer != 0 || ptDriver->RxBufferSize != 0 || ptDriver->RxBufferCounter != 0)
   {
     ret = DRV_BUSY;
   }
@@ -520,18 +524,17 @@ DRV_STATUS_E DRV_UART_Receive(DRV_UART_HANDLE_T * const ptDriver, uint8_t * cons
         }
         DRV_UART_Flush_Buffers(ptDriver);
       }
-
-      if(DRV_TOUT != ret)
+      if(ptDriver->ullFrameStartTick < ptDriver->tConfiguration.ulDriverTimeout)
       {
+        ptDriver->RxBuffer = 0;
+        ptDriver->RxBufferCounter = 0;
+        ptDriver->RxBufferSize = 0;
         if(ptDriver->tConfiguration.fnRxCompleteCallback != 0)
         {
           ptDriver->tConfiguration.fnRxCompleteCallback(ptDriver, ptDriver->tConfiguration.pRxCompleteCallbackHandle);
         }
         ret = DRV_OK;
       }
-
-      ptDriver->RxBuffer = NULL;
-      ptDriver->RxBufferSize = 0;
     }
     else if(ptDriver->tConfiguration.eOperationMode == DRV_OPERATION_MODE_IRQ)
     {
@@ -564,9 +567,9 @@ DRV_STATUS_E DRV_UART_Receive(DRV_UART_HANDLE_T * const ptDriver, uint8_t * cons
     }
     else
     {
-      ptDriver->RxBuffer = NULL;
-      ptDriver->RxBufferCounter = 0;
-      ptDriver->RxBufferSize = 0;
+      ptDriver->TxBuffer = 0;
+      ptDriver->TxBufferCounter = 0;
+      ptDriver->TxBufferSize = 0;
       ret = DRV_ERROR_PARAM;
     }
   }
@@ -594,23 +597,16 @@ DRV_STATUS_E DRV_UART_TransmitReceive(DRV_UART_HANDLE_T * const ptDriver, uint8_
 {
   DRV_HANDLE_CHECK(ptDriver);
   DRV_LOCK(ptDriver);
-
-  if((NULL == txData) ||
-     (NULL == rxData) ||
-     (0 == size))
+  if(txData == 0 || rxData == 0)
   {
     DRV_UNLOCK(ptDriver);
     return DRV_ERROR_PARAM;
   }
-
   DRV_STATUS_E ret = DRV_NIMPL;
   uint32_t ulExclusiveRead = 0xFFFFFFFFul;
   ptDriver->ullFrameStartTick = 0;
-
-  if((NULL != ptDriver->TxBuffer)   ||
-     (0 != ptDriver->TxBufferSize)  ||
-     (NULL != ptDriver->RxBuffer)   ||
-     (0 != ptDriver->RxBufferSize))
+  if(ptDriver->TxBuffer != 0 || ptDriver->TxBufferSize != 0 || ptDriver->TxBufferCounter != 0 || ptDriver->RxBuffer != 0
+    || ptDriver->RxBufferSize != 0 || ptDriver->RxBufferCounter != 0)
   {
     ret = DRV_BUSY;
   }
@@ -634,9 +630,14 @@ DRV_STATUS_E DRV_UART_TransmitReceive(DRV_UART_HANDLE_T * const ptDriver, uint8_
         }
         DRV_UART_Flush_Buffers(ptDriver);
       }
-
-      if(DRV_TOUT != ret)
+      if(ptDriver->ullFrameStartTick < ptDriver->tConfiguration.ulDriverTimeout)
       {
+        ptDriver->TxBuffer = 0;
+        ptDriver->TxBufferCounter = 0;
+        ptDriver->TxBufferSize = 0;
+        ptDriver->RxBuffer = 0;
+        ptDriver->RxBufferCounter = 0;
+        ptDriver->RxBufferSize = 0;
         if(ptDriver->tConfiguration.fnTxCompleteCallback != 0)
         {
           ptDriver->tConfiguration.fnTxCompleteCallback(ptDriver, ptDriver->tConfiguration.pTxCompleteCallbackHandle);
@@ -647,11 +648,6 @@ DRV_STATUS_E DRV_UART_TransmitReceive(DRV_UART_HANDLE_T * const ptDriver, uint8_
         }
         ret = DRV_OK;
       }
-
-      ptDriver->TxBuffer = 0;
-      ptDriver->TxBufferSize = 0;
-      ptDriver->RxBuffer = 0;
-      ptDriver->RxBufferSize = 0;
     }
     else if(ptDriver->tConfiguration.eOperationMode == DRV_OPERATION_MODE_IRQ)
     {
@@ -734,10 +730,7 @@ DRV_STATUS_E DRV_UART_PutChar(DRV_UART_HANDLE_T * const ptDriver, unsigned char 
 {
   DRV_HANDLE_CHECK(ptDriver);
   DRV_LOCK(ptDriver);
-
   DRV_STATUS_E ret = DRV_ERROR;
-  ptDriver->ullFrameStartTick = 0;
-
   if(ptDriver->TxBufferSize > 0 && ptDriver->TxBufferCounter != ptDriver->TxBufferSize)
   {
     ret = DRV_BUSY;
@@ -790,10 +783,7 @@ DRV_STATUS_E DRV_UART_GetChar(DRV_UART_HANDLE_T * const ptDriver, unsigned char 
     DRV_UNLOCK(ptDriver);
     return DRV_ERROR_PARAM;
   }
-
   DRV_STATUS_E ret = DRV_ERROR;
-  ptDriver->ullFrameStartTick = 0;
-
   if(ptDriver->RxBufferSize > 0 && ptDriver->RxBufferCounter != ptDriver->RxBufferSize)
   {
     ret = DRV_BUSY;
@@ -868,23 +858,12 @@ DRV_STATUS_E DRV_UART_Abort(DRV_UART_HANDLE_T * const ptDriver)
     ptDriver->ptDevice->uartcr_b.SIREN = ulSIREN;
     ptDriver->ptDevice->uartcr_b.uartEN = 1;
     DRV_NVIC_EnableIRQ(s_apHandleIRQnTable[(uint32_t) ptDriver->tConfiguration.eDeviceID - (uint32_t) DRV_UART_DEVICE_ID_MIN]);
-    ret = DRV_OK;
   }
   else if(ptDriver->tConfiguration.eOperationMode == DRV_OPERATION_MODE_DMA)
   {
     if(DRV_DMAC_Abort(ptDriver->tConfiguration.ptSequencerRx) != (ret = DRV_DMAC_Abort(ptDriver->tConfiguration.ptSequencerTx)))
     {
       ret = DRV_ERROR;
-    }
-    else
-    {
-      ptDriver->TxBuffer = 0;
-      ptDriver->TxBufferSize = 0;
-      ptDriver->TxBufferCounter = 0;
-
-      ptDriver->RxBuffer = 0;
-      ptDriver->RxBufferSize = 0;
-      ptDriver->RxBufferCounter = 0;
     }
   }
   else
@@ -910,11 +889,8 @@ DRV_STATUS_E DRV_UART_GetState(DRV_UART_HANDLE_T * const ptDriver, DRV_UART_STAT
 {
   DRV_HANDLE_CHECK(ptDriver);
   DRV_STATUS_E ret = DRV_OK;
-  if((NULL != ptDriver->TxBuffer)  ||
-     (0 != ptDriver->TxBufferSize) ||
-     (NULL != ptDriver->RxBuffer)  ||
-     (0 != ptDriver->RxBufferSize) ||
-     (0 != ptDriver->ptDevice->uartfr_b.BUSY))
+  if(ptDriver->TxBuffer != 0 || ptDriver->TxBufferSize != 0 || ptDriver->TxBufferCounter != 0 || ptDriver->RxBuffer != 0
+    || ptDriver->RxBufferSize != 0 || ptDriver->RxBufferCounter != 0 || ptDriver->ptDevice->uartfr_b.BUSY != 0)
   {
     ret = DRV_BUSY;
   }
@@ -941,9 +917,7 @@ DRV_STATUS_E DRV_UART_GetRxState(DRV_UART_HANDLE_T * const ptDriver, DRV_UART_ST
 {
   DRV_HANDLE_CHECK(ptDriver);
   DRV_STATUS_E ret = DRV_OK;
-
-  if((NULL != ptDriver->RxBuffer) ||
-     (0 != ptDriver->RxBufferSize))
+  if(ptDriver->RxBuffer != 0 || ptDriver->RxBufferSize != 0 || ptDriver->RxBufferCounter != 0)
   {
     ret = DRV_BUSY;
   }
@@ -970,9 +944,7 @@ DRV_STATUS_E DRV_UART_GetTxState(DRV_UART_HANDLE_T * const ptDriver, DRV_UART_ST
 {
   DRV_HANDLE_CHECK(ptDriver);
   DRV_STATUS_E ret = DRV_OK;
-
-  if((NULL != ptDriver->TxBuffer) ||
-     (0 != ptDriver->TxBufferSize))
+  if(ptDriver->TxBuffer != 0 || ptDriver->TxBufferSize != 0 || ptDriver->TxBufferCounter != 0)
   {
     ret = DRV_BUSY;
   }
@@ -1004,7 +976,7 @@ __STATIC_INLINE void DRV_UART_IRQ_Inline_Handler(DRV_UART_DEVICE_ID_E const eDev
     return;
   }
 #endif
-  size_t rtis = ptDriver->ptDevice->uartiir_b.RTIS; /* Receive Timeout Int.Stat */
+  size_t rtis = ptDriver->ptDevice->uartiir_b.RTIS;
   DRV_UART_Flush_Buffers(ptDriver);
   if(ptDriver->RxBufferCounter == ptDriver->RxBufferSize)
   {
@@ -1023,6 +995,7 @@ __STATIC_INLINE void DRV_UART_IRQ_Inline_Handler(DRV_UART_DEVICE_ID_E const eDev
       ptDriver->ptDevice->uartrxiflsel_b.RXIFLSEL = ptDriver->tConfiguration.eRxFifoWatermark;
       ptDriver->RxBuffer = 0;
       ptDriver->RxBufferSize = 0;
+      ptDriver->RxBufferCounter = 0;
     }
     else
     {
@@ -1048,9 +1021,10 @@ __STATIC_INLINE void DRV_UART_IRQ_Inline_Handler(DRV_UART_DEVICE_ID_E const eDev
         ptDriver->tConfiguration.fnTxCompleteCallback(ptDriver, ptDriver->tConfiguration.pTxCompleteCallbackHandle);
       }
       ptDriver->ptDevice->uartcr_b.TIE = 0;
-      ptDriver->ptDevice->uarttxiflsel_b.TXIFLSEL = ptDriver->tConfiguration.eTxFifoWatermark;
+      ptDriver->ptDevice->uartrxiflsel_b.RXIFLSEL = ptDriver->tConfiguration.eRxFifoWatermark;
       ptDriver->TxBuffer = 0;
       ptDriver->TxBufferSize = 0;
+      ptDriver->TxBufferCounter = 0;
     }
     else
     {
@@ -1074,145 +1048,6 @@ __STATIC_INLINE void DRV_UART_IRQ_Inline_Handler(DRV_UART_DEVICE_ID_E const eDev
   ptDriver->ptDevice->uartiir = (uint32_t) -1;
 }
 
-/*!***************************************************************************/
-/* Static function Definitions                                               */
-/*!***************************************************************************/
-
-/* Verify parameters before Initialization. */
-__STATIC_INLINE DRV_STATUS_E drv_UART_Init_VerifyParameters(DRV_UART_HANDLE_T* ptDriver)
-{
-  DRV_STATUS_E eRet = DRV_OK;
-
-  if((uint32_t) ptDriver->tConfiguration.eLineControl & (uint32_t) DRV_UART_LINE_CONTROL_MASK_SEND_BREAK
-    || (uint32_t) ptDriver->tConfiguration.eRTSControl & (uint32_t) DRV_UART_RTS_CONTROL_MASK
-    || (uint32_t) ptDriver->tConfiguration.eTxMode & (uint32_t) DRV_UART_TX_MODE_MASK_RECEIVE_ONLY)
-  {
-    return DRV_NSUPP;
-  }
-  /* The UART driver does not support DMA mode with disabled FIFO. */
-  if((DRV_UART_WATERMARK_1 == ptDriver->tConfiguration.eTxFifoWatermark) &&
-     (DRV_UART_WATERMARK_1 == ptDriver->tConfiguration.eRxFifoWatermark) &&
-     (DRV_OPERATION_MODE_DMA == ptDriver->tConfiguration.eOperationMode) &&
-     (0 == (ptDriver->tConfiguration.eLineControl & (uint32_t)DRV_UART_LINE_CONTROL_MASK_FIFO_ENABLE)))
-  {
-    return DRV_NSUPP;
-  }
-  if(((ptDriver->tConfiguration.eWordLength < DRV_UART_WORD_LENGTH_MIN || ptDriver->tConfiguration.eWordLength > DRV_UART_WORD_LENGTH_MAX)
-    && ptDriver->tConfiguration.eWordLength != DRV_UART_WORD_LENGTH_RESET) || ptDriver->tConfiguration.eRxFifoWatermark > DRV_UART_WATERMARK_MAX
-    || ptDriver->tConfiguration.eTxFifoWatermark > DRV_UART_WATERMARK_MAX || ptDriver->tConfiguration.Baud_Rate_Mode > DRV_UART_BAUDRATEMODE_MAX)
-  {
-    return DRV_ERROR_PARAM;
-  }
-  if(ptDriver->tConfiguration.eBaudrate > DRV_UART_BAUDRATE_MAX)
-  {
-    return DRV_ERROR_PARAM;
-  }
-  if(ptDriver->tConfiguration.eDeviceID >= DRV_UART_DEVICE_ID_MIN && ptDriver->tConfiguration.eDeviceID <= DRV_UART_DEVICE_ID_MAX)
-  {
-    ptDriver->ptDevice = s_apDeviceAddressTable[(unsigned int) ptDriver->tConfiguration.eDeviceID - (unsigned int) DRV_UART_DEVICE_ID_MIN];
-  }
-  else
-  {
-    return DRV_ERROR_PARAM;
-  }
-
-  return eRet;
-}
-
-/* Assign Default values to the Uninitialized parameters. */
-__STATIC_INLINE void drv_UART_Init_SetUninitializedParametersToDefault(DRV_UART_HANDLE_T* ptDriver)
-{
-  if(ptDriver->tConfiguration.Baud_Rate_Mode == DRV_UART_BAUDRATEMODE_RESET)
-  {
-    ptDriver->tConfiguration.Baud_Rate_Mode = DRV_UART_BAUDRATEMODE_DEFAULT;
-  }
-  if(ptDriver->tConfiguration.eBaudrate == DRV_UART_BAUDRATE_DEFAULT)
-  {
-    ptDriver->tConfiguration.eBaudrate = DRV_UART_BAUDRATE_9600;
-  }
-  if(ptDriver->tConfiguration.eWordLength == DRV_UART_WORD_LENGTH_RESET)
-  {
-    ptDriver->tConfiguration.eWordLength = DRV_UART_WORD_LENGTH_DEFAULT;
-  }
-  if(ptDriver->tConfiguration.eRxFifoWatermark == DRV_UART_WATERMARK_UNINITIALIZED)
-  {
-    ptDriver->tConfiguration.eRxFifoWatermark = DRV_UART_WATERMARK_DEFAULT;
-  }
-  if(ptDriver->tConfiguration.eTxFifoWatermark == DRV_UART_WATERMARK_UNINITIALIZED)
-  {
-    ptDriver->tConfiguration.eTxFifoWatermark = DRV_UART_WATERMARK_DEFAULT;
-  }
-}
-
-/* Calculates Bauddiv by the given baudrate. if the input baudrate is over 3.125 MB, the oversampling is set to 8x. */
-__STATIC_INLINE void drv_UART_Init_CalculateBaudDiv(DRV_UART_HANDLE_T* ptDriver)
-{
-  uint64_t ullBaudRate = ptDriver->tConfiguration.eBaudrate;
-  uint64_t ullBaudDiv = 0;
-  uint32_t ulUartcr_2_ReducedOverSampling = 0; /* Initially oversampling is 16x. */
-  uint32_t ulUartcr_2_bits = 0;
-  uint32_t ulBaudDiv_LSB = 0;
-  uint32_t ulBaudDiv_MSB = 0;
-
-  /* Compensates the fact, that the baudrate enum values are divided by 100. */
-  uint64_t ullSysClock = SystemCoreClock/100;
-
-  /* Only Mode 1 is used.*/
-  uint32_t ulUartcr_2_BaudRateMode = (uint32_t)DRV_UART_BAUDRATEMODE_1 - (uint32_t)DRV_UART_BAUDRATEMODE_MIN;
-
-  /* If a baudrate over 3.125 Mbps is requested, reduced oversampling of 8x is used.
-   * It doubles the baudrate internally, but the bit reception is more error-prone in noisy environments. */
-  if(ullBaudRate > DRV_UART_MAX_BAUDRATE_AT_OVERSAMPL16)
-  {
-    ulUartcr_2_ReducedOverSampling = 1;
-    /* Calculate the bauddiv, using Mode 1 formula and divide by two, because of the reduced oversampling
-     * doubles the baudrate internally. */
-    ullBaudDiv = (ullBaudRate * 8 * 65536) / ullSysClock;
-  }
-  else
-  {
-    /* Calculate the bauddiv, using Mode 1 standard formula: */
-    ullBaudDiv = (ullBaudRate * 16 * 65536) / ullSysClock;
-  }
-
-  /* Setting the control register uartcr_2 */
-  ulUartcr_2_bits = ((ulUartcr_2_BaudRateMode) |
-                     (ulUartcr_2_ReducedOverSampling << uart_uartcr_2_oversampling_8x_Pos));
-  ptDriver->ptDevice->uartcr_2 = ulUartcr_2_bits;
-
-  /* Set the bauddiv. */
-  ulBaudDiv_LSB = ullBaudDiv & 0xFF;
-  ulBaudDiv_MSB = ullBaudDiv >> 8;
-  ptDriver->ptDevice->uartlcr_l = ulBaudDiv_LSB;
-  ptDriver->ptDevice->uartlcr_m = ulBaudDiv_MSB;
-}
-
-/* Sets UART Line control parameters in the uartlcr_h register.
- * Setting TxFifoWaterMark or RxFifoWaterMark higher than 1 automatically enables FIFO, overriding user's choice. */
-__STATIC_INLINE void drv_UART_Init_SetLineControlParameters(DRV_UART_HANDLE_T* ptDriver)
-{
-  uint32_t ulUart_lcr_h_bits = 0;
-
-  /* Set UART parameters in the uartlcr_h register :
-   *  Word length [bits]: 5 / 6 / 7 / 8,      default = 8
-   *  Stop bit(s):        1 / 2,              default = 1
-   *  Parity:             Off / Odd / Even,   default = Off
-   *  FIFO:               Disabled / Enabled, default = Disabled
-   * */
-  ulUart_lcr_h_bits = ptDriver->tConfiguration.eLineControl & (uint32_t)DRV_UART_LINE_CONTROL_MASK;
-  ulUart_lcr_h_bits |= (ptDriver->tConfiguration.eWordLength << uart_uartlcr_h_WLEN_Pos) & uart_uartlcr_h_WLEN_Msk;
-
-  /* Setting TxFifoWaterMark or RxFifoWaterMark higher than 1 automatically enables FIFO, overriding user's choice.
-   * In Poll mode disabling FIFO could cause problems in transmissions over 5 Mbaud.
-   * In IRQ mode disabling FIFO could cause problems in transmissions over 2 Mbaud.  */
-  if((ptDriver->tConfiguration.eTxFifoWatermark > DRV_UART_WATERMARK_1) ||
-     (ptDriver->tConfiguration.eRxFifoWatermark > DRV_UART_WATERMARK_1))
-  {
-    ulUart_lcr_h_bits |= DRV_UART_LINE_CONTROL_MASK_FIFO_ENABLE;
-  }
-  ptDriver->ptDevice->uartlcr_h = ulUart_lcr_h_bits;
-}
-
 /*!
  * The generator define for generating irq handler source code.
  */
@@ -1221,7 +1056,7 @@ __STATIC_INLINE void drv_UART_Init_SetLineControlParameters(DRV_UART_HANDLE_T* p
 /*!
  * The define to where the irq handler code shall be generated.
  */
-/*lint -save -e123 The name of a macro defined with arguments was subsequently used without a following '(' */
+/*lint -save -e123 */
 DRV_DEF_REPEAT_EVAL(DRV_UART_DEVICE_COUNT, DRV_UART_IRQHandler_Generator, ~)
 /*lint -restore */
 

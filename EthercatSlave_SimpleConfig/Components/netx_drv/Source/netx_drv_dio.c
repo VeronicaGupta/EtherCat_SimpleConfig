@@ -1,13 +1,13 @@
 /*!************************************************************************//*!
  * \file     netx_drv_dio.c
  * \brief    DIO peripheral module driver.
- *           This file provides firmware functions to manage the following
+ *           This file provides firmware functions to manage the following 
  *           functionalities of the General Purpose Input/Output (DIO) peripheral:
  *            + Initialization and de-initialization functions
  *            + IO operation functions
  *            + Interrupt control
- * $Revision: 11321 $
- * $Date: 2024-04-23 13:03:21 +0300 (Tue, 23 Apr 2024) $
+ * $Revision: 6124 $
+ * $Date: 2019-08-28 19:41:54 +0200 (Mi, 28 Aug 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -339,7 +339,6 @@ DRV_STATUS_E DRV_DIO_ChannelSetMode(DRV_DIO_ID_T ulChannelID, DRV_DIO_MODE_E eMo
     if(eMode <= DRV_DIO_MODE_BLINK || eMode == DRV_DIO_MODE_PWM2)
     {
       s_tIODriver.ptGPIODevice->gpio_app_cfg_b[ulChannelID - DRV_DIO_ID_GPIO_MIN].mode = eMode;
-      s_tIODriver.ptGPIODevice->gpio_app_cfg_b[ulChannelID - DRV_DIO_ID_GPIO_MIN].inv = 0x00ul;
       ret = DRV_OK;
     }
     else if(eMode == DRV_DIO_MODE_CAPTURE_CONT_FALLING)
@@ -885,19 +884,19 @@ DRV_STATUS_E DRV_DIO_ChannelIRQMask(DRV_DIO_ID_T ulChannelID)
     switch (ulChannelID)
     {
     case DRV_DIO_ID_HIF_D12:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = hif_io_ctrl_hif_pio_irq_arm_mask_reset_irq_hif_d12_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = 0x1u;
       break;
     case DRV_DIO_ID_HIF_A16:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = hif_io_ctrl_hif_pio_irq_arm_mask_reset_irq_hif_a16_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = 0x2u;
       break;
     case DRV_DIO_ID_HIF_A17:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = hif_io_ctrl_hif_pio_irq_arm_mask_reset_irq_hif_a17_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = 0x4u;
       break;
     case DRV_DIO_ID_HIF_DIRQ:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = hif_io_ctrl_hif_pio_irq_arm_mask_reset_irq_hif_dirq_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_reset = 0x8u;
       break;
     case DRV_DIO_ID_BOD:
-      DRV_ASIC_CTRL_DEVICE->asic_ctrl_irq_mask_reset = asic_ctrl_asic_ctrl_irq_mask_reset_bod_fail_Msk;
+      DRV_ASIC_CTRL_DEVICE->asic_ctrl_irq_mask_reset = asic_ctrl_asic_ctrl_irq_mask_reset_bod_fail_Pos;
       break;
     default:
       ret = DRV_ERROR_PARAM;
@@ -941,19 +940,19 @@ DRV_STATUS_E DRV_DIO_ChannelIRQUnmask(DRV_DIO_ID_T ulChannelID)
     switch (ulChannelID)
     {
     case DRV_DIO_ID_HIF_D12:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = hif_io_ctrl_hif_pio_irq_arm_mask_set_irq_hif_d12_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = 0x1u;
       break;
     case DRV_DIO_ID_HIF_A16:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = hif_io_ctrl_hif_pio_irq_arm_mask_set_irq_hif_a16_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = 0x2u;
       break;
     case DRV_DIO_ID_HIF_A17:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = hif_io_ctrl_hif_pio_irq_arm_mask_set_irq_hif_a17_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = 0x4u;
       break;
     case DRV_DIO_ID_HIF_DIRQ:
-      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = hif_io_ctrl_hif_pio_irq_arm_mask_set_irq_hif_dirq_Msk;
+      DRV_HIF_IO_DEVICE->hif_pio_irq_arm_mask_set = 0x8u;
       break;
     case DRV_DIO_ID_BOD:
-      DRV_ASIC_CTRL_DEVICE->asic_ctrl_irq_mask_set = asic_ctrl_asic_ctrl_irq_mask_set_bod_fail_Msk;
+      DRV_ASIC_CTRL_DEVICE->asic_ctrl_irq_mask_set = asic_ctrl_asic_ctrl_irq_mask_reset_bod_fail_Pos;
       break;
     default:
       ret = DRV_ERROR_PARAM;
@@ -1583,7 +1582,7 @@ __WEAK void DRV_DIO_GPIO7_Callback(void)
 void ASIC_IRQHandler(void)
 {
   DRV_DIO_BOD_Callback();
-  DRV_ASIC_CTRL_DEVICE->asic_ctrl_irq_raw = asic_ctrl_asic_ctrl_irq_raw_bod_fail_Msk;
+  DRV_ASIC_CTRL_DEVICE->asic_ctrl_irq_raw = asic_ctrl_asic_ctrl_irq_raw_bod_fail_Pos;
 }
 
 /*!

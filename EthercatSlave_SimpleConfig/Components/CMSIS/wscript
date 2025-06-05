@@ -1,17 +1,12 @@
+
 def build(bld):
-    
-    toolchain = bld.env["UsedToolchain"]
-    if not toolchain:
-        bld.fatal('Environment parameter "UsedToolchain" is not available! Make sure to provide the environment parameter "UsedToolchain" in the root wscript file of your project. e.g.: conf.env["UsedToolchain"] = "gccarmemb"')
-    
-    platform  = bld.env["UsedPlatform"]
-    if not platform:
-        bld.fatal('Environment parameter "UsedPlatform" is not available! Make sure to provide the environment parameter "UsedPlatform" in the root wscript file of your project. e.g.: conf.env["UsedPlatform"]  = "netx90"')
-    
+
+    toolchain   = "gccarmemb"
     comp_prefix = bld.get_name_prefix(
         toolchain = toolchain,
-        platform  = platform)
+        platform  = "netx90")
     
+
 # Component CMSIS ---------------------------------------------------------
 
     defines = [
@@ -23,9 +18,8 @@ def build(bld):
                ]
     
     sources = [
-        "Device/Hilscher/netx/Source/GCC/startup_netx90_app.S",
-        "Device/Hilscher/netx/Source/system_netx.c",
-        "Device/Hilscher/netx/Source/Crc32_04C11DB7.c"
+        "Device/Hilscher/netx/Source/GCC/startup_netx90_app.S", 
+        "Device/Hilscher/netx/Source/system_netx.c", 
     ]
     
     i=0
@@ -45,8 +39,8 @@ def build(bld):
         name            = comp_prefix + "CMSIS",
         description     = "CMSIS",
         displaygroup    = "Libraries",
-        platform        = platform,
-        toolchain       = toolchain,
+        platform        = "netx90",
+        toolchain       = toolchain, 
         use             = [
                            "cmsis_configuration_sdk",
                           ],
@@ -54,7 +48,6 @@ def build(bld):
         includes        = includes,
         export_includes = includes,
         defines         = defines,
-        version         = "0.1.5.2"
     )
     
     bld.sdkcomponent(

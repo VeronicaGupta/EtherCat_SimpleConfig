@@ -1,0 +1,108 @@
+def build(bld):
+
+    VERSION_MAJOR    = 3
+    VERSION_MINOR    = 0
+    VERSION_BUILD    = 0
+    VERSION_REVISION = 0
+    VERSION = "%u.%u.%u.%u" % (VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_REVISION)
+    
+    toolchain   = "gccarmemb"
+    comp_prefix = bld.get_name_prefix(
+        toolchain = toolchain,
+        platform  = "netx90")
+    
+    sources = [
+         "NXHX90-JTAG/Sources/handler.c",
+         "NXHX90-JTAG/Sources/main.c",
+        ]
+
+    sources_usecaseA = [
+         "NXHX90-JTAG/Sources/netx90_app_header_useCaseA.c",
+        ]
+    
+    sources_usecaseC = [
+         "NXHX90-JTAG/Sources/netx90_app_header_useCaseC.c",
+        ]
+    
+    includes = [
+        "NXHX90-JTAG/Include",
+        ]        
+
+    
+    defines = [ 
+        "__NETX90",
+        "_NETX_",
+        "VERSION_MAJOR = %u" % VERSION_MAJOR,
+        "VERSION_MINOR = %u" % VERSION_MINOR,
+        "VERSION_BUILD = %u" % VERSION_BUILD,
+        "VERSION_REVISION = %u" % VERSION_REVISION,
+        ]
+        
+    uses = [ 
+        comp_prefix + "CMSIS",
+        comp_prefix + "netx_drv",
+        comp_prefix + "cifXToolkit",
+        comp_prefix + "cifXToolkit_OSAbstraction",
+        comp_prefix + "libc_support",
+        comp_prefix + "cifXApplicationDemo",
+        comp_prefix + "cifXApplicationDemoECS",
+        comp_prefix + "netx90_HostAbstractionLayer",
+        ]
+                       
+    bld.program ( 
+        target       = "netx90_sdram",
+        name         = comp_prefix + "netx90_sdram",
+        description  = "Host Example using NXHX90-JTAG as Host",
+        displaygroup = "Targets",
+        version      = VERSION,
+        platform     = "netx90",
+        toolchain    = toolchain,
+        use          = uses,
+        source       = sources + sources_usecaseC,
+        includes     = includes,
+        defines      = defines,
+        linkerscript = "NXHX90-JTAG/Linker/netx90_sdram.ld",
+        features     = ["group_lib"],
+        )
+    
+    bld.firmware(
+        target       = "nx90_app.nai",
+        name         = comp_prefix + "netx90_app_iflash",
+        description  = "Host Example using NXHX90-JTAG as Host",
+        displaygroup = "Targets",
+        version      = VERSION,
+        platform     = "netx90",
+        toolchain    = toolchain,
+        use          = uses,
+        source       = sources + sources_usecaseA,
+        includes     = includes,
+        defines      = defines,
+        stlib        = 'm c',
+        linkerscript = ["NXHX90-JTAG/Linker/netx90_app_iflash.ld"],
+        features     = ["group_lib"],
+        netx_type    = 'netx90_rev1',
+    )
+
+# the following sdk component is used for configuration purposes in several components
+# in order to keep the components generic and commonly usable in all demo applications
+    bld.sdkcomponent(
+        name            = "cifXApplicationDemoConfig_sdk",
+        export_defines  = [
+#                           "DEMO_DONT_USE_CHANNEL0",       # Communication channel 0 is implicitly used by default, it must be explicitly disabled
+                           "DEMO_USE_CHANNEL0",             # Communication channel 0 is anyway implicitly opened, this define just for readability
+#                           "DEMO_USE_CHANNEL1",            # Communication channel 1 is opened - e.g. SocketIf or WebIf 
+#                           "DEMO_USE_CHANNEL2",            # Communication channel 2 is opened - e.g. netPROXY channel 
+ #                           "DEMO_QUIET",                   # Less printf debug outputs 
+                           # "DEMO_DONT_USE_COMMAND_LOOKUP", # Do not use the packet command look up table, which is specific to the used protocol stack
+#                           "DEMO_ONLY_MAILBOX",            # no cyclic IO data handler registered, very special case e.g. for OpenModbusTCP message mode
+                           ],
+    )
+    
+    bld.sdkcomponent(
+        name            = "cmsis_configuration_sdk",
+        export_defines  = [
+                           "__STACK_SIZE = 0x00002000",
+                           "__HEAP_SIZE =  0x00008000",
+                           ],
+        )
+    

@@ -1,8 +1,8 @@
 /**************************************************************************//**
  * \file     netx_drv_dmac.c
  * \brief    DMA controller module driver.
- * $Revision: 11368 $
- * $Date: 2024-06-04 18:17:06 +0300 (Tue, 04 Jun 2024) $
+ * $Revision: 6915 $
+ * $Date: 2020-03-03 10:25:22 +0100 (Di, 03 Mrz 2020) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -67,8 +67,6 @@ void * s_apDeviceChannelCallbackHandleTable[DRV_DMAC_CH_DEVICE_COUNT] = { 0 };
 #define DRV_HANDLE_CHECK(handle) ;
 #endif
 
-#define DRV_DMAC_LINKED_LIST_TRANSFER_SIZE        (4092u)
-
 /*!
  * \brief This function initializes the dmac context object.
  *
@@ -79,10 +77,6 @@ void * s_apDeviceChannelCallbackHandleTable[DRV_DMAC_CH_DEVICE_COUNT] = { 0 };
  * One should not interact (change values) with the context object itself after initializing it.
  * However it is possible in some cases to wait until the device is not busy anymore, modify
  * the configuration and reinitialize the context again.
- *
- * In case of an error during initialization, the function returns an error value, but the lock for the handle, will not be released.
- * Together with the return value, this will ensure that the driver can only be interacted with if it has been correctly initialized.
- * Since the lock is initialized when this function is called, this function can still be called again with other parameters after a failed initialization.
  *
  * \memberof DRV_DMAC_HANDLE_T
  * \param[in,out] ptSequencer The handle of the driver
@@ -221,63 +215,45 @@ DRV_STATUS_E DRV_DMAC_Start(DRV_DMAC_HANDLE_T * const ptSequencer, void * const 
     DRV_UNLOCK(ptSequencer);
     return DRV_BUSY;
   }
-  uint32_t ulWidth = 0x1ul << (uint32_t) ptSequencer->tConfiguration.eTransferWidthSource;
-  if(((size % ulWidth) != 0) || (size / ulWidth) > DRV_DMAC_LINKED_LIST_TRANSFER_SIZE * DRV_DMAC_LIST_LENGTH)
+  size_t ulWidth = 0x1ul << (uint32_t) ptSequencer->tConfiguration.eTransferWidthSource;
+  if(((size % ulWidth) != 0) || (size / ulWidth) > 4095u * DRV_DMAC_LIST_LENGTH)
   {
     DRV_UNLOCK(ptSequencer);
     return DRV_ERROR_PARAM;
   }
-
-  uint32_t i = 0;
+  // create linked list
+  ptSequencer->atLinkedList[0].ptDest = ptBufferDestination;
+  ptSequencer->atLinkedList[0].ptSource = ptBufferSource;
+  ptSequencer->atLinkedList[0].ptNextElement = 0;
+  ptSequencer->atLinkedList[0].tControl.bf.eGenerateTerminalInterrupt = DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_ACTIVE;
+  ptSequencer->atLinkedList[0].tControl.bf.eArmEq = DRV_DMAC_ARM_EQ_DEFAULT;
+  ptSequencer->atLinkedList[0].tControl.bf.eDestBurstSize = DRV_DMAC_BURST_TRANSFER_SIZE_1;
+  ptSequencer->atLinkedList[0].tControl.bf.eSourceBurstSize = DRV_DMAC_BURST_TRANSFER_SIZE_1;
+  ptSequencer->atLinkedList[0].tControl.bf.eDestIncrementation = ptSequencer->tConfiguration.eIncrementationDest;
+  ptSequencer->atLinkedList[0].tControl.bf.eSourceIncrementation = ptSequencer->tConfiguration.eIncrementationSource;
+  ptSequencer->atLinkedList[0].tControl.bf.eDestTransferWidth = ptSequencer->tConfiguration.eTransferWidthDest;
+  ptSequencer->atLinkedList[0].tControl.bf.eSourceTransferWidth = ptSequencer->tConfiguration.eTransferWidthSource;
+#if (DRV_DMAC_LIST_LENGTH > 1u)
+  size_t i;
   for(i = 0; i < DRV_DMAC_LIST_LENGTH; i++)
   {
-    ptSequencer->atLinkedList[i].tControl.bf.eGenerateTerminalInterrupt = DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_INACTIVE;
-    ptSequencer->atLinkedList[i].tControl.bf.eArmEq = DRV_DMAC_ARM_EQ_DEFAULT;
-    ptSequencer->atLinkedList[i].tControl.bf.eDestBurstSize = DRV_DMAC_BURST_TRANSFER_SIZE_1;
-    ptSequencer->atLinkedList[i].tControl.bf.eSourceBurstSize = DRV_DMAC_BURST_TRANSFER_SIZE_1;
-    ptSequencer->atLinkedList[i].tControl.bf.eDestIncrementation = ptSequencer->tConfiguration.eIncrementationDest;
-    ptSequencer->atLinkedList[i].tControl.bf.eSourceIncrementation = ptSequencer->tConfiguration.eIncrementationSource;
-    ptSequencer->atLinkedList[i].tControl.bf.eDestTransferWidth = ptSequencer->tConfiguration.eTransferWidthDest;
-    ptSequencer->atLinkedList[i].tControl.bf.eSourceTransferWidth = ptSequencer->tConfiguration.eTransferWidthSource;
-
-    if(DRV_DMAC_INCREMENTATION_ACTIVE == ptSequencer->tConfiguration.eIncrementationDest)
+    if(size / ulWidth > 4095u)
     {
-      /*lint -save -e124 */
-      ptSequencer->atLinkedList[i].ptDest = ptBufferDestination + (DRV_DMAC_LINKED_LIST_TRANSFER_SIZE * ulWidth * i);
-      /*lint -restore */
-    }
-    else
-    {
-      ptSequencer->atLinkedList[i].ptDest = ptBufferDestination;
-    }
-
-    if(DRV_DMAC_INCREMENTATION_ACTIVE == ptSequencer->tConfiguration.eIncrementationSource)
-    {
-      /*lint -save -e124 */
-      ptSequencer->atLinkedList[i].ptSource = ptBufferSource + (DRV_DMAC_LINKED_LIST_TRANSFER_SIZE * ulWidth * i);
-      /*lint -restore */
-    }
-    else
-    {
-      ptSequencer->atLinkedList[i].ptSource = ptBufferSource;
-    }
-
-    if(size / ulWidth > DRV_DMAC_LINKED_LIST_TRANSFER_SIZE)
-    {
-      ptSequencer->atLinkedList[i].tControl.bf.ulTransferSize = DRV_DMAC_LINKED_LIST_TRANSFER_SIZE;
+      ptSequencer->atLinkedList[i].tControl.bf.ulTransferSize = 4095u;
       ptSequencer->atLinkedList[i].ptNextElement = &(ptSequencer->atLinkedList[i + 1]);
-
-      size -= DRV_DMAC_LINKED_LIST_TRANSFER_SIZE * ulWidth;
+      size -= 4095u * ulWidth;
     }
     else
     {
       ptSequencer->atLinkedList[i].tControl.bf.ulTransferSize = size / ulWidth;
       ptSequencer->atLinkedList[i].ptNextElement = 0;
-      ptSequencer->atLinkedList[i].tControl.bf.eGenerateTerminalInterrupt = DRV_DMAC_GENERATE_TERMINAL_INTERRUPT_ACTIVE;
       break;
     }
   }
-
+#else
+  ptSequencer->atLinkedList[0].tControl.bf.ulTransferSize = size / ulWidth;
+  ptSequencer->atLinkedList[0].ptNextElement = 0;
+#endif
   // copy first element
   ptSequencer->ptDevice->dmac_chsrc_ad = ptSequencer->atLinkedList[0].ptSource;
   ptSequencer->ptDevice->dmac_chdest_ad = ptSequencer->atLinkedList[0].ptDest;

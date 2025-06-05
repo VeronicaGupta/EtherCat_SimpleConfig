@@ -1,11 +1,12 @@
 /*!************************************************************************//*!
- * \file    netx_drv_adc.c
- * \brief   ADC peripheral module driver.
- *          This file provides firmware functions related to the netX90 ADC
- *          e.g.DRV_ADC_Driver_Init(), DRV_ADC_Seq_Init(), DRV_ADC_Seq_Start()
- *              DRV_ADC_Seq_GetState(), DRV_ADC_Seq_GetSample()
- * $Revision: 10737 $
- * $Date: 2023-08-18 16:36:12 +0300 (Fri, 18 Aug 2023) $
+ * \file     netx_drv_spi.c
+ * \brief    GPIO peripheral module driver.
+ *           This file provides firmware functions to manage the following
+ *           functionalities of the General Purpose Input/Output (GPIO) peripheral:
+ *            + Initialization and de-initialization functions
+ *            + IO operation functions
+ * $Revision: 6251 $
+ * $Date: 2019-10-07 09:27:10 +0200 (Mo, 07 Okt 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -21,44 +22,29 @@
  ******************************************************************************/
 
 #include "netx_drv.h"
-#ifdef DRV_ADC_MODULE_ENABLED   /* NOTE: needs 'PREDEFINED = DRV_ADC_MODULE_ENABLED' in Doxygen-Config-File if not enabled */
+#ifdef DRV_ADC_MODULE_ENABLED
 
-/*lint -save -e685   Relational operator '>' always evaluates to 'false'  */
+/*lint -save -e685 */
+/*lint -save -e568 */
 
-/*! \defgroup ADC_lable  ADC
+/*! \defgroup ADC ADC
  * \{
- * \brief The ADC driver controls the NetX90 Analog to Digital Converter.
+ * \brief This is the ADC driver, defined by DRV_ADC_HANDLE_T
  *
  * \details
- * The ADC driver can be used to acquire digital-samples of NetX90 Analog-Signal-Inputs.
+ * The ADC driver is used to interact with the ADC hardware component. The driver is a set of
+ * convenience functions to interact with the devices registers.
  *
- * The driver controls the NetX90-ADC-Module which consists of 4-sub-units. It provides functions for e.g.
- * - Get an actual single value (e.g. in polling mode).
+ * There are severeal applications of the adc that come to mind.
+ * - Get now a single value.
  * - Get continuous sampling to automate the sampling process.
  * - Get a set of samples one after another.
  * - Get a set of samples at the same time.
+ * - and more
  *
- * Each ADC-sub-unit is associated with an analog input-multiplexer (MUX) for the various input-channels.
- * Some configurable 'Sequencer-HW-Logic' is basically able to switch this MUX automatically
- *  when multiple channels are enabled.
- *
- * As every other driver component of the driver-package, a context- or handle-object has to be created first.
- * (one for the ADC-Block, and one for each Sequencer to be used)
- * These handles can be initialized using 'DRV_ADC_INITIALIZER' and 'DRV_ADC_SEQ_INITIALIZER'
- * but certain parameters usually need to be modified depending on application-requirements
- * before calling the initialize functions.
- * Note that when using 'polling mode' basically just one-channel should be active/enabled
- * because the sequencer will provide just the 'final-result' of all active channels via 'DRV_ADC_Seq_GetSample()'.
- *
- * Note1: Thus most practical for applications is probably the 'DRV_OPERATION_MODE_DMA' where conversion results
- * are stored by the Sequencer via 'memory-pointers' for each channel.
- * This is especially the case when multiple channels shall be converted at once,
- * because in polling- or IRQ-mode, the register used by DRV_ADC_Seq_GetSample() is updated so fast by the seq.controller
- * such that reading it by SW is not fast enough.
- *
- * Note2: make sure the destination/store-memory-address for the DMA-operation is 'internal RAM'
- * since the DMA might not reliable store data in 'external SDRAM' !
- * \note Also check out the ADC-example-applications in 'Examples_netX90_app_drv_V.x.x.x.x' found via the Hilscher web-page.
+ * As every other driver component of the package a context object has to be created first.
+ * This objects configuration has to be modified for the task ahead and then the device
+ * will be initialized by calling the initialize function on the context.
  */
 
 /*!
@@ -90,20 +76,7 @@ static IRQn_Type const s_apHandleIRQnTable[DRV_ADC_SEQ_DEVICE_COUNT] = DRV_ADC_S
 static DRV_ADC_SEQ_HANDLE_T * s_apHandleAddressTable[DRV_ADC_SEQ_DEVICE_COUNT] = { 0 };
 
 /*!
- * \brief The enumeration for the run/stop commands of the adc sequencer.
- */
-typedef enum DRV_ADC_SEQ_COMMAND_Etag
-{
-  DRV_ADC_SEQ_RUN = 0x1u,  /*!< Start measurement sequence */
-  DRV_ADC_SEQ_STOP = 0x0u, /*!< Stop measurement sequence  */
-} DRV_ADC_SEQ_COMMAND_E;
-
-/*!
  * The function takes a DRV_SPI_HANDLE_T pointer which contains a DRV_ADC_ATTRIBUTES_T structure.
- *
- * In case of an error during initialization, the function returns an error value, but the lock for the handle, will not be released.
- * Together with the return value, this will ensure that the driver can only be interacted with if it has been correctly initialized.
- * Since the lock is initialized when this function is called, this function can still be called again with other parameters after a failed initialization.
  *
  * \public
  * \memberof DRV_ADC_HANDLE_T
@@ -206,11 +179,9 @@ DRV_STATUS_E DRV_ADC_Driver_DeInit(DRV_ADC_HANDLE_T * const ptDriver)
  * \param[in] eSequencerMask Mask of sequencers to start
  * \return  DRV_OK
  *          DRV_ERROR_PARAM
- * \sa DRV_ADC_Seq_Start
  */
 DRV_STATUS_E DRV_ADC_Start(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE_MSK_E eSequencerMask)
 {
-  uint32_t ulSequencerMask = (uint32_t)eSequencerMask;
   if(ptDriver == NULL)
   {
     return DRV_ERROR_PARAM;
@@ -218,12 +189,12 @@ DRV_STATUS_E DRV_ADC_Start(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE
 
   DRV_LOCK(ptDriver);
 
-  if((ulSequencerMask > DRV_ADC_SEQ_DEVICE_MSK_MAX) || (ulSequencerMask < DRV_ADC_SEQ_DEVICE_MSK_MIN))
+  if((eSequencerMask > DRV_ADC_SEQ_DEVICE_MSK_MAX) || (eSequencerMask < DRV_ADC_SEQ_DEVICE_MSK_MIN))
   {
     return DRV_ERROR_PARAM;
   }
   //TODO: Make use of DRV_ADC_SEQ_DEVICE_COUNT or DRV_ADC_SEQ_DEVICE_ID_MAX/MIN
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_0)
+  if(eSequencerMask && DRV_ADC_SEQ_DEVICE_MSK_0)
   {
     if(ptDriver->aptAdcSequencer[0] != NULL)
     {
@@ -245,16 +216,16 @@ DRV_STATUS_E DRV_ADC_Start(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE
       }
       else
       {
-        ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_0;
+        eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_0));
       }
     }
     else
     {
-      ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_0;
+      eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_0));
     }
   }
 
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_1)
+  if(eSequencerMask && DRV_ADC_SEQ_DEVICE_MSK_1)
   {
     if(ptDriver->aptAdcSequencer[1] != NULL)
     {
@@ -276,16 +247,16 @@ DRV_STATUS_E DRV_ADC_Start(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE
       }
       else
       {
-        ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_1;
+        eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_1));
       }
     }
     else
     {
-      ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_1;
+      eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_1));
     }
   }
 
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_2)
+  if(eSequencerMask && DRV_ADC_SEQ_DEVICE_MSK_2)
   {
     if(ptDriver->aptAdcSequencer[2] != NULL)
     {
@@ -307,16 +278,16 @@ DRV_STATUS_E DRV_ADC_Start(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE
       }
       else
       {
-        ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_2;
+        eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_2));
       }
     }
     else
     {
-      ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_2;
+      eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_2));
     }
   }
 
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_3)
+  if(eSequencerMask && DRV_ADC_SEQ_DEVICE_MSK_3)
   {
     if(ptDriver->aptAdcSequencer[3] != NULL)
     {
@@ -338,17 +309,17 @@ DRV_STATUS_E DRV_ADC_Start(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE
       }
       else
       {
-        ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_3;
+        eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_3));
       }
     }
     else
     {
-      ulSequencerMask &= ~DRV_ADC_SEQ_DEVICE_MSK_3;
+      eSequencerMask = (DRV_ADC_SEQ_DEVICE_MSK_E) ((uint32_t) eSequencerMask & ~((uint32_t) DRV_ADC_SEQ_DEVICE_MSK_3));
     }
   }
 
-  /* start together */
-  ptDriver->ptDevice->madc_start = ulSequencerMask;
+  /* start all together */
+  ptDriver->ptDevice->madc_start = (uint32_t) eSequencerMask;
 
   DRV_UNLOCK(ptDriver);
   return DRV_OK;
@@ -366,8 +337,6 @@ DRV_STATUS_E DRV_ADC_Start(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE
  */
 DRV_STATUS_E DRV_ADC_Stop(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE_MSK_E eSequencerMask)
 {
-  uint32_t ulSequencerMask = (uint32_t)eSequencerMask;
-
   if(ptDriver == NULL)
   {
     return DRV_ERROR_PARAM;
@@ -375,13 +344,13 @@ DRV_STATUS_E DRV_ADC_Stop(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE_
 
   DRV_LOCK(ptDriver);
 
-  if((ulSequencerMask > DRV_ADC_SEQ_DEVICE_MSK_MAX) || (ulSequencerMask < DRV_ADC_SEQ_DEVICE_MSK_MIN))
+  if((eSequencerMask > DRV_ADC_SEQ_DEVICE_MSK_MAX) || (eSequencerMask < DRV_ADC_SEQ_DEVICE_MSK_MIN))
   {
     DRV_UNLOCK(ptDriver);
     return DRV_ERROR_PARAM;
   }
 
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_0)
+  if(eSequencerMask & (unsigned int) DRV_ADC_SEQ_DEVICE_MSK_0)
   {
     ptDriver->aptAdcSequencer[0]->ptDevice->madc_seq_cmd &= ~madc_seq0_madc_seq_cmd_run_Msk;
 
@@ -391,7 +360,7 @@ DRV_STATUS_E DRV_ADC_Stop(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE_
     }
   }
 
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_1)
+  if(eSequencerMask & (unsigned int) DRV_ADC_SEQ_DEVICE_MSK_1)
   {
     ptDriver->aptAdcSequencer[1]->ptDevice->madc_seq_cmd &= ~madc_seq0_madc_seq_cmd_run_Msk;
 
@@ -401,7 +370,7 @@ DRV_STATUS_E DRV_ADC_Stop(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE_
     }
   }
 
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_2)
+  if(eSequencerMask & (unsigned int) DRV_ADC_SEQ_DEVICE_MSK_2)
   {
     ptDriver->aptAdcSequencer[2]->ptDevice->madc_seq_cmd &= ~madc_seq0_madc_seq_cmd_run_Msk;
 
@@ -411,7 +380,7 @@ DRV_STATUS_E DRV_ADC_Stop(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE_
     }
   }
 
-  if(ulSequencerMask & DRV_ADC_SEQ_DEVICE_MSK_3)
+  if(eSequencerMask & (unsigned int) DRV_ADC_SEQ_DEVICE_MSK_3)
   {
     ptDriver->aptAdcSequencer[3]->ptDevice->madc_seq_cmd &= ~madc_seq0_madc_seq_cmd_run_Msk;
 
@@ -421,16 +390,14 @@ DRV_STATUS_E DRV_ADC_Stop(DRV_ADC_HANDLE_T * const ptDriver, DRV_ADC_SEQ_DEVICE_
     }
   }
 
+  ptDriver->ptDevice->madc_start = (uint32_t) eSequencerMask;
+
   DRV_UNLOCK(ptDriver);
   return DRV_OK;
 }
 
 /*!
  * Initializes the adc sequencer and its handle by the given configuration..
- *
- * In case of an error during initialization, the function returns an error value, but the lock for the handle, will not be released.
- * Together with the return value, this will ensure that the driver can only be interacted with if it has been correctly initialized.
- * Since the lock is initialized when this function is called, this function can still be called again with other parameters after a failed initialization.
  *
  * \public
  * \memberof DRV_ADC_SEQ_HANDLE_T
@@ -499,11 +466,11 @@ DRV_STATUS_E DRV_ADC_Seq_Init(DRV_ADC_SEQ_HANDLE_T * const ptSequencer, DRV_ADC_
       return DRV_ERROR_PARAM;
     }
   }
-  if((ptSequencer->tConfiguration.pvBaseAdr > DRV_ADC_SEQ_BASE_ADDRESS_MAX) || (ptSequencer->tConfiguration.pvBaseAdr < DRV_ADC_SEQ_BASE_ADDRESS_MIN)) //lint !e413
+  if((ptSequencer->tConfiguration.eBaseAdr > DRV_ADC_SEQ_BASE_ADDRESS_MAX) || (ptSequencer->tConfiguration.eBaseAdr < DRV_ADC_SEQ_BASE_ADDRESS_MIN))
   {
     return DRV_ERROR_PARAM;
   }
-  for(ulIndexLoop = 0; ulIndexLoop < DRV_ADC_MEASUREMENTS_MAX; ulIndexLoop++) /* NOTE: DRV_ADC_MEASUREMENTS_MAX == 8 */
+  for(ulIndexLoop = 0; ulIndexLoop < DRV_ADC_MEASUREMENTS_MAX; ulIndexLoop++)
   {
     if((ptSequencer->tConfiguration.tMeasurement[ulIndexLoop].eEnable > DRV_ADC_SEQ_MEAS_ENABLE_MAX)
       || (ptSequencer->tConfiguration.tMeasurement[ulIndexLoop].eEnable < DRV_ADC_SEQ_MEAS_ENABLE_MIN))
@@ -618,7 +585,7 @@ DRV_STATUS_E DRV_ADC_Seq_Init(DRV_ADC_SEQ_HANDLE_T * const ptSequencer, DRV_ADC_
   ptSequencer->ptDevice->madc_seq_tracking_time_mux7 = (uint32_t) ptSequencer->tConfiguration.eChannelTrackingTime[DRV_ADC_SEQ_MEASUREMENT_7];
 
   /* madc_seq_ms_baseadr */
-  ptSequencer->ptDevice->madc_seq_ms_baseadr = (uint32_t) ptSequencer->tConfiguration.pvBaseAdr;
+  ptSequencer->ptDevice->madc_seq_ms_baseadr = (uint32_t) ptSequencer->tConfiguration.eBaseAdr;
 
   if(ptSequencer->tConfiguration.eOperationMode == DRV_OPERATION_MODE_IRQ)
   {
@@ -710,8 +677,6 @@ DRV_STATUS_E DRV_ADC_Seq_SetMode(DRV_ADC_SEQ_HANDLE_T * const ptSequencer, DRV_A
  */
 DRV_STATUS_E DRV_ADC_Seq_Start(DRV_ADC_SEQ_HANDLE_T * const ptSequencer)
 {
-  uint32_t ulSequencerCmdRegValue = 0;
-
   if(ptSequencer == NULL)
   {
     return DRV_ERROR_PARAM;
@@ -739,10 +704,8 @@ DRV_STATUS_E DRV_ADC_Seq_Start(DRV_ADC_SEQ_HANDLE_T * const ptSequencer)
     ptSequencer->ptDevice->madc_seq_irq_mask_reset = 0x1FFul;
   }
 
-  ulSequencerCmdRegValue = ptSequencer->tConfiguration.eContinuousMode;
-  ulSequencerCmdRegValue = ulSequencerCmdRegValue << madc_seq0_madc_seq_cmd_continuous_Pos;
-  ulSequencerCmdRegValue |= DRV_ADC_SEQ_RUN;
-  ptSequencer->ptDevice->madc_seq_cmd = ulSequencerCmdRegValue;
+  ptSequencer->ptDevice->madc_seq_cmd_b.continuous = ptSequencer->tConfiguration.eContinuousMode;
+  ptSequencer->ptDevice->madc_seq_cmd_b.run = 1u;
 
   DRV_UNLOCK(ptSequencer);
   return DRV_OK;
@@ -766,7 +729,7 @@ DRV_STATUS_E DRV_ADC_Seq_Stop(DRV_ADC_SEQ_HANDLE_T * const ptSequencer)
 
   DRV_LOCK(ptSequencer);
 
-  ptSequencer->ptDevice->madc_seq_cmd_b.run = DRV_ADC_SEQ_STOP;
+  ptSequencer->ptDevice->madc_seq_cmd_b.run = 0u;
 
   if(ptSequencer->tConfiguration.eOperationMode == DRV_OPERATION_MODE_IRQ)
   {
@@ -1186,17 +1149,15 @@ __STATIC_INLINE void DRV_ACD_IRQ_Inline_Handler(DRV_ADC_SEQ_DEVICE_ID_E const eD
   ptSequencer->ptDevice->madc_seq_irq_raw = 1ul << ulIrqMasked;
 }
 
-/*!
- * \brief Macro for automatic ADC-IRQ-Function generation.
- */
 #define  DRV_ACD_IRQHandler_Generator(id, _) DRV_Default_IRQHandler_Function_Generator(MADC ## id ## _IRQHandler ,DRV_ACD_IRQ_Inline_Handler,DRV_ADC_SEQ_DEVICE_ID_ADC ## id)
 
-/*lint -save -e123 The name of a macro defined with arguments was subsequently used without a following '(' */
+/*lint -save -e123 */
 DRV_DEF_REPEAT_EVAL(DRV_ADC_SEQ_DEVICE_COUNT, DRV_ACD_IRQHandler_Generator, ~)
 /*lint -restore */
 
 /*! \} *//* End of group ADC */
 
+/*lint -restore */
 /*lint -restore */
 
 #endif /* DRV_ADC_MODULE_DISABLE */

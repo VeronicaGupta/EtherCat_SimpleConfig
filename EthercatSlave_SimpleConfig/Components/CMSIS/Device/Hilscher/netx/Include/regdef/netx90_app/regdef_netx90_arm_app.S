@@ -1,5 +1,6 @@
 /*********************************************************************/
-/* SVN Revision: $Rev: 1175 $        release-1.5.0.4 2023-09-28      */
+/* Based on verilog file from: 190308_0616                           */
+/* SVN Revision: $Rev: 1158 $        release-1.4.0.1                 */
 /* from regdef.v by regdef2h auto-generated C-header file            */
 /* please see the regdef.html file for detailed register description */
 /*********************************************************************/
@@ -116,8 +117,7 @@
 
 /* ===================================================================== */
 
-#define Addr_NX90_sdram          0x10000000
-#define NX90_NETX_HIF_SDRAM_AREA 0x10000000
+#define Addr_NX90_sdram 0x10000000
 
 /* --------------------------------------------------------------------- */
 /* Register sdram_base */
@@ -155,8 +155,7 @@
 
 /* ===================================================================== */
 
-#define Addr_NX90_extsram       0x68000000
-#define NX90_NETX_HIF_SRAM_AREA 0x68000000
+#define Addr_NX90_extsram 0x68000000
 
 /* --------------------------------------------------------------------- */
 /* Register cs0_base */
@@ -28776,7 +28775,7 @@
 /* => ASIC_CTRL IRQ mask set: */
 /*    The IRQ mask enables interrupt requests for corresponding interrupt sources. */
 /*    As its bits might be changed by different software tasks, */
-/*    the IRQ mask register is not writable directly, but by set and reset masks: */
+/*    the IRQ maskq register is not writable directly, but by set and reset masks: */
 /*    Write access with '1' sets interrupt mask bit. */
 /*    Write access with '0' does not influence this bit. */
 /*    Read access shows actual interrupt mask. */
@@ -30394,7 +30393,7 @@
 
 /* --------------------------------------------------------------------- */
 /* Register iflash_protection_info */
-/* => This register is lockable by asic_ctrl_com.netx_lock-lock_system_cfg. */
+/* =>  */
 /* => Mode: R/W */
 /* --------------------------------------------------------------------- */
 
@@ -30463,45 +30462,49 @@
 #define Adr_NX90_hif_io_cfg             0xFF401480
 #define DFLT_VAL_NX90_hif_io_cfg        0x01000060
 
-#define MSK_NX90_hif_io_cfg_sel_hif_dpm                0x00000001
-#define SRT_NX90_hif_io_cfg_sel_hif_dpm                0
-#define DFLT_VAL_NX90_hif_io_cfg_sel_hif_dpm           0x00000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_hif_dpm        0x00000000
-#define MSK_NX90_hif_io_cfg_sel_dpm_serial             0x00000002
-#define SRT_NX90_hif_io_cfg_sel_dpm_serial             1
-#define DFLT_VAL_NX90_hif_io_cfg_sel_dpm_serial        0x00000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_dpm_serial     0x00000000
-#define MSK_NX90_hif_io_cfg_sel_dpm_serial_sph         0x00000004
-#define SRT_NX90_hif_io_cfg_sel_dpm_serial_sph         2
-#define DFLT_VAL_NX90_hif_io_cfg_sel_dpm_serial_sph    0x00000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_dpm_serial_sph 0x00000000
-#define MSK_NX90_hif_io_cfg_sel_dpm_serial_spo         0x00000008
-#define SRT_NX90_hif_io_cfg_sel_dpm_serial_spo         3
-#define DFLT_VAL_NX90_hif_io_cfg_sel_dpm_serial_spo    0x00000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_dpm_serial_spo 0x00000000
-#define MSK_NX90_hif_io_cfg_en_sdpm1                   0x00000010
-#define SRT_NX90_hif_io_cfg_en_sdpm1                   4
-#define DFLT_VAL_NX90_hif_io_cfg_en_sdpm1              0x00000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_en_sdpm1           0x00000000
-#define MSK_NX90_hif_io_cfg_hif_mi_cfg                 0x00000060
-#define SRT_NX90_hif_io_cfg_hif_mi_cfg                 5
-#define DFLT_VAL_NX90_hif_io_cfg_hif_mi_cfg            0x00000060
-#define DFLT_BF_VAL_NX90_hif_io_cfg_hif_mi_cfg         0x00000003
-#define MSK_NX90_hif_io_cfg_en_hif_sdram_mi            0x00000080
-#define SRT_NX90_hif_io_cfg_en_hif_sdram_mi            7
-#define DFLT_VAL_NX90_hif_io_cfg_en_hif_sdram_mi       0x00000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_en_hif_sdram_mi    0x00000000
-#define MSK_NX90_hif_io_cfg_sel_hif_a_width            0x00000f00
-#define SRT_NX90_hif_io_cfg_sel_hif_a_width            8
-#define DFLT_VAL_NX90_hif_io_cfg_sel_hif_a_width       0x00000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_hif_a_width    0x00000000
-#define MSK_NX90_hif_io_cfg_en_hif_rdy_pio_mi          0x01000000
-#define SRT_NX90_hif_io_cfg_en_hif_rdy_pio_mi          24
-#define DFLT_VAL_NX90_hif_io_cfg_en_hif_rdy_pio_mi     0x01000000
-#define DFLT_BF_VAL_NX90_hif_io_cfg_en_hif_rdy_pio_mi  0x00000001
+#define MSK_NX90_hif_io_cfg_sel_hif_dpm                    0x00000001
+#define SRT_NX90_hif_io_cfg_sel_hif_dpm                    0
+#define DFLT_VAL_NX90_hif_io_cfg_sel_hif_dpm               0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_hif_dpm            0x00000000
+#define MSK_NX90_hif_io_cfg_sel_dpm_serial                 0x00000002
+#define SRT_NX90_hif_io_cfg_sel_dpm_serial                 1
+#define DFLT_VAL_NX90_hif_io_cfg_sel_dpm_serial            0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_dpm_serial         0x00000000
+#define MSK_NX90_hif_io_cfg_sel_dpm_serial_sph             0x00000004
+#define SRT_NX90_hif_io_cfg_sel_dpm_serial_sph             2
+#define DFLT_VAL_NX90_hif_io_cfg_sel_dpm_serial_sph        0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_dpm_serial_sph     0x00000000
+#define MSK_NX90_hif_io_cfg_sel_dpm_serial_spo             0x00000008
+#define SRT_NX90_hif_io_cfg_sel_dpm_serial_spo             3
+#define DFLT_VAL_NX90_hif_io_cfg_sel_dpm_serial_spo        0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_dpm_serial_spo     0x00000000
+#define MSK_NX90_hif_io_cfg_en_sdpm1                       0x00000010
+#define SRT_NX90_hif_io_cfg_en_sdpm1                       4
+#define DFLT_VAL_NX90_hif_io_cfg_en_sdpm1                  0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_en_sdpm1               0x00000000
+#define MSK_NX90_hif_io_cfg_hif_mi_cfg                     0x00000060
+#define SRT_NX90_hif_io_cfg_hif_mi_cfg                     5
+#define DFLT_VAL_NX90_hif_io_cfg_hif_mi_cfg                0x00000060
+#define DFLT_BF_VAL_NX90_hif_io_cfg_hif_mi_cfg             0x00000003
+#define MSK_NX90_hif_io_cfg_en_hif_sdram_mi                0x00000080
+#define SRT_NX90_hif_io_cfg_en_hif_sdram_mi                7
+#define DFLT_VAL_NX90_hif_io_cfg_en_hif_sdram_mi           0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_en_hif_sdram_mi        0x00000000
+#define MSK_NX90_hif_io_cfg_sel_hif_a_width                0x00000f00
+#define SRT_NX90_hif_io_cfg_sel_hif_a_width                8
+#define DFLT_VAL_NX90_hif_io_cfg_sel_hif_a_width           0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_sel_hif_a_width        0x00000000
+#define MSK_NX90_hif_io_cfg_en_hif_rdy_pio_mi              0x01000000
+#define SRT_NX90_hif_io_cfg_en_hif_rdy_pio_mi              24
+#define DFLT_VAL_NX90_hif_io_cfg_en_hif_rdy_pio_mi         0x01000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_en_hif_rdy_pio_mi      0x00000001
+#define MSK_NX90_hif_io_cfg_en_hif_wdg_sys_hif_d19         0x02000000
+#define SRT_NX90_hif_io_cfg_en_hif_wdg_sys_hif_d19         25
+#define DFLT_VAL_NX90_hif_io_cfg_en_hif_wdg_sys_hif_d19    0x00000000
+#define DFLT_BF_VAL_NX90_hif_io_cfg_en_hif_wdg_sys_hif_d19 0x00000000
 
 /* all used bits of 'NX90_hif_io_cfg': */
-#define MSK_USED_BITS_NX90_hif_io_cfg 0x01000fff
+#define MSK_USED_BITS_NX90_hif_io_cfg 0x03000fff
 
 /* --------------------------------------------------------------------- */
 /* Register hif_pio_cfg */
@@ -34395,17 +34398,11 @@
 /*    Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). */
 /*    The capacitor inside ADC needs time to be charged depending \ */
 /*    on the driving strength of the external signal. \ */
-/*    For 12 bit precision, a settling to time of 9 tau should be ensured. */
-/*    tau can be calculated by tau = 9*(ADC_MUX_RSER + Rext) * ADC_MUX_CIN, \ */
-/*    with Rext being additional resistance from devices external to the SOC. */
-/*    The setting of tt_add also depends on the setting of */
-/*    madc_seq_cfg.adcclk_period and can be calculate by the following formula: */
-/*    tt_add = ceil( tau/10ns - madc_seq_cfg.adcclk_period ) - 2 */
+/*    For 12 bit precision, this time should be 9*(Rint+Rext)*C, \ */
+/*    with Rint=1kOhm and C=7.5pF. */
+/*    The total formula for this value is: */
+/*    tt_add = ceil((6,75 x Rext/kOhm) + 6,75) - adcclk_period/10ns - 2 */
 /*    Set tt_add=4 if calculated value is smaller 4. */
-/*    Note: madc_seq_cfg.adcclk_period and madc_seq_tracking_time_mux[x].tt_add */
-/*          will count down to 0 meaning that the value set in the registers */
-/*          is increased by 1. To compensate this the tt_add formula includes a '-2'. */
-/*    Note: ADC_MUX_RSET(1.5kOhm) and ADC_MUX_CIN(10pF) are defined in the electrical parameters. */
 /*    The total ADC cycle time results in: */
 /*    tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. */
 /* => Mode: R/W */
@@ -36787,10 +36784,10 @@
 /* --------------------------------------------------------------------- */
 /* Register i2c_mdr */
 /* => I2C master data register (master FIFO): */
-/*    There is only one FIFO for both receive and transmit master data with a depth of 16 bytes. For a master write access, data read from the FIFO is */
-/*    is sent via I2C. For a master read access, data received from I2C is written into the FIFO. */
-/*    In case of imminent data transfer failure (read transfer and FIFO is full or write transfer and FIFO is empty), the transfer will be paused. */
-/*    To continue the transfer, the FIFO must be handled first (filled for transmit, read out for receive). */
+/*    There is only one FIFO for both receive and transmit master data with a depth of 16 bytes. For master write access, data sent by the master */
+/*    is delivered from the FIFO. For master read access, data received by the master is stored in the FIFO. */
+/*    In case of imminent data transfer failure (read transfer and FIFO is full or write transfer and FIFO is empty), the transfer will be interrupted. */
+/*    To continue the transfer, the FIFO must be handled first (filled for write transfer, read out for read transfer). */
 /*    Note: The FIFO behavior has been changed: For netX 51/52/56 and older versions, the current command was aborted and the cmd_err was raised. */
 /* => Mode: R/W */
 /* --------------------------------------------------------------------- */
@@ -36811,9 +36808,8 @@
 /* --------------------------------------------------------------------- */
 /* Register i2c_sdr */
 /* => I2C slave data register (slave FIFO): */
-/*    There is only one FIFO for both receive and transmit slave data with a depth of 16 bytes. For a read access of an external master, data sent by */
-/* this */
-/*    slave is read from the FIFO. For a write access of an external master, data received by this slave is written into the FIFO. */
+/*    There is only one FIFO for both receive and transmit slave data with a depth of 16 bytes. For master read access, data sent by the slave */
+/*    is delivered from the FIFO. For master write access, data received by the slave is stored in the FIFO. */
 /*    A transfer is initiated after the detection of I2C-start-sequence to the device address (i2c_scr.sid, sreq IRQ) which is acknowledged by this */
 /*    device (i2c_scr.ac_start). For read transfers, sent data is read from the FIFO immediately after the detection of the acknowledge on */
 /*    the I2C-bus. SDA will be driven with the next data MSB immediately after the acknowledge SCL high phase. */

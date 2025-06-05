@@ -3,7 +3,7 @@
  * \brief   peripheral module driver.
  *          This is the common part of the DRV initialization
  * $Revision: 6124 $
- * $Date: 2019-08-28 20:41:54 +0300 (Wed, 28 Aug 2019) $
+ * $Date: 2019-08-28 19:41:54 +0200 (Mi, 28 Aug 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an

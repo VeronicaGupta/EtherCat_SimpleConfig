@@ -2,7 +2,7 @@
  * \file     netx_drv_xpic.c
  * \brief    XPIC module driver.
  * $Revision: 6592 $
- * $Date: 2019-12-17 15:14:57 +0200 (Tue, 17 Dec 2019) $
+ * $Date: 2019-12-17 14:14:57 +0100 (Di, 17 Dez 2019) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an

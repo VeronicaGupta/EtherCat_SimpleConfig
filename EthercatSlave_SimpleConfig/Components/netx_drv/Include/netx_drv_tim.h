@@ -1,8 +1,8 @@
 /*!************************************************************************//*!
  * \file    netx_drv_tim.h
  * \brief   Header file of timer driver
- * $Revision: 11372 $
- * $Date: 2024-06-06 15:07:46 +0300 (Thu, 06 Jun 2024) $
+ * $Revision: 4646 $
+ * $Date: 2018-12-19 08:47:36 +0100 (Mi, 19 Dez 2018) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -192,8 +192,6 @@ typedef struct DRV_TIM_CONFIGURATION_Ttag
  * The configuration SHALL be changed before initializing the device and shall not be changed
  * afterwards.
  * The rest of it SHALL not be modified outside of the driver, even if it appears to be possible.
- * \struct DRV_TIM_HANDLE_T
- * \struct DRV_TIM_HANDLE_Ttag
  */
 typedef struct DRV_TIM_HANDLE_Ttag
 {
@@ -275,7 +273,7 @@ DRV_STATUS_E DRV_TIM_GetState(DRV_TIM_HANDLE_T * const ptTim, DRV_TIM_STATE_E * 
  * \memberof DRV_TIM_HANDLE_T
  * \return void
  */
-__STATIC_FORCEINLINE void DRV_TIM_LatchSystimes(void){
+__STATIC_FORCEINLINE void DRV_TIM_LatchSytimes(void){
   DRV_SYSTIME_LT_DEVICE->intlogic_lt_systimes_latch = (uint32_t) -1;
 }
 

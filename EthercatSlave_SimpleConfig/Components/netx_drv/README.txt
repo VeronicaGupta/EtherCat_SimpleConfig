@@ -1,5 +1,5 @@
 /**************************************************************************************//*
-$Id: README.txt 11618 2024-10-07 13:01:36Z dmilkov $: 
+$Id: README.txt 6608 2019-12-17 15:27:55Z AndreGross $:
 **************************************************************************************//**
 \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 \if netx_drv_mainpage
@@ -252,8 +252,7 @@ has a global context objet and the legacy hardware abstraction layer drivers.
 digraph example {
   edge [fontname="Helvetica",fontsize="9",labelfontname="Helvetica",labelfontsize="9"];
   node [fontname="Helvetica",fontsize="9",shape=record];
-  Node1 [label="{DRV_DEV_HANDLE_T\n|+ Buffer\l+ BufferSize\l+ BufferCounter\l+ tLock\land many more...\l|+ DRV_DEV_Init()\l+ DRV_DEV_DeInit()\l+ DRV_DEV_Transmit()\l+ DRV_DEV_Receive()\l+ DRV_DEV_TransmitReceive()\l+ DRV_DEV_
-()\l+ DRV_DEV_Abort()\l+ DRV_DEV_GetState()\land many more...\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="The device handle/class/context object."];
+  Node1 [label="{DRV_DEV_HANDLE_T\n|+ Buffer\l+ BufferSize\l+ BufferCounter\l+ tLock\land many more...\l|+ DRV_DEV_Init()\l+ DRV_DEV_DeInit()\l+ DRV_DEV_Transmit()\l+ DRV_DEV_Receive()\l+ DRV_DEV_TransmitReceive()\l+ DRV_DEV_Change()\l+ DRV_DEV_Abort()\l+ DRV_DEV_GetState()\land many more...\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="The device handle/class/context object."];
   Node2 -> Node1 [color="grey25",fontsize="9",style="solid",label=" +tConfiguration" ,arrowhead="odiamond",fontname="Helvetica"];
   Node2 [label="{DRV_DEV_CONFIGURATION_T\n|+ eDeviceID\l+ eOperationMode\l+ eFrequency\l+ eFormat\l+ eDuplex\land many more...\l|}",height=0.2,width=0.4,color="black",tooltip="The configuration structure of the device driver. "];
   Node3 -> Node2 [color="grey25",fontsize="9",style="solid",label=" +uAttribute" ,arrowhead="odiamond",fontname="Helvetica"];
@@ -938,18 +937,6 @@ Changelog
 
 Version       | Date       | Who  | Description
 --------------|------------|------|-----------------------------------
-V0.1.5.3      | 2024-10-07 | DM   | enhancements and bug-fixes
-V0.1.5.2      | 2024-06-21 | DM   | enhancements and bug-fixes
-V0.1.5.1      | 2024-04-22 | DM   | enhancements and bug-fixes
-V0.1.5.0      | 2024-02-20 | DM   | enhancements and bug-fixes
-V0.1.4.0      | 2023-06-27 | EB   | enhancements and bug-fixes
-V0.1.3.0      | 2022-02-09 | EB   | Versioning, usage for 'Template'
-V0.1.2.0      | 2022-01-28 | JZ   | Versioning
-V0.1.0.3      | 2020-11-06 | AGR  | SPI and I2C
-V0.1.0.2      | 2020-09-28 | AGR  | GCC Note
-V0.1.0.1      | 2020-09-28 | AGR  | Versioning
-V0.1.1.0      | 2020-09-22 | AGR  | Versioning
-V0.1.0.0      | 2020-09-07 | AGR  | NAE, MCP and FPU
 V0.0.5.0      | 2019-12-17 | AGR  | Header changes
 V0.0.4.10     | 2019-12-16 | AGR  | XPIC Hotfix
 V0.0.4.9      | 2019-12-05 | AGR  | SPI and UART Hotfix
@@ -967,140 +954,6 @@ V0.0.2.0      | 2018-03-01 | AGR  | CAN Pre-Beta
 V0.0.1.0      | 2018-01-26 | AGR  | Pre-Beta
 V0.0.0.3564   | 2018-01-16 | AGR  | Alpha
 V0.0.0.3452   | 2017-11-06 | AGR  | Pre-Alpha
-
-### V0.1.5.3
-
-** Bug
-- [NX90APPDRV-183] - meaningless test of eDioMskOutputReference in DRV_TIM_ChannelGetCapture()
-- [NX90APPDRV-264] - I2C - Master Transmit results in mFIFO Underrun when addressing is 10-bit
-- [NX90APPDRV-265] - I2C - Master Receive results in mFIFO Underrun when addressing is 10-bit
-- [NX90APPDRV-266] - I2C - Master Transmit does not work with 10-bit slave addressing
-- [NX90APPDRV-267] - I2C - Master Receive does not work correctly with 10-bit slave addressing
-- [NX90APPDRV-268] - I2C - Master Transmit repeats sending 10-bit address' second byte in continuous mode
-- [NX90APPDRV-269] - Hardfault occurs when debugging with SDRAM as target 
-- [NX90APPDRV-270] - I2C - Master Receive repeats sending second 10-bit address' byte in continuous mode
-- [NX90APPDRV-271] - I2C - sAckPollMaximum configuration value not validated. Value range should be added in description.
-- [NX90APPDRV-273] - I2C - eSpeedMode is not validated
-- [NX90APPDRV-274] - I2C - Polling mode MasterTransmit() and MasterReceive() error in transfer in consecutive Continuous and Continuous End operations
-- [NX90APPDRV-275] - I2C - Slave Transmit function generates cyclic IRQs while waiting for Master's request
-- [NX90APPDRV-276] - I2C - Abort function fix
-- [NX90APPDRV-277] - I2C - Device address verification for Master and Slave mode
-- [NX90APPDRV-279] - I2C - Slave does not detect transfer direction change or premature stop from Master
-- [NX90APPDRV-281] - I2C - Master does not send Stop in IRQ mode, when Slave is not responding
-- [NX90APPDRV-282] - I2C - Master Receive with 10-bit addressing does not correspond to the Philips standard
-
-### V0.1.5.2
-
-** Bug
-- Bit Field usage must result always in word access, no byte access
-- DRV_TIM_LatchSytimes - Corrected wrong spelling
-- linker-script 'netx90_app_intram.ld' needs ALIGN(8)
-- un-lucky defines like 'hash' in 'netx90_app.h' - implemented a mechanism to resolve definition conflicts with language reserved words
-- DRV functions return DRV_LOCKED in single thread usage - little modification in Semaphore of locking mechanism
-- Wrong file name in header comment block of netx_drv_user_conf_template.h
-- DRV_UART_Receive always return BUSY if a RX timeout occurs in polling mode
-- DMAC - Transfer of more than 4095 byte is not working
-
-** New Feature
-- Add version parameter to bld.stlib commmand in the component wscript
-
-
-
-### V0.1.5.1
-
-** Bug
-- I2C module is used only as a master device, but get param error if don't config tSlaveAddress parameter
-- I2C copy and paste errors
-- I2C - Watermark issue when receiving data as a slave
-- DRV_I2C_MasterTransmit() function seems to set incorrect I2C command in IRQ mode
-- I2C - Compile error due to bool usage
-- I2C - Device does not transmit data correctly in slave mode
-- I2C - On High Speed in Slave Mode, Device does not transmit correctly first bytes of data
-- I2C - Polling mode Master Receive functionality ends a transaction to be continued with STOP on the line
-- I2C - MasterTransmit() continues mode correction
-- I2C - Copying all received data out of FIFO not possible in Slave mode after STOP
-- I2C - Watermark issue when receiving data as a master
-- I2C - In Master Receive IRQ mode transaction is not finished if ISR is interrupted by higher priority IRQ
-
-** New Feature
-- I2C Timeout Config Entry
-
-** Change
-- I2C - Implement timeout functionality in Slave Polling mode
-
-
-### V0.1.5.0
-
-** Bug
-- ptTim->ulSubID
-- SPI RefillLevel
-- SPI device in IRQ mode stuck with DRV_BUSY when sending small amount of data with low SPI frequencies 
-- DIO - Reconfiguration of the GPIO capture mode with DRV_DIO_ChannelSetMode does not work correctly
-- I2C - Watermark issue when receiving data as a slave
-- UART - DRV_UART_ABORT not working correctly in DMA mode
-- Implement writing of ADC Sequencer command register once per job with all parameters
-- UART - Transmission does not work properly when watermark level is 1 in DMA mode
-- UART - ullFrameStartTick for timeout is not reset in DRV_UART_GetChar and DRV_UART_PutChar
-- Problem when using a SQI interface from app side in standard SPI full-duplex mode
-- SQI Chip Select hardware mode issue
-- Function DRV_I2C_Abort() returns only negative result
-- DRV_I2C_MasterReceive() function is no more useable if returns with timeout in polling mode
-
-** New Feature
-- Test SPI slave functionality in SQI capable SPI driver
-- Uart driver: add support to 6.25M baudrate
-- Trimmed ADC_VREF for low-level driver of temperature sensor
-- In function DRV_ADC_Start() wrong check for selected sequencer
-
-** Change
-- UART Baud Rate Mode Calculation
-- netX 90 regdef update due to ADC register description
-- Change ADC software default value for tt_add to 10
-
-
-
-### V0.1.4.0 Versioning, some enhancements due requests
-- DRV_LOCK/'DRV_UNLOCK' introduced different solution for these macros 'as new default'
-        in 'netx_drv_conf.h', 'netx_drv.h', not using LDREX/STREX instructions
-        Note: these macros are used/included by 'all drivers'
-- ADC   changed config data type of DMA Base Address 
-- ADC   fixed wrong check for selected sequencer in DRV_ADC_Start 
-- TIMER fixed DRV_TIM_Init not returning DRV_NSUPP when DMA mode is selected
-- DIO   fixed bug in DRV_DIO_ChannelSetMode where reconfiguring of GPIO capture mode did not work
-- CMSIS added feature 'using Trimmed ADC_VREF for low-level driver of temperature sensor'
-
-### V0.1.3.0 Versioning, note on some driver-code
-- ADC added more description-text in .c and .h file
-- SPI introduced a fix for getting SQI-Mode 'using DMA' working
-
-### V0.1.2.0 Versioning
-- version with updated wscript
-
-### V0.1.0.3 SPI and I2C
-- SPI fixed size correction
-- I2C missing clr added
-- DMAC added the falsely removed align. Note does still not disapear.
-
-### V0.1.0.2 GCC Note
-- DMAC Another approach to the note regarding packed bit-fields in gcc 4.4 increased the amount of notes, so it was reverted again
-
-### V0.1.1.0 Versioning
-- Tagged the wrong version
-
-### V0.1.0.0 NAE, MCP and FPU
-- CMSIS FPU support added
-- CMSIS NAE in linker scripts is correctly placed now
-- CMSIS License of linker scripts has changed
-- WAF modified configuration struct
-- DMAC abort now disables the device before waiting for the active flag to go down
-- I2C Refill Level was added
-- I2C Clear is now functional
-- I2C get state now copes with missing state parameter
-- SPI Abort now also for polling mode
-- SPI Refill Level was added
-- SPI added assert
-- SPI fixed size correction
-- UART Abort fixed
 
 ### V0.0.5.0 Header changes
 Changed the wscript and tagged basically the V0.0.4.10 again due to the

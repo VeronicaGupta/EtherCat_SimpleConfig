@@ -2,7 +2,7 @@
  * \file    netx_drv_dio.h
  * \brief   Header file of DIO DRV module.
  * $Revision: 4538 $
- * $Date: 2018-11-22 18:26:55 +0200 (Thu, 22 Nov 2018) $
+ * $Date: 2018-11-22 17:26:55 +0100 (Do, 22 Nov 2018) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an

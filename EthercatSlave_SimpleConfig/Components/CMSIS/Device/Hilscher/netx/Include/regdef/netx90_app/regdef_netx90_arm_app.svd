@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--automatically generated with svd_converter.py-->
-<!--SVN Revision: $Rev: 1175 $        release-1.5.0.4 2023-09-28    -->
+<!--Based on verilog file from: 190308_0616-->
+<!--SVN Revision: $Rev: 1158 $        release-1.4.0.1               -->
 
 <device xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.0" xs:noNamespaceSchemaLocation="CMSIS-SVD_Schema_1_0.xsd">
   <name>netx90_app</name>
@@ -30476,7 +30477,7 @@
         <register>
           <!--Absolute address of 'asic_ctrl_irq_mask_set': 0xFF4012B8-->
           <name>asic_ctrl_irq_mask_set</name>
-          <description>ASIC_CTRL IRQ mask set: The IRQ mask enables interrupt requests for corresponding interrupt sources. As its bits might be changed by different software tasks, the IRQ mask register is not writable directly, but by set and reset masks: Write access with '1' sets interrupt mask bit. Write access with '0' does not influence this bit. Read access shows actual interrupt mask. Attention: Before activating interrupt mask, delete old pending interrupts by writing the same value to bod_irq_raw. </description>
+          <description>ASIC_CTRL IRQ mask set: The IRQ mask enables interrupt requests for corresponding interrupt sources. As its bits might be changed by different software tasks, the IRQ maskq register is not writable directly, but by set and reset masks: Write access with '1' sets interrupt mask bit. Write access with '0' does not influence this bit. Read access shows actual interrupt mask. Attention: Before activating interrupt mask, delete old pending interrupts by writing the same value to bod_irq_raw. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x000000B8</addressOffset>
           <size>32</size>
@@ -32224,7 +32225,7 @@
         <register>
           <!--Absolute address of 'iflash_protection_info': 0xFF401448-->
           <name>iflash_protection_info</name>
-          <description>This register is lockable by asic_ctrl_com.netx_lock-lock_system_cfg. </description>
+          <description>no Register description</description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x00000048</addressOffset>
           <size>32</size>
@@ -32298,12 +32299,17 @@
           <size>32</size>
           <access>read-write</access>
           <resetValue>0x01000060</resetValue>
-          <resetMask>0x01000FFF</resetMask>
+          <resetMask>0x03000FFF</resetMask>
           <fields>
             <field>
               <name>bf_align1</name>
-              <bitRange>[31:25]</bitRange>
+              <bitRange>[31:26]</bitRange>
               <description>bitField alignment value for aeabi compatibility</description>
+            </field>
+            <field>
+              <name>en_hif_wdg_sys_hif_d19</name>
+              <bitRange>[25:25]</bitRange>
+              <description>Obsolete for netX90, removed by regdef filter script. Enable 'wdg_active'/'WDGACT'-signal of netX system watchdog on HIF_D19. # default 0 When this bit is set HIF_D19 will be set to output mode and provide watchdog-active signal. However this will have no effect when HIF_D19 is used for another function. For parallel DPM with watchdog HIF_D19 must be set to PIO mode inside DPM module. Note: netX system watch can be programmed inside address area 'WATCHDOG'/'NETX_WDG_AREA'. </description>
             </field>
             <field>
               <name>en_hif_rdy_pio_mi</name>
@@ -37500,7 +37506,7 @@
         <register>
           <!--Absolute address of 'madc_seq_tracking_time_mux0': 0xFF401804-->
           <name>madc_seq_tracking_time_mux0</name>
-          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, a settling to time of 9 tau should be ensured. tau can be calculated by tau = 9*(ADC_MUX_RSER + Rext) * ADC_MUX_CIN,   with Rext being additional resistance from devices external to the SOC. The setting of tt_add also depends on the setting of madc_seq_cfg.adcclk_period and can be calculate by the following formula: tt_add = ceil( tau/10ns - madc_seq_cfg.adcclk_period ) - 2 Set tt_add=4 if calculated value is smaller 4. Note: madc_seq_cfg.adcclk_period and madc_seq_tracking_time_mux[x].tt_add       will count down to 0 meaning that the value set in the registers       is increased by 1. To compensate this the tt_add formula includes a '-2'. Note: ADC_MUX_RSET(1.5kOhm) and ADC_MUX_CIN(10pF) are defined in the electrical parameters. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
+          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, this time should be 9*(Rint+Rext)*C,   with Rint=1kOhm and C=7.5pF. The total formula for this value is: tt_add = ceil((6,75 x Rext/kOhm) + 6,75) - adcclk_period/10ns - 2 Set tt_add=4 if calculated value is smaller 4. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x00000004</addressOffset>
           <size>32</size>
@@ -38635,7 +38641,7 @@
         <register>
           <!--Absolute address of 'madc_seq_tracking_time_mux0': 0xFF401904-->
           <name>madc_seq_tracking_time_mux0</name>
-          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, a settling to time of 9 tau should be ensured. tau can be calculated by tau = 9*(ADC_MUX_RSER + Rext) * ADC_MUX_CIN,   with Rext being additional resistance from devices external to the SOC. The setting of tt_add also depends on the setting of madc_seq_cfg.adcclk_period and can be calculate by the following formula: tt_add = ceil( tau/10ns - madc_seq_cfg.adcclk_period ) - 2 Set tt_add=4 if calculated value is smaller 4. Note: madc_seq_cfg.adcclk_period and madc_seq_tracking_time_mux[x].tt_add       will count down to 0 meaning that the value set in the registers       is increased by 1. To compensate this the tt_add formula includes a '-2'. Note: ADC_MUX_RSET(1.5kOhm) and ADC_MUX_CIN(10pF) are defined in the electrical parameters. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
+          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, this time should be 9*(Rint+Rext)*C,   with Rint=1kOhm and C=7.5pF. The total formula for this value is: tt_add = ceil((6,75 x Rext/kOhm) + 6,75) - adcclk_period/10ns - 2 Set tt_add=4 if calculated value is smaller 4. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x00000004</addressOffset>
           <size>32</size>
@@ -39770,7 +39776,7 @@
         <register>
           <!--Absolute address of 'madc_seq_tracking_time_mux0': 0xFF401A04-->
           <name>madc_seq_tracking_time_mux0</name>
-          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, a settling to time of 9 tau should be ensured. tau can be calculated by tau = 9*(ADC_MUX_RSER + Rext) * ADC_MUX_CIN,   with Rext being additional resistance from devices external to the SOC. The setting of tt_add also depends on the setting of madc_seq_cfg.adcclk_period and can be calculate by the following formula: tt_add = ceil( tau/10ns - madc_seq_cfg.adcclk_period ) - 2 Set tt_add=4 if calculated value is smaller 4. Note: madc_seq_cfg.adcclk_period and madc_seq_tracking_time_mux[x].tt_add       will count down to 0 meaning that the value set in the registers       is increased by 1. To compensate this the tt_add formula includes a '-2'. Note: ADC_MUX_RSET(1.5kOhm) and ADC_MUX_CIN(10pF) are defined in the electrical parameters. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
+          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, this time should be 9*(Rint+Rext)*C,   with Rint=1kOhm and C=7.5pF. The total formula for this value is: tt_add = ceil((6,75 x Rext/kOhm) + 6,75) - adcclk_period/10ns - 2 Set tt_add=4 if calculated value is smaller 4. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x00000004</addressOffset>
           <size>32</size>
@@ -40905,7 +40911,7 @@
         <register>
           <!--Absolute address of 'madc_seq_tracking_time_mux0': 0xFF401B04-->
           <name>madc_seq_tracking_time_mux0</name>
-          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, a settling to time of 9 tau should be ensured. tau can be calculated by tau = 9*(ADC_MUX_RSER + Rext) * ADC_MUX_CIN,   with Rext being additional resistance from devices external to the SOC. The setting of tt_add also depends on the setting of madc_seq_cfg.adcclk_period and can be calculate by the following formula: tt_add = ceil( tau/10ns - madc_seq_cfg.adcclk_period ) - 2 Set tt_add=4 if calculated value is smaller 4. Note: madc_seq_cfg.adcclk_period and madc_seq_tracking_time_mux[x].tt_add       will count down to 0 meaning that the value set in the registers       is increased by 1. To compensate this the tt_add formula includes a '-2'. Note: ADC_MUX_RSET(1.5kOhm) and ADC_MUX_CIN(10pF) are defined in the electrical parameters. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
+          <description>ADC sample extension for input channel 0 Length of 2nd adcclk in steps of 10ns system clock(~ delay of 3rd adcclk edge). The capacitor inside ADC needs time to be charged depending   on the driving strength of the external signal.   For 12 bit precision, this time should be 9*(Rint+Rext)*C,   with Rint=1kOhm and C=7.5pF. The total formula for this value is: tt_add = ceil((6,75 x Rext/kOhm) + 6,75) - adcclk_period/10ns - 2 Set tt_add=4 if calculated value is smaller 4. The total ADC cycle time results in: tcycle = 14 * adcclk_period + clock_sync_delay (max 1 adcclk_period) + tt_add * 10ns. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x00000004</addressOffset>
           <size>32</size>
@@ -44266,7 +44272,7 @@
             <field>
               <name>mode</name>
               <bitRange>[3:1]</bitRange>
-              <description>I2C-speed-mode: If this device is used as a slave only, the mode should be set to the data rate generated by the fastest master on the I2C-bus for appropriate input filtering and spike suppression. The programmed mode defines also the SDA hold time after a falling edge of SCL. {     |                              | Value Mode                           SDA hold time after SCL low 000 Fast/Standard mode, 50 kbit/s       630ns 001 Fast/Standard mode, 100 kbit/s      630ns 010 Fast/Standard mode, 200 kbit/s      630ns 011 Fast/Standard mode, 400 kbit/s      310ns 100 High-speed mode, 800 kbit/s         150ns 101 High-speed mode, 1.2 Mbit/s          70ns 110 High-speed mode, 1.7 Mbit/s          70ns 111 High-speed mode, 3.4 Mbit/s          30ns} </description>
+              <description>I2C-speed-mode: If this device is used as a slave only, the mode should be set to the data rate generated by the fastest master on the I2C-bus for appropriate input filtering and spike suppression. 000: Fast/Standard mode, 50 kbit/s 001: Fast/Standard mode, 100 kbit/s 010: Fast/Standard mode, 200 kbit/s 011: Fast/Standard mode, 400 kbit/s 100: High-speed mode, 800 kbit/s 101: High-speed mode, 1.2 Mbit/s 110: High-speed mode, 1.7 Mbit/s 111: High-speed mode, 3.4 Mbit/s) </description>
             </field>
             <field>
               <name>en_i2c</name>
@@ -44384,7 +44390,7 @@
         <register>
           <!--Absolute address of 'i2c_mdr': 0xFF80108C-->
           <name>i2c_mdr</name>
-          <description>I2C master data register (master FIFO): There is only one FIFO for both receive and transmit master data with a depth of 16 bytes. For a master write access, data read from the FIFO is is sent via I2C. For a master read access, data received from I2C is written into the FIFO. In case of imminent data transfer failure (read transfer and FIFO is full or write transfer and FIFO is empty), the transfer will be paused. To continue the transfer, the FIFO must be handled first (filled for transmit, read out for receive). Note: The FIFO behavior has been changed: For netX 51/52/56 and older versions, the current command was aborted and the cmd_err was raised. </description>
+          <description>I2C master data register (master FIFO): There is only one FIFO for both receive and transmit master data with a depth of 16 bytes. For master write access, data sent by the master is delivered from the FIFO. For master read access, data received by the master is stored in the FIFO. In case of imminent data transfer failure (read transfer and FIFO is full or write transfer and FIFO is empty), the transfer will be interrupted. To continue the transfer, the FIFO must be handled first (filled for write transfer, read out for read transfer). Note: The FIFO behavior has been changed: For netX 51/52/56 and older versions, the current command was aborted and the cmd_err was raised. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x0000000C</addressOffset>
           <size>32</size>
@@ -44400,14 +44406,14 @@
             <field>
               <name>mdata</name>
               <bitRange>[7:0]</bitRange>
-              <description>I2C master transmit or receive data: Transmit data will be removed from the FIFO after the receiving slave has generated the corresponding acknowledge. Transmit data that has not been acknowledged will not be removed from the FIFO. </description>
+              <description>I2C master transmit or receive data: Write data will be removed from the FIFO after the receiving slave has generated the corresponding acknowledge. Write data that has not been acknowledged will not be removed from the FIFO. </description>
             </field>
           </fields>
         </register>
         <register>
           <!--Absolute address of 'i2c_sdr': 0xFF801090-->
           <name>i2c_sdr</name>
-          <description>I2C slave data register (slave FIFO): There is only one FIFO for both receive and transmit slave data with a depth of 16 bytes. For a read access of an external master, data sent by this slave is read from the FIFO. For a write access of an external master, data received by this slave is written into the FIFO. A transfer is initiated after the detection of I2C-start-sequence to the device address (i2c_scr.sid, sreq IRQ) which is acknowledged by this device (i2c_scr.ac_start). For read transfers, sent data is read from the FIFO immediately after the detection of the acknowledge on the I2C-bus. SDA will be driven with the next data MSB immediately after the acknowledge SCL high phase. In case of a master read transfer and slave FIFO underrun, corrupted data will be sent to the master and the IRQ fifo_err will be set. In case of a master write transfer and slave FIFO is full, no acknowledge will be generated for the last received byte. No FIFO overflow will occur, but the last transferred byte (not acknowledged) will be lost and has to be sent again by the master. </description>
+          <description>I2C slave data register (slave FIFO): There is only one FIFO for both receive and transmit slave data with a depth of 16 bytes. For master read access, data sent by the slave is delivered from the FIFO. For master write access, data received by the slave is stored in the FIFO. A transfer is initiated after the detection of I2C-start-sequence to the device address (i2c_scr.sid, sreq IRQ) which is acknowledged by this device (i2c_scr.ac_start). For read transfers, sent data is read from the FIFO immediately after the detection of the acknowledge on the I2C-bus. SDA will be driven with the next data MSB immediately after the acknowledge SCL high phase. In case of a master read transfer and slave FIFO underrun, corrupted data will be sent to the master and the IRQ fifo_err will be set. In case of a master write transfer and slave FIFO is full, no acknowledge will be generated for the last received byte. No FIFO overflow will occur, but the last transferred byte (not acknowledged) will be lost and has to be sent again by the master. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x00000010</addressOffset>
           <size>32</size>
@@ -44597,12 +44603,12 @@
             <field>
               <name>mfifo_err_undr</name>
               <bitRange>[9:9]</bitRange>
-              <description>Master FIFO underrun error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. Note: This can only happen in case of a CPU read accesses to an empty FIFO. The I2C statemachine will pause external transfers before FIFO underrun occurs. </description>
+              <description>Master FIFO underrun error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. </description>
             </field>
             <field>
               <name>mfifo_err_ovfl</name>
               <bitRange>[8:8]</bitRange>
-              <description>Master FIFO overflow error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. Note: This can only happen in case of a CPU write accesses to a full FIFO. The I2C statemachine will pause external transfers before FIFO overflow occurs. </description>
+              <description>Master FIFO overflow error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. </description>
             </field>
             <field>
               <name>mfifo_full</name>
@@ -65102,7 +65108,7 @@
             <field>
               <name>mode</name>
               <bitRange>[3:1]</bitRange>
-              <description>I2C-speed-mode: If this device is used as a slave only, the mode should be set to the data rate generated by the fastest master on the I2C-bus for appropriate input filtering and spike suppression. The programmed mode defines also the SDA hold time after a falling edge of SCL. {     |                              | Value Mode                           SDA hold time after SCL low 000 Fast/Standard mode, 50 kbit/s       630ns 001 Fast/Standard mode, 100 kbit/s      630ns 010 Fast/Standard mode, 200 kbit/s      630ns 011 Fast/Standard mode, 400 kbit/s      310ns 100 High-speed mode, 800 kbit/s         150ns 101 High-speed mode, 1.2 Mbit/s          70ns 110 High-speed mode, 1.7 Mbit/s          70ns 111 High-speed mode, 3.4 Mbit/s          30ns} </description>
+              <description>I2C-speed-mode: If this device is used as a slave only, the mode should be set to the data rate generated by the fastest master on the I2C-bus for appropriate input filtering and spike suppression. 000: Fast/Standard mode, 50 kbit/s 001: Fast/Standard mode, 100 kbit/s 010: Fast/Standard mode, 200 kbit/s 011: Fast/Standard mode, 400 kbit/s 100: High-speed mode, 800 kbit/s 101: High-speed mode, 1.2 Mbit/s 110: High-speed mode, 1.7 Mbit/s 111: High-speed mode, 3.4 Mbit/s) </description>
             </field>
             <field>
               <name>en_i2c</name>
@@ -65220,7 +65226,7 @@
         <register>
           <!--Absolute address of 'i2c_mdr': 0xFF90034C-->
           <name>i2c_mdr</name>
-          <description>I2C master data register (master FIFO): There is only one FIFO for both receive and transmit master data with a depth of 16 bytes. For a master write access, data read from the FIFO is is sent via I2C. For a master read access, data received from I2C is written into the FIFO. In case of imminent data transfer failure (read transfer and FIFO is full or write transfer and FIFO is empty), the transfer will be paused. To continue the transfer, the FIFO must be handled first (filled for transmit, read out for receive). Note: The FIFO behavior has been changed: For netX 51/52/56 and older versions, the current command was aborted and the cmd_err was raised. </description>
+          <description>I2C master data register (master FIFO): There is only one FIFO for both receive and transmit master data with a depth of 16 bytes. For master write access, data sent by the master is delivered from the FIFO. For master read access, data received by the master is stored in the FIFO. In case of imminent data transfer failure (read transfer and FIFO is full or write transfer and FIFO is empty), the transfer will be interrupted. To continue the transfer, the FIFO must be handled first (filled for write transfer, read out for read transfer). Note: The FIFO behavior has been changed: For netX 51/52/56 and older versions, the current command was aborted and the cmd_err was raised. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x0000000C</addressOffset>
           <size>32</size>
@@ -65236,14 +65242,14 @@
             <field>
               <name>mdata</name>
               <bitRange>[7:0]</bitRange>
-              <description>I2C master transmit or receive data: Transmit data will be removed from the FIFO after the receiving slave has generated the corresponding acknowledge. Transmit data that has not been acknowledged will not be removed from the FIFO. </description>
+              <description>I2C master transmit or receive data: Write data will be removed from the FIFO after the receiving slave has generated the corresponding acknowledge. Write data that has not been acknowledged will not be removed from the FIFO. </description>
             </field>
           </fields>
         </register>
         <register>
           <!--Absolute address of 'i2c_sdr': 0xFF900350-->
           <name>i2c_sdr</name>
-          <description>I2C slave data register (slave FIFO): There is only one FIFO for both receive and transmit slave data with a depth of 16 bytes. For a read access of an external master, data sent by this slave is read from the FIFO. For a write access of an external master, data received by this slave is written into the FIFO. A transfer is initiated after the detection of I2C-start-sequence to the device address (i2c_scr.sid, sreq IRQ) which is acknowledged by this device (i2c_scr.ac_start). For read transfers, sent data is read from the FIFO immediately after the detection of the acknowledge on the I2C-bus. SDA will be driven with the next data MSB immediately after the acknowledge SCL high phase. In case of a master read transfer and slave FIFO underrun, corrupted data will be sent to the master and the IRQ fifo_err will be set. In case of a master write transfer and slave FIFO is full, no acknowledge will be generated for the last received byte. No FIFO overflow will occur, but the last transferred byte (not acknowledged) will be lost and has to be sent again by the master. </description>
+          <description>I2C slave data register (slave FIFO): There is only one FIFO for both receive and transmit slave data with a depth of 16 bytes. For master read access, data sent by the slave is delivered from the FIFO. For master write access, data received by the slave is stored in the FIFO. A transfer is initiated after the detection of I2C-start-sequence to the device address (i2c_scr.sid, sreq IRQ) which is acknowledged by this device (i2c_scr.ac_start). For read transfers, sent data is read from the FIFO immediately after the detection of the acknowledge on the I2C-bus. SDA will be driven with the next data MSB immediately after the acknowledge SCL high phase. In case of a master read transfer and slave FIFO underrun, corrupted data will be sent to the master and the IRQ fifo_err will be set. In case of a master write transfer and slave FIFO is full, no acknowledge will be generated for the last received byte. No FIFO overflow will occur, but the last transferred byte (not acknowledged) will be lost and has to be sent again by the master. </description>
           <dataType>uint32_t</dataType>
           <addressOffset>0x00000010</addressOffset>
           <size>32</size>
@@ -65433,12 +65439,12 @@
             <field>
               <name>mfifo_err_undr</name>
               <bitRange>[9:9]</bitRange>
-              <description>Master FIFO underrun error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. Note: This can only happen in case of a CPU read accesses to an empty FIFO. The I2C statemachine will pause external transfers before FIFO underrun occurs. </description>
+              <description>Master FIFO underrun error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. </description>
             </field>
             <field>
               <name>mfifo_err_ovfl</name>
               <bitRange>[8:8]</bitRange>
-              <description>Master FIFO overflow error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. Note: This can only happen in case of a CPU write accesses to a full FIFO. The I2C statemachine will pause external transfers before FIFO overflow occurs. </description>
+              <description>Master FIFO overflow error occurred. Data is lost and the master FIFO must be cleared by bit i2c_mfifo_cr.mfifo_clr. Clearing the master FIFO will also clear this read-only status bit. </description>
             </field>
             <field>
               <name>mfifo_full</name>

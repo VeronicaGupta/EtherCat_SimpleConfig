@@ -83,18 +83,16 @@ extern void (*__init_array_end)();/*!< Constructor list end */
  */
 void SystemInit(void);
 
-typedef struct NETX_TEMP_SENSOR_DATA_Ttag
+typedef struct NETX_TEMP_CALIBRATION_Ttag
 {
-  unsigned long  aulCalDate[2];
-  unsigned short usAdcValue;
-  unsigned char  bRefTemperature;
-  unsigned char  bReserved1;
-  unsigned short usAdcVrefValue;
-  unsigned char  abReserved2[6];
-  unsigned long  ulCrc32;
-} NETX_TEMP_SENSOR_DATA_T;
+  unsigned long aulCalDate[2];
+  unsigned short ulADCValue;
+  unsigned char sRefTemperature;
+  unsigned char saucReserved[9];
+  unsigned long ulCrc32;
+} NETX_TEMP_CALIBRATION_T;
 
-extern NETX_TEMP_SENSOR_DATA_T g_atTempSensorData[2];
+extern NETX_TEMP_CALIBRATION_T g_atTemperatureCalibrationData[2];
 
 static inline uint32_t SystemADC3V3To2V6(uint32_t ulValue){
   return (ulValue*(33u<<14))/(26u<<14);
@@ -104,12 +102,12 @@ static inline uint32_t SystemADC3V3To2V6(uint32_t ulValue){
 /*!
  * Global integer where the steepness of the temperature curve is stored.
  */
-extern int g_TempGradient;
+extern int g_TemperatureGradient;
 
 /*!
  * Global integer where the y-intercept of the temperature curve is stored.
  */
-extern int g_TempIntercept;
+extern int g_TemperatureIntercept;
 
 /*!
  * Global integer where the y-intercept of the temperature curve is stored.
@@ -119,12 +117,12 @@ void SystemTemperatureByADCValue(uint32_t ulADCValue, int* ulTempValue);
 /*!
  * Global integer where the steepness of the temperature curve is stored.
  */
-extern float g_TempGradient;
+extern float g_TemperatureGradient;
 
 /*!
  * Global integer where the y-intercept of the temperature curve is stored.
  */
-extern float g_TempIntercept;
+extern float g_TemperatureIntercept;
 
 /*!
  * Global integer where the y-intercept of the temperature curve is stored.

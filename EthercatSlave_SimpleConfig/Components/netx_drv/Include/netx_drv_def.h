@@ -2,8 +2,8 @@
  * \file    netx_drv_def.h
  * \brief   This file contains the peripheral driver common defines, enumeration,
  *          macros and structures definitions.
- * $Revision: 8158 $
- * $Date: 2020-09-18 19:50:56 +0300 (Fri, 18 Sep 2020) $
+ * $Revision: 4646 $
+ * $Date: 2018-12-19 08:47:36 +0100 (Mi, 19 Dez 2018) $
  * \copyright Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
  * \note Exclusion of Liability for this demo software:
  * The following software is intended for and must only be used for reference and in an
@@ -60,7 +60,7 @@ typedef enum DRV_STATUS_Etag
   DRV_NIMPL = -5,/*!< The requested function is not implemented for the given parameters. */
   DRV_ERROR_PARAM = -6,/*!< The given parameters are incorrect. */
   DRV_LOCKED = -7,/*!< The drivers api is locked by an other execution context. */
-  DRV_ERROR_BUFFER = -8,/*!< The buffer is corrupted. */
+  DRV_ERROR_BUFFER = -8/*!< The buffer is corrupted. */
 } DRV_STATUS_E, *DRV_STATUS_EP;
 
 /*!

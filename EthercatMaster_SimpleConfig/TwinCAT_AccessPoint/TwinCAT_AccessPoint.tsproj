@@ -1,4 +1,89 @@
 <?xml version="1.0"?>
-<TcSmProject>
-	<Project/>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.55">
+	<ImageDatas>
+		<ImageData Id="1000">424de6000000000000007600000028000000100000000e000000010004000000000070000000c30e0000c30e000000000000000000000000000000008000008000000080800080000000800080008080000080808000c0c0c0000000ff0000ff000000ffff00ff000000ff00ff00ffff0000ffffff00ffffffffffffffffff0000000003077fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff7007777777777fff8077887707f77fff7777777877777fff0000000700007fff0000000000007fffffffffffffffff</ImageData>
+	</ImageDatas>
+	<Project ProjectGUID="{49AD2ECA-FF24-4BF4-B2AA-ED7BB1A6750D}" Target64Bit="true" ShowHideConfigurations="#x6">
+		<Io>
+			<Device Id="2" DevType="111" DevFlags="#x0003" AmsPort="28674" AmsNetId="10.1.42.124.3.1" RemoteName="Device 2 (EtherCAT)" InfoImageId="2">
+				<Name>Device 2 (EtherCAT)</Name>
+				<AddressInfo>
+					<Pnp>
+						<DeviceDesc>Ethernet 2 (TwinCAT-Intel PCI Ethernet Adapter (Gig</DeviceDesc>
+						<DeviceName>\DEVICE\{1872ACD2-5C04-4271-9CD8-72688666B2D8}</DeviceName>
+						<DeviceData>e86a6448a41a</DeviceData>
+					</Pnp>
+				</AddressInfo>
+				<Image Id="1" AddrType="9" ImageType="3">
+					<Name>Image</Name>
+				</Image>
+				<Box Id="1" BoxType="9099" BoxFlags="#x00000020">
+					<Name>Box 1 (NETX 90-RE/ECS)</Name>
+					<ImageId>1000</ImageId>
+					<EtherCAT SlaveType="2" PdiType="#x0006" MboxDataLinkLayer="true" StateMBoxPolling="true" CycleMBoxPollingTime="0" CoeType="51" VendorId="#xe0000044" ProductCode="#x0000003d" RevisionNo="#x00000001" InfoDataAddr="true" PortPhys="17" MaxSlotCount="256" MaxSlotGroupCount="1" SlotPdoIncrement="1" SlotIndexIncrement="16" Type="NETX 90-RE/ECS" Desc="NETX 90-RE/ECS" PortABoxInfo="#x00ffffff">
+						<SyncMan>001080002600010001000000800080008000001026010000</SyncMan>
+						<SyncMan>801080002200010002000000800080008000801022010000</SyncMan>
+						<SyncMan>001106006400010003000000000000040000001164030000</SyncMan>
+						<SyncMan>001d0a002000010004000000000000040000001d20030000</SyncMan>
+						<Fmmu>0000000000000000001100020100000001000000000000000000000000000000</Fmmu>
+						<Fmmu>0000000000000000001d00010100000002000000000000000000000000000000</Fmmu>
+						<Fmmu>00000000000000000d0800010100000003000000000000000000000000000000</Fmmu>
+						<Pdo Name="TxPDO 1A00" Index="#x1a00" Flags="#x0011" SyncMan="3">
+							<Entry Name="1 Byte In (0)" Index="#x3000" Sub="#x01">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (1)" Index="#x3000" Sub="#x02">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (2)" Index="#x3000" Sub="#x03">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (3)" Index="#x3000" Sub="#x04">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (4)" Index="#x3000" Sub="#x05">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (5)" Index="#x3000" Sub="#x06">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (6)" Index="#x3000" Sub="#x07">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (7)" Index="#x3000" Sub="#x08">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (8)" Index="#x3000" Sub="#x09">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte In (9)" Index="#x3000" Sub="#x0a">
+								<Type>USINT</Type>
+							</Entry>
+						</Pdo>
+						<Pdo Name="RxPDO 1600" Index="#x1600" InOut="1" Flags="#x0011" SyncMan="2">
+							<Entry Name="1 Byte Out (0)" Index="#x2000" Sub="#x01">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte Out (1)" Index="#x2000" Sub="#x02">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte Out (2)" Index="#x2000" Sub="#x03">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte Out (3)" Index="#x2000" Sub="#x04">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte Out (4)" Index="#x2000" Sub="#x05">
+								<Type>USINT</Type>
+							</Entry>
+							<Entry Name="1 Byte Out (5)" Index="#x2000" Sub="#x06">
+								<Type>USINT</Type>
+							</Entry>
+						</Pdo>
+					</EtherCAT>
+				</Box>
+				<EtherCAT/>
+			</Device>
+		</Io>
+	</Project>
 </TcSmProject>

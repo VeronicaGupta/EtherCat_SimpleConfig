@@ -1,0 +1,37 @@
+def build(bld):
+    
+    toolchain   = "gccarmemb"
+    bld.toolchain   = toolchain
+    bld.platform  = "netx90"
+    comp_prefix = bld.get_name_prefix(
+        toolchain = bld.toolchain,
+        platform  = bld.platform)
+
+    
+# Component cifXToolkit OS-Abstraction ------------------------------------------------------------
+                           
+    sources   = [
+        "OSAbstraction/OS_Custom_netX.c",
+        "User/TKitUser_Custom_netX.c",
+        ]
+    
+    includes = [
+        "OSAbstraction",
+        ]
+
+    bld.stlib(
+        target          = "cifXToolkit_OSAbstraction",
+        name            = comp_prefix + "cifXToolkit_OSAbstraction",
+        description     = "Serial DPM cifXToolkit Library for netX90",
+        displaygroup    = "Libraries",
+        platform        = bld.platform,
+        toolchain       = toolchain, 
+        use             = [
+                           comp_prefix + "cifXToolkit",
+                           "CMSIS_sdk",
+                           "netx_drv_sdk",
+                          ],
+        source          = sources,
+        includes        = includes,
+        export_includes = includes,
+    )

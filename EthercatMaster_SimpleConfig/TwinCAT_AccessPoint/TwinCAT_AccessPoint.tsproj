@@ -28,55 +28,55 @@
 						<Fmmu>0000000000000000001100020100000001000000000000000000000000000000</Fmmu>
 						<Fmmu>0000000000000000001d00010100000002000000000000000000000000000000</Fmmu>
 						<Fmmu>00000000000000000d0800010100000003000000000000000000000000000000</Fmmu>
-						<Pdo Name="TxPDO 1A00" Index="#x1a00" Flags="#x0011" SyncMan="3">
-							<Entry Name="1 Byte In (0)" Index="#x3000" Sub="#x01">
+						<Pdo Name="1. TxPDO" Index="#x1a00" Flags="#x0011" SyncMan="3">
+							<Entry Name="Dip_Inputdata" Index="#x3000" Sub="#x01">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (1)" Index="#x3000" Sub="#x02">
+							<Entry Name="CycleCnt" Index="#x3000" Sub="#x02">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (2)" Index="#x3000" Sub="#x03">
+							<Entry Name="Alarm0_Code" Index="#x3000" Sub="#x03">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (3)" Index="#x3000" Sub="#x04">
+							<Entry Name="Error0_Code" Index="#x3000" Sub="#x04">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (4)" Index="#x3000" Sub="#x05">
+							<Entry Name="Alarm0" Index="#x3000" Sub="#x05">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (5)" Index="#x3000" Sub="#x06">
+							<Entry Name="Error0" Index="#x3000" Sub="#x06">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (6)" Index="#x3000" Sub="#x07">
+							<Entry Name="Uart_Inputdata0" Index="#x3000" Sub="#x07">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (7)" Index="#x3000" Sub="#x08">
+							<Entry Name="Uart_Inputdata1" Index="#x3000" Sub="#x08">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (8)" Index="#x3000" Sub="#x09">
+							<Entry Name="Alarm1" Index="#x3000" Sub="#x09">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte In (9)" Index="#x3000" Sub="#x0a">
+							<Entry Name="Error1" Index="#x3000" Sub="#x0a">
 								<Type>USINT</Type>
 							</Entry>
 						</Pdo>
-						<Pdo Name="RxPDO 1600" Index="#x1600" InOut="1" Flags="#x0011" SyncMan="2">
-							<Entry Name="1 Byte Out (0)" Index="#x2000" Sub="#x01">
+						<Pdo Name="1. RxPDO" Index="#x1600" InOut="1" Flags="#x0011" SyncMan="2">
+							<Entry Name="Outputdata0" Index="#x2000" Sub="#x01">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte Out (1)" Index="#x2000" Sub="#x02">
+							<Entry Name="Outputdata1" Index="#x2000" Sub="#x02">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte Out (2)" Index="#x2000" Sub="#x03">
+							<Entry Name="Outputdata2" Index="#x2000" Sub="#x03">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte Out (3)" Index="#x2000" Sub="#x04">
+							<Entry Name="Outputdata3" Index="#x2000" Sub="#x04">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte Out (4)" Index="#x2000" Sub="#x05">
+							<Entry Name="Outputdata4" Index="#x2000" Sub="#x05">
 								<Type>USINT</Type>
 							</Entry>
-							<Entry Name="1 Byte Out (5)" Index="#x2000" Sub="#x06">
+							<Entry Name="Outputdata5" Index="#x2000" Sub="#x06">
 								<Type>USINT</Type>
 							</Entry>
 						</Pdo>

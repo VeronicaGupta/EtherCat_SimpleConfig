@@ -1,0 +1,50 @@
+Target:  X090F000.nxi
+Version: V5.2.0.0
+
+Used Libraries
+==============
+
+
+
+liblfw_slave_config_netx90.a    V5.2.0.0  <No description>
+liblfw_slave_ecos_netx90_ndis.a V5.2.0.0  <No description>
+
+armv7em-none-eabi/4.9.3
+-----------------------
+libconfigmanager.a              V1.4.0.0  ConfigManager 
+libdrveth_gci.a                 V1.0.0.2  DrvEth GCI 
+libecmbx.a                      V1.0.6.0  libecmbx 
+libecmbxcommon.a                V1.0.6.0  libecmbxcommon 
+libecmbxsdoinfoserver.a         V1.0.6.0  libecmbxsdoinfoserver 
+libecmbxsdoserver.a             V1.0.6.0  libecmbxsdoserver 
+libecsbase.a                    V5.2.0.0  libecsbase 
+libecscoe.a                     V5.2.0.0  libecscoe 
+libecscommon.a                  V5.2.0.0  libecscommon 
+libecseoe.a                     V5.2.0.0  libecseoe 
+libecseoeif.a                   V5.2.0.0  libecseoeif 
+libecsfoe.a                     V5.2.0.0  libecsfoe 
+libfirmwaretoolbox.a            V1.1.0.0  FirmwareToolbox 
+libgeneric_ap.a                 V1.2.0.3  Generic AP 
+libhttp.a                       V1.1.1.0  HTTP
+liblwip.a                       V4.5.0.2  lwIP based IP stack 
+liblwip_socketapigci.a          V4.5.0.2  lwIP based Socket API (GCI) 
+libmbedcrypto.a                 V1.1.0.0  Hilscher mbedTLS 
+libnetx_toolbox_netx90.a        V1.3.0.0  netX Toolbox 
+libodv3.a                       V3.4.16.0 libodv3 
+libodv3_api.a                   V3.4.16.0 libodv3_api 
+libps_toolbox.a                 V1.5.0.0  PS Toolbox 
+libtcpbuf_minimal.a             V1.1.1.0  TCPBUF
+libwebifgci.a                   V1.1.1.0  WebIf_GCI
+libwebserver_configurations.a   V1.1.1.0  WebServer Configurations
+libwebserver_minimal.a          V1.1.1.0   
+
+armv7em-none-eabi/4.9.3/ecos
+----------------------------
+libdrv_eth.a                    V1.6.2.0  DrvEth 
+libecs_netx90.a                 V5.1.4.0  libecs_netx90 
+libecsgci.a                     V5.2.0.0  libecsgci 
+libmarshaller.a                 V1.1.0.0  netX Marshaller 
+libmiddleware.a                 V1.4.0.1  Middleware Library 
+libosal_ecos.a                  V2.2.0.1  OSAL 
+libstorage.a                    V1.2.0.0  eCos Storage Library 
+libtarget.a                     V1.4.0.2  eCos  

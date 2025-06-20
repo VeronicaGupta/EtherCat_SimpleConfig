@@ -1,0 +1,46 @@
+def build(bld):
+    
+    
+# Component cifXApplicationDemo ------------------------------------------------------------    
+    netx_studio_sources = [
+        "Sources/App_DemoApplication.c", 
+        "Sources/App_DemoApplicationFunctions.c", 
+        "Sources/App_EventHandler.c", 
+        "Sources/App_SystemPackets.c",
+        "Sources/App_TerminalHandler.c", 
+        "Sources/App_PacketCommunication.c", 
+        ]
+
+    includes = [
+        "Includes",
+        ]
+
+
+    for toolchain,platform in (("codesourcery","netx51"),("gccarmemb","netx90"),):
+
+        comp_prefix = bld.get_name_prefix(toolchain = toolchain, suffix = None,   platform = platform)
+        
+        bld.stlib( 
+            target          = "cifXApplicationDemo",
+            name            = comp_prefix + "cifXApplicationDemo",
+            description     = "cifX Application Demo - protocol independent body",
+            displaygroup    = "Libraries",
+            platform        = platform,
+            toolchain       = toolchain, 
+            use             = [
+                               "Hil_Definition_cifXApi_sdk",
+                               "cifXToolkit_sdk",
+                               "Hil_Definition_netXFirmware_sdk",
+                               "hostabstractionlayer_sdk",
+                               "cifXApplicationDemoConfig_sdk",
+                              ],
+            source          = netx_studio_sources,
+            includes        = includes,
+            export_includes = includes,
+            )
+    
+    bld.sdkcomponent(
+        name            = "cifXApplicationDemo_sdk",
+        export_includes = includes,
+        )
+    

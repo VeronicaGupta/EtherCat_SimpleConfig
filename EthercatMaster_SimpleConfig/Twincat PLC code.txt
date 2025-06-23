@@ -12,31 +12,52 @@ VAR
 
     fbOpen         : FB_FileOpen;       // opens or creates the CSV file :contentReference[oaicite:6]{index=6}
     fbWrite        : FB_FileWrite;      // writes data into the file :contentReference[oaicite:7]{index=7}
+	fbRead         : FB_FileRead;
+	fbclose        : FB_FileClose;
+	fbFileSeek     : FB_FileSeek;
+	nSeekPos     : DINT;
+	eOrigin      : E_SeekOrigin :=SEEK_SET;
 
-    hFile          : UDINT;              // handle returned by FB_FileOpen (UINT) :contentReference[oaicite:8]{index=8}
+    hSrcFile          : UINT;              // handle returned by FB_FileOpen (UINT) :contentReference[oaicite:8]{index=8}
     ts             : ULINT;             // 100 ns-resolution timestamp :contentReference[oaicite:9]{index=9}
     sLine          : STRING(120);       // formatted CSV line buffer :contentReference[oaicite:10]{index=10}
     bytesWritten   : UDINT;             // number of bytes actually written
-    
-    bTrigger       : BOOL;
+	
+	bTrigger       : BOOL;
+	nErrId: UDINT;
+	bError: BOOL;
+	Step: UDINT;
+	openDone : BOOL :=FALSE;
+	sLine_len: UDINT;
 END_VAR
+
 
 
 // === ONE-TIME INITIALIZATION ===
 (* Open CSV file for append; MODE_WRITE|MODE_CREATE = 16#0002 *)  
 fbOpen(  
-    sPathName := 'C:\Data\trigger_log.csv',  
-    nMode     := 16#0002,  
-    bExecute  := TRUE  
+	sPathName := 'C:\Users\parnika.gupta\Documents\twincat_log.csv',
+	nMode     := FOPEN_MODEAPPEND OR FOPEN_MODEPLUS OR FOPEN_MODETEXT,
+	bExecute := TRUE,
+	tTimeout := T#1S,
 );
-  
-hFile := fbOpen.hFile;   // store the file handle for writes :contentReference[oaicite:11]{index=11}  
-fbOpen.bExecute := FALSE; // reset execute flag per FB_FileOpen state machine :contentReference[oaicite:12]{index=12}  
 
+fbOpen.bExecute := FALSE;// reset execute flag per FB_FileOpen state machine :contentReference[oaicite:12]{index=12}  
+IF NOT fbOpen.bBusy AND NOT openDone THEN 
+   IF fbOpen.bError THEN 
+		nErrId := fbOpen.nErrId; 
+		bError := TRUE; 
+		Step := 50; 
+   ELSE 
+		hSrcFile := fbOpen.hFile; // store the file handle for writes :contentReference[oaicite:11]{index=11}
+		Step := Step + 1; 
+		openDone := TRUE;
+   END_IF 
+END_IF 
 // On each cycle, evaluate uiTrigger:
 //   • If uiTrigger ≠ 0 → bTriggerBool := TRUE
 //   • If uiTrigger = 0 → bTriggerBool := FALSE
-bTrigger := (uiTrigger <> 0);
+bTrigger := 1; //(uiTrigger <> 0);
 
 // === CYCLIC TASK: EDGE DETECTION & LOGGING ===
 (* 1) Rising edge: trigger from 0→1 → start logging *)  
@@ -52,7 +73,7 @@ END_IF
 prevTrig := bTrigger;   // update previous trigger for next cycle :contentReference[oaicite:13]{index=13}  
 
 // 3) While loggingActive, capture timestamp & write CSV  
-IF loggingActive THEN  
+IF openDone AND loggingActive THEN  
     ts := F_GetSystemTime();  // read 64-bit OS time (100 ns units) :contentReference[oaicite:14]{index=14}  
 
     // build comma-separated line: "<ts>,<b0>,<b1>,<b2>\r\n"  
@@ -71,17 +92,41 @@ IF loggingActive THEN
               CONCAT( ',', TO_STRING(uiTxByte2) ),  // ',', byte2
               '\r\n'                                // newline
             ));
-        // :contentReference[oaicite:15]{index=15}  
+		// :contentReference[oaicite:15]{index=15}  
 
-    // append the line to the file  
-    fbWrite(  
-        hFile       := UDINT_TO_INT(hFile), // file handle (UINT) :contentReference[oaicite:16]{index=16}  
-        pWriteBuff  := ADR(sLine),          // pointer to data buffer :contentReference[oaicite:17]{index=17}  
-        cbWriteLen  := LEN(sLine),          // number of chars to write :contentReference[oaicite:18]{index=18}  
-        bExecute    := TRUE,                // trigger write on edge :contentReference[oaicite:19]{index=19}  
-        tTimeout    := T#2S                 // allow up to 2 s for write  
-    );  
-    fbWrite.bExecute := FALSE;          // reset for next write :contentReference[oaicite:20]{index=20}  
+    // append the line to the file  	
+	sLine_len := INT_TO_UDINT(LEN(sLine));
+	IF sLine_len >4 THEN
+		fbWrite(  
+			hFile       := hSrcFile, // file handle (UINT) :contentReference[oaicite:16]{index=16}  
+			pWriteBuff  := ADR(sLine),          // pointer to data buffer :contentReference[oaicite:17]{index=17}  
+			cbWriteLen  := sLine_len,          // number of chars to write :contentReference[oaicite:18]{index=18}  
+			bExecute    := TRUE,                // trigger write on edge :contentReference[oaicite:19]{index=19}
+			tTimeout := T#1S,
+		);  
+		fbWrite.bExecute := FALSE;          // reset for next write :contentReference[oaicite:20]{index=20}  
+		//fbWrite( bExecute := FALSE ); 
+		(*IF openDone AND (hSrcFile <> 0) AND NOT fbWrite.bBusy THEN 
+		   IF fbWrite.bError THEN 
+				nErrId := fbWrite.nErrId; 
+				bError := TRUE; 
+				Step := 50; 
+		   ELSE 
+				IF fbRead.bEOF THEN (* Check if the EOF flag ist set *) 
+					 Step := 50;     (* Cleanup: close the destination and source files *) 
+				ELSE 
+					 Step := 5; (* Repeat reading/writing *) 
+				END_IF
+			END_IF
+		END_IF*)
+	END_IF
+
+	
 END_IF  
 
 
+fbClose(
+	hFile := hSrcFile,
+	bExecute := TRUE,
+	tTimeout := T#1S,
+);

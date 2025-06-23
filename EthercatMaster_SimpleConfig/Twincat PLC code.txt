@@ -1,0 +1,87 @@
+PROGRAM MAIN
+VAR
+    (*– I/O Mappings –*)
+    uiTrigger      AT %QB5   : USINT;    // RxPDO 0x1600 Byte Out 5 trigger :contentReference[oaicite:0]{index=0}
+    uiTxByte0      AT %IB0   : USINT;   // TxPDO byte 0 → process-image byte 0 :contentReference[oaicite:1]{index=1}
+    uiTxByte1      AT %IB1   : USINT;   // TxPDO byte 1 → process-image byte 1 :contentReference[oaicite:2]{index=2}
+    uiTxByte2      AT %IB2   : USINT;   // TxPDO byte 2 → process-image byte 2 :contentReference[oaicite:3]{index=3}
+
+    (*– State & File I/O –*)
+    prevTrig       : BOOL := FALSE;     // previous scan trigger state :contentReference[oaicite:4]{index=4}
+    loggingActive  : BOOL := FALSE;     // TRUE between rising/falling edges :contentReference[oaicite:5]{index=5}
+
+    fbOpen         : FB_FileOpen;       // opens or creates the CSV file :contentReference[oaicite:6]{index=6}
+    fbWrite        : FB_FileWrite;      // writes data into the file :contentReference[oaicite:7]{index=7}
+
+    hFile          : UDINT;              // handle returned by FB_FileOpen (UINT) :contentReference[oaicite:8]{index=8}
+    ts             : ULINT;             // 100 ns-resolution timestamp :contentReference[oaicite:9]{index=9}
+    sLine          : STRING(120);       // formatted CSV line buffer :contentReference[oaicite:10]{index=10}
+    bytesWritten   : UDINT;             // number of bytes actually written
+    
+    bTrigger       : BOOL;
+END_VAR
+
+
+// === ONE-TIME INITIALIZATION ===
+(* Open CSV file for append; MODE_WRITE|MODE_CREATE = 16#0002 *)  
+fbOpen(  
+    sPathName := 'C:\Data\trigger_log.csv',  
+    nMode     := 16#0002,  
+    bExecute  := TRUE  
+);
+  
+hFile := fbOpen.hFile;   // store the file handle for writes :contentReference[oaicite:11]{index=11}  
+fbOpen.bExecute := FALSE; // reset execute flag per FB_FileOpen state machine :contentReference[oaicite:12]{index=12}  
+
+// On each cycle, evaluate uiTrigger:
+//   • If uiTrigger ≠ 0 → bTriggerBool := TRUE
+//   • If uiTrigger = 0 → bTriggerBool := FALSE
+bTrigger := (uiTrigger <> 0);
+
+// === CYCLIC TASK: EDGE DETECTION & LOGGING ===
+(* 1) Rising edge: trigger from 0→1 → start logging *)  
+IF bTrigger AND NOT prevTrig THEN  
+    loggingActive := TRUE;  
+END_IF  
+
+(* 2) Falling edge: trigger from 1→0 → stop logging *)  
+IF NOT bTrigger AND prevTrig THEN  
+    loggingActive := FALSE;  
+END_IF  
+
+prevTrig := bTrigger;   // update previous trigger for next cycle :contentReference[oaicite:13]{index=13}  
+
+// 3) While loggingActive, capture timestamp & write CSV  
+IF loggingActive THEN  
+    ts := F_GetSystemTime();  // read 64-bit OS time (100 ns units) :contentReference[oaicite:14]{index=14}  
+
+    // build comma-separated line: "<ts>,<b0>,<b1>,<b2>\r\n"  
+    sLine := CONCAT(
+            CONCAT(
+              CONCAT(
+                CONCAT(
+                  CONCAT( TO_STRING(ts), ',' ),  // ts → STRING
+                  TO_STRING(uiTxByte0)           // byte0 → STRING
+                ),
+                ','                              // literal separator
+              ),
+              TO_STRING(uiTxByte1)               // byte1 → STRING
+            ),
+            CONCAT(
+              CONCAT( ',', TO_STRING(uiTxByte2) ),  // ',', byte2
+              '\r\n'                                // newline
+            ));
+        // :contentReference[oaicite:15]{index=15}  
+
+    // append the line to the file  
+    fbWrite(  
+        hFile       := UDINT_TO_INT(hFile), // file handle (UINT) :contentReference[oaicite:16]{index=16}  
+        pWriteBuff  := ADR(sLine),          // pointer to data buffer :contentReference[oaicite:17]{index=17}  
+        cbWriteLen  := LEN(sLine),          // number of chars to write :contentReference[oaicite:18]{index=18}  
+        bExecute    := TRUE,                // trigger write on edge :contentReference[oaicite:19]{index=19}  
+        tTimeout    := T#2S                 // allow up to 2 s for write  
+    );  
+    fbWrite.bExecute := FALSE;          // reset for next write :contentReference[oaicite:20]{index=20}  
+END_IF  
+
+

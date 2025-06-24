@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.55">
 	<ImageDatas>
-		<ImageData Id="1000">424de6000000000000007600000028000000100000000e000000010004000000000070000000c30e0000c30e000000000000000000000000000000008000008000000080800080000000800080008080000080808000c0c0c0000000ff0000ff000000ffff00ff000000ff00ff00ffff0000ffffff00ffffffffffffffffff0000000003077fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff7007777777777fff8077887707f77fff7777777877777fff0000000700007fff0000000000007fffffffffffffffff</ImageData>
+		<ImageData Id="1000">424de6000000000000007600000028000000100000000e00000001000400000000000000000000000000000000000000000000000000ff00ff0088ee8a0021df25000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001222222222210001222222222222101222222222222221222222222222222222222222222222221222222222222221012222222222221000222222222222000012220222222100000110001222100000000000011100000000000000000000</ImageData>
+		<ImageData Id="1001">424de6000000000000007600000028000000100000000e000000010004000000000070000000c30e0000c30e000000000000000000000000000000008000008000000080800080000000800080008080000080808000c0c0c0000000ff0000ff000000ffff00ff000000ff00ff00ffff0000ffffff00ffffffffffffffffff0000000003077fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff0000000000007fff7007777777777fff8077887707f77fff7777777877777fff0000000700007fff0000000000007fffffffffffffffff</ImageData>
 	</ImageDatas>
 	<Project ProjectGUID="{3A8803C0-09DD-471B-BFE2-4A69E6DD2A68}" Target64Bit="true" ShowHideConfigurations="#x6">
 		<System>
@@ -13,6 +14,187 @@
 					<Name>PlcTask</Name>
 				</Task>
 			</Tasks>
+			<Modules>
+				<Module Id="#x01010010" KeepUnrestoredLinks="2">
+					<Name>Object1 (TcDcExternalTimeProvider)</Name>
+					<ImageId>1000</ImageId>
+					<TmcDesc GUID="{EF84E567-0BF1-44AF-B307-96ABC55D6990}">
+						<Name>TcDcExternalTimeProvider</Name>
+						<CLSID ClassFactory="TcIotDrivers">{EF84E567-0BF1-44AF-B307-96ABC55D6990}</CLSID>
+						<InitSequence>SO</InitSequence>
+						<Contexts>
+							<Context>
+								<Id>1</Id>
+								<ManualConfig>
+									<OTCID>#x03000011</OTCID>
+								</ManualConfig>
+								<Priority>11</Priority>
+								<CycleTime>1000000</CycleTime>
+							</Context>
+						</Contexts>
+						<Interfaces>
+							<Interface DisableCodeGeneration="true">
+								<Type GUID="{00000012-0000-0000-E000-000000000064}">ITComObject</Type>
+							</Interface>
+							<Interface DisableCodeGeneration="true">
+								<Type GUID="{03000010-0000-0000-E000-000000000064}">ITcCyclic</Type>
+							</Interface>
+							<Interface DisableCodeGeneration="true">
+								<Type GUID="{03000012-0000-0000-E000-000000000064}">ITcADI</Type>
+							</Interface>
+							<Interface DisableCodeGeneration="true">
+								<Type GUID="{03000018-0000-0000-E000-000000000064}">ITcWatchSource</Type>
+							</Interface>
+						</Interfaces>
+						<Parameters>
+							<Parameter HideParameter="true">
+								<Name>TraceLevelMax</Name>
+								<Comment><![CDATA[Controls the amount of log messages.]]></Comment>
+								<BitSize>32</BitSize>
+								<BaseType GUID="{8007AE3B-86BB-40F2-B385-EF87FCC239A4}">TcTraceLevel</BaseType>
+								<PTCID>#x03002103</PTCID>
+								<ContextId>1</ContextId>
+							</Parameter>
+							<Parameter CreateSymbol="true">
+								<Name>TimeType</Name>
+								<Comment TxtId=""><![CDATA[Type of External Time Provider;]]></Comment>
+								<BitSize>32</BitSize>
+								<BaseType GUID="{18071995-0000-0000-0000-000000000009}">DINT</BaseType>
+								<EnumInfo>
+									<Text><![CDATA[None]]></Text>
+									<Enum>0</Enum>
+								</EnumInfo>
+								<EnumInfo>
+									<Text><![CDATA[Hard]]></Text>
+									<Enum>1</Enum>
+								</EnumInfo>
+								<EnumInfo>
+									<Text><![CDATA[Medium]]></Text>
+									<Enum>2</Enum>
+								</EnumInfo>
+								<EnumInfo>
+									<Text><![CDATA[Soft]]></Text>
+									<Enum>3</Enum>
+								</EnumInfo>
+								<Default>
+									<EnumText>Soft</EnumText>
+								</Default>
+								<PTCID>#x03150001</PTCID>
+								<ContextId>1</ContextId>
+							</Parameter>
+						</Parameters>
+						<DataAreas>
+							<DataArea>
+								<AreaNo AreaType="InputDst" CreateSymbols="true" ShowSymbols="true">1</AreaNo>
+								<Name>Inputs</Name>
+								<ContextId>1</ContextId>
+								<ByteSize>40</ByteSize>
+								<Symbol>
+									<Name>nDcToExtTimeOffset</Name>
+									<Comment TxtId=""><![CDATA[Difference between local DC Time and external time;]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000C}">LINT</BaseType>
+									<Unit><![CDATA[[ns]]]></Unit>
+									<BitOffs>0</BitOffs>
+								</Symbol>
+								<Symbol>
+									<Name>nDcToTcTimeOffset</Name>
+									<Comment TxtId=""><![CDATA[Difference between local DC Time and TwinCAT Time(System Time) ;]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000C}">LINT</BaseType>
+									<Unit><![CDATA[[ns]]]></Unit>
+									<BitOffs>64</BitOffs>
+								</Symbol>
+								<Symbol>
+									<Name>nDcToWldTimeOffset</Name>
+									<Comment TxtId=""><![CDATA[Difference between local DC Time and a superior world time whose is additional to the offset to the external time;]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000C}">LINT</BaseType>
+									<Unit><![CDATA[[ns]]]></Unit>
+									<BitOffs>128</BitOffs>
+								</Symbol>
+								<Symbol>
+									<Name>nDcInternalTime</Name>
+									<Comment TxtId=""><![CDATA[Internal DC Time for validation;]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000B}">ULINT</BaseType>
+									<Unit><![CDATA[[ns]]]></Unit>
+									<BitOffs>192</BitOffs>
+								</Symbol>
+								<Symbol>
+									<Name>nDcExternalTime</Name>
+									<Comment TxtId=""><![CDATA[External DC Time for validation;]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000B}">ULINT</BaseType>
+									<Unit><![CDATA[[ns]]]></Unit>
+									<BitOffs>256</BitOffs>
+								</Symbol>
+							</DataArea>
+							<DataArea>
+								<AreaNo AreaType="OutputSrc" CreateSymbols="true">2</AreaNo>
+								<Name>Outputs</Name>
+								<ContextId>1</ContextId>
+								<ByteSize>32</ByteSize>
+								<Symbol>
+									<Name>nSysTime</Name>
+									<Comment TxtId=""><![CDATA[Local system time based 100ns ticks since 01.01.1601 (FILETIME);]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000C}">LINT</BaseType>
+									<Unit><![CDATA[[100ns]]]></Unit>
+									<BitOffs>0</BitOffs>
+								</Symbol>
+								<Symbol>
+									<Name>nExtTime</Name>
+									<Comment TxtId=""><![CDATA[External system time based 100ns ticks since 01.01.1601 (FILETIME);]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000C}">LINT</BaseType>
+									<Unit><![CDATA[[100ns]]]></Unit>
+									<BitOffs>64</BitOffs>
+								</Symbol>
+								<Symbol>
+									<Name>nSysToExtTimeOffset</Name>
+									<Comment TxtId=""><![CDATA[Difference between local system time and external time;]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000C}">LINT</BaseType>
+									<Unit><![CDATA[[100ns]]]></Unit>
+									<BitOffs>128</BitOffs>
+								</Symbol>
+								<Symbol>
+									<Name>nSysToExtTimeDeviation</Name>
+									<Comment TxtId=""><![CDATA[Deviation between internal corrected time and external time;]]></Comment>
+									<BitSize>64</BitSize>
+									<BaseType GUID="{18071995-0000-0000-0000-00000000000C}">LINT</BaseType>
+									<Unit><![CDATA[[100ns/1s]]]></Unit>
+									<BitOffs>192</BitOffs>
+								</Symbol>
+							</DataArea>
+						</DataAreas>
+						<InterfacePointers>
+							<InterfacePointer>
+								<PTCID>#x03002060</PTCID>
+								<Name>CyclicCaller</Name>
+								<Type GUID="{0300001E-0000-0000-E000-000000000064}">ITcCyclicCaller</Type>
+							</InterfacePointer>
+						</InterfacePointers>
+						<ParameterValues>
+							<Value>
+								<Name>TraceLevelMax</Name>
+								<EnumText>tlAlways</EnumText>
+							</Value>
+							<Value>
+								<Name>TimeType</Name>
+								<EnumText>Hard</EnumText>
+							</Value>
+						</ParameterValues>
+						<InterfacePointerValues>
+							<Value>
+								<Name>CyclicCaller</Name>
+								<OTCID>#x03000011</OTCID>
+							</Value>
+						</InterfacePointerValues>
+					</TmcDesc>
+				</Module>
+			</Modules>
 		</System>
 		<Plc>
 			<Project GUID="{2E48945D-0216-4191-B21B-68D171398607}" Name="test" PrjFilePath="test\test.plcproj" TmcFilePath="test\test.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
@@ -62,6 +244,116 @@
 				</Instance>
 			</Project>
 		</Plc>
+		<Analytics>
+			<Name>ANALYTICS</Name>
+			<ImageId>281</ImageId>
+			<Symbols>
+				<Symbol>Inputs.Frm0State</Symbol>
+				<Symbol>Inputs.Frm0WcState</Symbol>
+				<Symbol>Inputs.Frm0InputToggle</Symbol>
+				<Symbol>Inputs.SlaveCount</Symbol>
+				<Symbol>Inputs.DevState</Symbol>
+				<Symbol>Outputs.Frm0Ctrl</Symbol>
+				<Symbol>Outputs.Frm0WcCtrl</Symbol>
+				<Symbol>Outputs.DevCtrl</Symbol>
+				<Symbol>PlcTask Inputs.MAIN.uiTxByte0</Symbol>
+				<Symbol>PlcTask Inputs.MAIN.uiTxByte1</Symbol>
+				<Symbol>PlcTask Inputs.MAIN.uiTxByte2</Symbol>
+				<Symbol>PlcTask Outputs.MAIN.uiTrigger</Symbol>
+				<Symbol>Inputs.nDcToExtTimeOffset</Symbol>
+				<Symbol>Inputs.nDcToTcTimeOffset</Symbol>
+				<Symbol>Inputs.nDcToWldTimeOffset</Symbol>
+				<Symbol>Inputs.nDcInternalTime</Symbol>
+				<Symbol>Inputs.nDcExternalTime</Symbol>
+				<Symbol>Outputs.nSysTime</Symbol>
+				<Symbol>Outputs.nExtTime</Symbol>
+				<Symbol>Outputs.nSysToExtTimeOffset</Symbol>
+				<Symbol>Outputs.nSysToExtTimeDeviation</Symbol>
+			</Symbols>
+			<AddiStreamDescription>
+				<Address></Address>
+				<Longitude></Longitude>
+				<Latitude></Latitude>
+			</AddiStreamDescription>
+			<SystemAlias></SystemAlias>
+			<DataLogger Disabled="true" GUID="{2871417F-D7F4-8D0A-B3F5-D61C63E7D102}">
+				<Name>Data Logger 1</Name>
+				<Name></Name>
+				<ParameterValues>
+					<Value>
+						<Name>Data Format</Name>
+						<EnumText>ANALYTICS_FORMAT_FILE</EnumText>
+					</Value>
+					<Value>
+						<Name>Data Compression</Name>
+						<EnumText>ANALYTICS_COMPRESSION_NONE</EnumText>
+					</Value>
+					<Value>
+						<Name>Max. Compression Compare Width</Name>
+						<EnumText>ANALYTICS_COMP_WIDTH_8</EnumText>
+					</Value>
+					<Value>
+						<Name>MQTT Host Name</Name>
+						<String>127.0.0.1</String>
+					</Value>
+					<Value>
+						<Name>MQTT Tcp Port</Name>
+						<Value>1883</Value>
+					</Value>
+					<Value>
+						<Name>MQTT Main Topic</Name>
+						<String>DefaultMainTopic</String>
+					</Value>
+					<Value>
+						<Name>MQTT Client ID</Name>
+						<String></String>
+					</Value>
+					<Value>
+						<Name>MQTT User Name</Name>
+						<String></String>
+					</Value>
+					<Value>
+						<Name>MQTT Password</Name>
+						<String></String>
+					</Value>
+				</ParameterValues>
+				<Stream Caller="#x03040010" Adi="#x03040010" Id="#x02040004" CntAds="#x00000020" CntFile="#x00000010" CntRing="#x00000002" SamplingDivider="1" DeviceStream="true">
+					<Name>Device 2 (EtherCAT).Image</Name>
+					<DisplayName>DeviceStream1</DisplayName>
+					<LoggerObject Enabled="true">
+						<AreaName>Box 1 (NETX 90-RE/ECS)^TxPDO 1A00</AreaName>
+						<SymName>1 Byte In (0)</SymName>
+						<HierName>Box 1 (NETX 90-RE/ECS).TxPDO 1A00.1 Byte In (0)</HierName>
+					</LoggerObject>
+					<LoggerObject Enabled="true">
+						<AreaName>Box 1 (NETX 90-RE/ECS)^TxPDO 1A00</AreaName>
+						<SymName>1 Byte In (1)</SymName>
+						<HierName>Box 1 (NETX 90-RE/ECS).TxPDO 1A00.1 Byte In (1)</HierName>
+					</LoggerObject>
+					<LoggerObject Enabled="true">
+						<AreaName>Box 1 (NETX 90-RE/ECS)^TxPDO 1A00</AreaName>
+						<SymName>1 Byte In (2)</SymName>
+						<HierName>Box 1 (NETX 90-RE/ECS).TxPDO 1A00.1 Byte In (2)</HierName>
+					</LoggerObject>
+					<LoggerObject Enabled="true">
+						<AreaName>Box 1 (NETX 90-RE/ECS)^RxPDO 1600</AreaName>
+						<SymName>1 Byte Out (5)</SymName>
+						<HierName>Box 1 (NETX 90-RE/ECS).RxPDO 1600.1 Byte Out (5)</HierName>
+					</LoggerObject>
+					<FileDir>%TC_BOOTPRJPATH%</FileDir>
+				</Stream>
+				<Stream Caller="#x08502001" Adi="#x08502000" Id="#x02040005" CntAds="#x00000020" CntFile="#x00000010" CntRing="#x00000002" SamplingDivider="1">
+					<Name>test.test Instance.PlcTask</Name>
+					<DisplayName>PlcStream1</DisplayName>
+					<FileDir>%TC_BOOTPRJPATH%</FileDir>
+				</Stream>
+				<Stream Caller="#x03000011" Adi="#x01010010" Id="#x02040006" CntAds="#x00000020" CntFile="#x0000009d" CntRing="#x00000002" SamplingDivider="1">
+					<Name>TcCOM Objects.Object1 (TcDcExternalTimeProvider)</Name>
+					<DisplayName>TcComStream1</DisplayName>
+					<FileDir>%TC_BOOTPRJPATH%</FileDir>
+				</Stream>
+			</DataLogger>
+		</Analytics>
 		<Io>
 			<Device Id="2" DevType="111" DevFlags="#x0003" AmsPort="28674" AmsNetId="10.1.42.124.3.1" RemoteName="Device 2 (EtherCAT)" InfoImageId="2">
 				<Name>Device 2 (EtherCAT)</Name>
@@ -77,7 +369,7 @@
 				</Image>
 				<Box Id="1" BoxType="9099" BoxFlags="#x00000020">
 					<Name>Box 1 (NETX 90-RE/ECS)</Name>
-					<ImageId>1000</ImageId>
+					<ImageId>1001</ImageId>
 					<EtherCAT SlaveType="2" PdiType="#x0006" MboxDataLinkLayer="true" StateMBoxPolling="true" CycleMBoxPollingTime="0" CoeType="51" VendorId="#xe0000044" ProductCode="#x0000003d" RevisionNo="#x00000001" InfoDataAddr="true" PortPhys="17" MaxSlotCount="256" MaxSlotGroupCount="1" SlotPdoIncrement="1" SlotIndexIncrement="16" Type="NETX 90-RE/ECS" Desc="NETX 90-RE/ECS" PortABoxInfo="#x00ffffff">
 						<SyncMan>001080002600010001000000800080008000001026010000</SyncMan>
 						<SyncMan>801080002200010002000000800080008000801022010000</SyncMan>

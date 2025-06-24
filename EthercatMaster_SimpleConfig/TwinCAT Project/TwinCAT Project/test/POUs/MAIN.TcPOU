@@ -17,6 +17,9 @@ VAR
     fbWrite        : FB_FileWrite;      // writes data into the file :contentReference[oaicite:7]{index=7}
 	fbRead         : FB_FileRead;
 	fbclose        : FB_FileClose;
+	fbFileSeek     : FB_FileSeek;
+	nSeekPos     : DINT;
+	eOrigin      : E_SeekOrigin :=SEEK_SET;
 
     hSrcFile          : UINT;              // handle returned by FB_FileOpen (UINT) :contentReference[oaicite:8]{index=8}
     ts             : ULINT;             // 100 ns-resolution timestamp :contentReference[oaicite:9]{index=9}
@@ -27,23 +30,19 @@ VAR
 	nErrId: UDINT;
 	bError: BOOL;
 	Step: UDINT;
-	openDone : BOOl :=FALSE;
+	openDone : BOOL :=FALSE;
 	sLine_len: UDINT;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-// === ONE-TIME INITIALIZATION ===
+      <ST><![CDATA[// === ONE-TIME INITIALIZATION ===
 (* Open CSV file for append; MODE_WRITE|MODE_CREATE = 16#0002 *)  
-IF NOT opendone THEN
-	fbOpen(  
-		sPathName := 'C:\Users\parnika.gupta\Documents\twincat_log.csv',
-		nMode     := 16#000C, //FOPEN_MODEAPPEND OR FOPEN_MODEPLUS OR FOPEN_MODETEXT,
-		bExecute := TRUE,
-		tTimeout := T#1S,
-	);
-	openDone := TRUE;
-END_IF
+fbOpen(  
+	sPathName := 'C:\Users\parnika.gupta\Documents\twincat_log.csv',
+	nMode     := FOPEN_MODEAPPEND OR FOPEN_MODEPLUS OR FOPEN_MODETEXT,
+	bExecute := TRUE,
+	tTimeout := T#1S,
+);
 
 fbOpen.bExecute := FALSE;// reset execute flag per FB_FileOpen state machine :contentReference[oaicite:12]{index=12}  
 IF NOT fbOpen.bBusy AND NOT openDone THEN 
@@ -54,6 +53,7 @@ IF NOT fbOpen.bBusy AND NOT openDone THEN
    ELSE 
 		hSrcFile := fbOpen.hFile; // store the file handle for writes :contentReference[oaicite:11]{index=11}
 		Step := Step + 1; 
+		openDone := TRUE;
    END_IF 
 END_IF 
 // On each cycle, evaluate uiTrigger:
@@ -135,35 +135,7 @@ fbClose(
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="170" Count="2" />
-      <LineId Id="362" Count="1" />
-      <LineId Id="174" Count="1" />
-      <LineId Id="273" Count="0" />
-      <LineId Id="352" Count="0" />
-      <LineId Id="177" Count="0" />
-      <LineId Id="366" Count="0" />
-      <LineId Id="368" Count="0" />
-      <LineId Id="365" Count="0" />
-      <LineId Id="179" Count="0" />
-      <LineId Id="274" Count="8" />
-      <LineId Id="238" Count="0" />
-      <LineId Id="231" Count="3" />
-      <LineId Id="180" Count="18" />
-      <LineId Id="214" Count="14" />
-      <LineId Id="202" Count="1" />
-      <LineId Id="303" Count="0" />
-      <LineId Id="337" Count="0" />
-      <LineId Id="339" Count="0" />
-      <LineId Id="205" Count="4" />
-      <LineId Id="351" Count="0" />
-      <LineId Id="211" Count="1" />
-      <LineId Id="318" Count="12" />
-      <LineId Id="317" Count="0" />
-      <LineId Id="354" Count="0" />
-      <LineId Id="342" Count="1" />
-      <LineId Id="213" Count="0" />
-      <LineId Id="356" Count="5" />
-      <LineId Id="355" Count="0" />
+      <LineId Id="596" Count="96" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

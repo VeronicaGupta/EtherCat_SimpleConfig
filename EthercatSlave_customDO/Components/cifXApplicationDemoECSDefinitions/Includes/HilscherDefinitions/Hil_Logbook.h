@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
                  Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ***********************************************************************************************************************
-  $Id: Hil_Logbook.h 225 2019-04-24 13:47:48Z AndreasB $: *//**
+  $Id: Hil_Logbook.h 351 2021-01-26 11:02:11Z ABessler $: *//**
 
   \file Hil_Logbook.h
 
@@ -41,6 +41,7 @@ typedef enum {
   /* HIL_LOGBOOK_ENTRY_TYPE_DPM_MASTER_STATUS          = 0x0012, */
   HIL_LOGBOOK_ENTRY_TYPE_PACKET_ISSUE                  = 0x0013, /*!< Information to a received packet/service  */
   HIL_LOGBOOK_ENTRY_TYPE_SDO_FAILURE                   = 0x0014, /*!< SDO Configuration issue occurred */
+  HIL_LOGBOOK_ENTRY_TYPE_CFGMGR_TLV                    = 0x0015, /*!< Config Manager TLV */
 
 
   /*! The entry is not valid and shall not be evaluated */
@@ -171,10 +172,22 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST {
   uint8_t  abReserved[2];   /*!< Reserved for future or internal use */
   uint32_t ulSdoAbortCode;  /*!< SDO abort code */
 
-
 } HIL_LOGBOOK_ENTRY_TYPE_SDO_FAILURE_T;
 
+/*! Structure definition for HIL_LOGBOOK_ENTRY_TYPE_CFGMGR_TLV entries.
+ * A TLV entry have raise an event within the Config Manager.
+ *
+ * Notification string:
+ *  "The TLV type {0:#06x} with length {1:d} at index {2:#010x} raised an issue with the code {3:#010x}"
+ **/
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST {
+  uint16_t usType;        /*!< TLV type */
+  uint16_t usLength;      /*!< Length of TLV entry */
+  uint32_t ulIndex;       /*!< Index of TLV within a config data stream */
+  uint32_t ulSta;         /*!< Status code */
+  uint8_t  abReserved[4]; /*!< Reserved for future or internal use */
 
+} HIL_LOGBOOK_ENTRY_TYPE_CFGMGR_TLV_T;
 
 #ifdef __HIL_PRAGMA_PACK_ENABLE
   #pragma __HIL_PRAGMA_UNPACK_1(HIL_LOGBOOK)

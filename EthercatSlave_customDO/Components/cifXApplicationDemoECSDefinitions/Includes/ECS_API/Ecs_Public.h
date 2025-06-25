@@ -1,7 +1,7 @@
 /**************************************************************************************
  Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ***************************************************************************************
-$Id: Ecs_Public.h 90592 2020-03-02 16:17:25Z Sven $:
+$Id: Ecs_Public.h 102063 2021-08-19 11:54:06Z SBormann $:
 **************************************************************************************/
 
 #ifndef _ECS_PUBLIC_H
@@ -41,6 +41,8 @@ $Id: Ecs_Public.h 90592 2020-03-02 16:17:25Z Sven $:
 #define ECAT_SET_CONFIG_BOOTMBX                                     0x00000100
 #define ECAT_SET_CONFIG_DEVICEINFO                                  0x00000200
 #define ECAT_SET_CONFIG_SMLENGTH                                    0x00000400
+#define ECAT_SET_CONFIG_MBXSTART                                    0x00000800
+#define ECAT_SET_CONFIG_VOE                                         0x00001000
 
 #define ECAT_SET_CONFIG_SYSTEMFLAGS_AUTOSTART                       0x00000000
 #define ECAT_SET_CONFIG_SYSTEMFLAGS_APP_CONTROLLED                  0x00000001
@@ -53,6 +55,7 @@ $Id: Ecs_Public.h 90592 2020-03-02 16:17:25Z Sven $:
 #define ECAT_SET_CONFIG_COEDETAILS_ENABLE_SDOCOMPLETEACCESS         0x20
 
 #define ECAT_SET_CONFIG_COEFLAGS_USE_CUSTOM_OD                      0x01
+#define ECAT_SET_CONFIG_COEFLAGS_ENABLE_DIAGHISTORY                 0x02
 
 #define ECAT_SET_CONFIG_SYNCPDI_SYNC0_OUTPUT_TYPE_MASK              0x01
 #define ECAT_SET_CONFIG_SYNCPDI_SYNC0_POLARITY_MASK                 0x02
@@ -190,6 +193,14 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SET_CONFIG_SMLENGTH_Ttag
   uint16_t usSM3StartAddress;  /* should match (usProcDataSm2Start + 3 * ((usProcDataSm2Length + 3) & (~3)) <= usProcDataSm3Start)*/
 } ECAT_SET_CONFIG_SMLENGTH_T;
 
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SET_CONFIG_MBXSTART_Ttag
+{
+  uint16_t usStdMbxSm0StartAddress;
+  uint16_t usStdMbxSm1StartAddress;
+  uint16_t usBootMbxSm0StartAddress;
+  uint16_t usBootMbxSm1StartAddress;
+} ECAT_SET_CONFIG_MBXSTART_T;
+
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SET_CONFIG_REQ_DATA_COMPONENTS_Ttag
 {
   ECAT_SET_CONFIG_COE_T tCoECfg;
@@ -202,6 +213,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SET_CONFIG_REQ_DATA_COMPO
   ECAT_SET_CONFIG_BOOTMBX_T tBootMxbCfg;
   ECAT_SET_CONFIG_DEVICEINFO_T tDeviceInfoCfg;
   ECAT_SET_CONFIG_SMLENGTH_T tSmLengthCfg;
+  ECAT_SET_CONFIG_MBXSTART_T tMbxStartCfg;
 } ECAT_SET_CONFIG_REQ_DATA_COMPONENTS_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SET_CONFIG_REQ_DATA_Ttag
@@ -759,6 +771,9 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_DPM_GET_STATION_ALIAS_CNF
 #define ECAT_COE_SEND_EMERGENCY_REQ                                 0x00001994
 #define ECAT_COE_SEND_EMERGENCY_CNF                                 0x00001995
 
+#define ECAT_COE_WRITE_DIAG_HISTORY_REQ                             0x00001BA0
+#define ECAT_COE_WRITE_DIAG_HISTORY_CNF                             0x00001BA1
+
 /* -----------------------------------------------------------------------------
  *  packets
  * -----------------------------------------------------------------------------
@@ -791,6 +806,39 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_COE_SEND_EMERGENCY_CNF_Tt
   HIL_PACKET_HEADER_T tHead;
   /* no data part */
 } ECAT_COE_SEND_EMERGENCY_CNF_T;
+
+/*******************************************************************************
+ * ECAT_COE_WRITE_DIAG_HISTORY_REQ/
+ * ECAT_COE_WRITE_DIAG_HISTORY_CNF
+ */
+
+/* request packet */
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_COE_WRITE_DIAG_HISTORY_REQ_DATA_Ttag
+{
+  uint32_t ulDiagCode;
+  uint8_t bType;
+  uint16_t usTextID;
+  uint8_t abDiagData[5]; /* used when diagcode refers to emergency type of code */
+  uint8_t bNumParams;
+  uint8_t bEnableCustomEmcyCode;
+  uint16_t usCustomEmcyCode; /* when diagcode has no mapping for emcy codes this allows enabling sending custom ones except A0XX */
+  uint32_t ulParameterDataBytes;
+  uint8_t abParameterData[128];
+} ECAT_COE_WRITE_DIAG_HISTORY_REQ_DATA_T;
+
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_COE_WRITE_DIAG_HISTORY_REQ_Ttag
+{
+  HIL_PACKET_HEADER_T tHead;
+  ECAT_COE_WRITE_DIAG_HISTORY_REQ_DATA_T tData;
+} ECAT_COE_WRITE_DIAG_HISTORY_REQ_T;
+
+/* confirmation packet */
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_COE_WRITE_DIAG_HISTORY_CNF_Ttag
+{
+  HIL_PACKET_HEADER_T tHead;
+  /* no data part */
+} ECAT_COE_WRITE_DIAG_HISTORY_CNF_T;
+
 
 /*******************************************************************************
 
@@ -1227,7 +1275,16 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_CREATE_IDN_REQ_DAT
   uint16_t usMaxNameLength;
   uint16_t usMaxUnitLength;
   /* fragmentable part */
-  uint8_t abData[1];
+  uint8_t abData[__HIL_VARIABLE_LENGTH_ARRAY];
+  /* format:
+   * uint16_t usDataState; if enabled
+   * struct { uint16_t usNameLength; uint16_t usPad; uint8_t abName[usNameLength]; }; if enabled
+   * struct { uint16_t usUnitLength; uint16_t usPad; uint8_t abUnit[usUnitLength]; }; if enabled
+   * union MinimumValue; if enabled
+   * union MaximumValue; if enabled
+   * union OpDataValue; if enabled
+   * union DefaultValue; if enabled
+   */
 } ECAT_SOEIDN_CREATE_IDN_REQ_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_CREATE_IDN_REQ_Ttag
@@ -1237,6 +1294,19 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_CREATE_IDN_REQ_Tta
 } ECAT_SOEIDN_CREATE_IDN_REQ_T;
 
 /* confirmation packet */
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_CREATE_IDN_CNF_DATA_Ttag
+{
+  /* unfragmentable part */
+  uint32_t ulTotalLength;
+  uint16_t usIdn;
+  uint16_t usMaxListDataSize;
+  uint32_t ulAttribute;
+  uint8_t bDriveNo;
+  uint8_t bValueInfo;
+  uint16_t usMaxNameLength;
+  uint16_t usMaxUnitLength;
+} ECAT_SOEIDN_CREATE_IDN_CNF_DATA_T;
+
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_CREATE_IDN_CNF_Ttag
 {
   HIL_PACKET_HEADER_T tHead;
@@ -1261,9 +1331,16 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_DELETE_IDN_REQ_Tta
 } ECAT_SOEIDN_DELETE_IDN_REQ_T;
 
 /* confirmation packet */
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_DELETE_IDN_CNF_DATA_Ttag
+{
+  uint16_t usIdn;
+  uint8_t bDriveNo;
+} ECAT_SOEIDN_DELETE_IDN_CNF_DATA_T;
+
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_DELETE_IDN_CNF_Ttag
 {
   HIL_PACKET_HEADER_T tHead;
+  ECAT_SOEIDN_DELETE_IDN_CNF_DATA_T tData;
 } ECAT_SOEIDN_DELETE_IDN_CNF_T;
 
 /*******************************************************************************
@@ -1291,6 +1368,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_REGISTER_FOR_IDN_I
 {
   uint16_t usIdn;
   uint8_t bDriveNo;
+  uint32_t ulHandle;
 } ECAT_SOEIDN_REGISTER_FOR_IDN_INDICATIONS_CNF_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_REGISTER_FOR_IDN_INDICATIONS_CNF_Ttag
@@ -1307,8 +1385,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_REGISTER_FOR_IDN_I
 /* request packet */
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_UNREGISTER_FROM_IDN_INDICATIONS_REQ_DATA_Ttag
 {
-  uint16_t usIdn;
-  uint8_t bDriveNo;
+  uint32_t ulHandle;
 } ECAT_SOEIDN_UNREGISTER_FROM_IDN_INDICATIONS_REQ_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_UNREGISTER_FROM_IDN_INDICATIONS_REQ_Ttag
@@ -1320,8 +1397,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_UNREGISTER_FROM_ID
 /* confirmation packet */
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_UNREGISTER_FROM_IDN_INDICATIONS_CNF_DATA_Ttag
 {
-  uint16_t usIdn;
-  uint8_t bDriveNo;
+  uint32_t ulHandle;
 } ECAT_SOEIDN_UNREGISTER_FROM_IDN_INDICATIONS_CNF_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOEIDN_UNREGISTER_FROM_IDN_INDICATIONS_CNF_Ttag
@@ -1480,9 +1556,13 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_REQ_Ttag
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_CNF_DATA_Ttag
 {
   /* unfragmentable part */
+  uint16_t usIdn;
+  uint8_t bElement;
+  uint8_t bDriveNo;
+  uint16_t usMaxReadLength;
   uint16_t usTotalLength;
   /* fragmentable part */
-  uint8_t abData[1];
+  uint8_t abData[__HIL_VARIABLE_LENGTH_ARRAY];
 } ECAT_SOE_READ_CNF_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_CNF_Ttag
@@ -1497,13 +1577,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_CNF_Ttag
  */
 
 /* indication packet */
-typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_IND_DATA_Ttag
-{
-  uint16_t usIdn;
-  uint8_t bElement;
-  uint8_t bDriveNo;
-  uint16_t usMaxReadLength;
-} ECAT_SOE_READ_IND_DATA_T;
+typedef ECAT_SOE_READ_REQ_DATA_T ECAT_SOE_READ_IND_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_IND_Ttag
 {
@@ -1512,13 +1586,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_IND_Ttag
 } ECAT_SOE_READ_IND_T;
 
 /* response packet */
-typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_RES_DATA_Ttag
-{
-  /* unfragmentable part */
-  uint16_t usTotalLength;
-  /* fragmentable part */
-  uint8_t abData[1];
-} ECAT_SOE_READ_RES_DATA_T;
+typedef ECAT_SOE_READ_CNF_DATA_T ECAT_SOE_READ_RES_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_READ_RES_Ttag
 {
@@ -1554,7 +1622,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_REQ_DATA_Ttag
   uint8_t bDriveNo;
   uint16_t usTotalLength;
   /* fragmentable part */
-  uint8_t abData[1];
+  uint8_t abData[__HIL_VARIABLE_LENGTH_ARRAY];
 } ECAT_SOE_WRITE_REQ_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_REQ_Ttag
@@ -1564,9 +1632,19 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_REQ_Ttag
 } ECAT_SOE_WRITE_REQ_T;
 
 /* confirmation packet */
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_CNF_DATA_Ttag
+{
+  /* unfragmentable part */
+  uint16_t usIdn;
+  uint8_t bElement;
+  uint8_t bDriveNo;
+  uint16_t usTotalLength;
+} ECAT_SOE_WRITE_CNF_DATA_T;
+
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_CNF_Ttag
 {
   HIL_PACKET_HEADER_T tHead;
+  ECAT_SOE_WRITE_CNF_DATA_T tData;
 } ECAT_SOE_WRITE_CNF_T;
 
 /*******************************************************************************
@@ -1575,16 +1653,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_CNF_Ttag
  */
 
 /* indication packet */
-typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_IND_DATA_Ttag
-{
-  /* unfragmentable part */
-  uint16_t usIdn;
-  uint8_t bElement;
-  uint8_t bDriveNo;
-  uint16_t usTotalLength;
-  /* fragmentable part */
-  uint8_t abData[1];
-} ECAT_SOE_WRITE_IND_DATA_T;
+typedef ECAT_SOE_WRITE_REQ_DATA_T ECAT_SOE_WRITE_IND_DATA_T;
 
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_IND_Ttag
 {
@@ -1593,9 +1662,12 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_IND_Ttag
 } ECAT_SOE_WRITE_IND_T;
 
 /* response packet */
+typedef ECAT_SOE_WRITE_CNF_DATA_T ECAT_SOE_WRITE_RES_DATA_T;
+
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_WRITE_RES_Ttag
 {
   HIL_PACKET_HEADER_T tHead;
+  ECAT_SOE_WRITE_RES_DATA_T tData;
 } ECAT_SOE_WRITE_RES_T;
 
 
@@ -1633,9 +1705,16 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_PROCCMD_NOTIFY_REQ_Tt
 } ECAT_SOE_PROCCMD_NOTIFY_REQ_T;
 
 /* confirmation packet */
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_PROCCMD_NOTIFY_CNF_DATA_Ttag
+{
+  uint16_t usIdn;
+  uint8_t bDriveNo;
+} ECAT_SOE_PROCCMD_NOTIFY_CNF_DATA_T;
+
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ECAT_SOE_PROCCMD_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T tHead;
+  ECAT_SOE_PROCCMD_NOTIFY_CNF_DATA_T tData;
 } ECAT_SOE_PROCCMD_NOTIFY_CNF_T;
 
 

@@ -1,7 +1,7 @@
 /**************************************************************************************
   Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ***************************************************************************************
-  $Id: Hil_ComponentID.h 323 2020-05-14 09:12:14Z AndreasB $:
+  $Id: Hil_ComponentID.h 387 2021-04-22 12:31:35Z RMayer $:
 
   Description:
     This file contains all Hilscher components (task) identifiers.
@@ -59,6 +59,10 @@
 /* MessageId: HIL_COMPONENT_ID_RX_TIMER */
 /* MessageText: rcX Timer. */
 #define HIL_COMPONENT_ID_RX_TIMER        ((uint32_t)0x00010007L)
+
+/* MessageId: HIL_COMPONENT_ID_MAINTENANCE */
+/* MessageText: Maintenance task. */
+#define HIL_COMPONENT_ID_MAINTENANCE     ((uint32_t)0x00010008L)
 
 /***********************************************************************************/
 /* EtherCAT Base stack task identifiers */
@@ -1001,21 +1005,21 @@
 #define HIL_COMPONENT_ID_PROFIDRIVE      ((uint32_t)0x00970000L)
 
 /***********************************************************************************/
-/* PROFIDRIVE - PA task identifier     ( not used ) */
+/*****/
 /***********************************************************************************/
 /* MessageId: HIL_COMPONENT_ID_PROFIDRIVE_PA */
 /* MessageText: PROFIDRIVE parameter Access interface task. */
 #define HIL_COMPONENT_ID_PROFIDRIVE_PA   ((uint32_t)0x00980000L)
 
 /***********************************************************************************/
-/* PROFIDRIVE - AP task identifier     ( not used ) */
+/*****/
 /***********************************************************************************/
 /* MessageId: HIL_COMPONENT_ID_PROFIDRIVE_AP */
 /* MessageText: PROFIDRIVE user application task. */
 #define HIL_COMPONENT_ID_PROFIDRIVE_AP   ((uint32_t)0x009A0000L)
 
 /***********************************************************************************/
-/* PROFIDRIVE - OD task identifier      ( not used ) */
+/*****/
 /***********************************************************************************/
 /* MessageId: HIL_COMPONENT_ID_PROFIDRIVE_OD */
 /* MessageText: PROFIDRIVE Object Dictionary task. */
@@ -1580,6 +1584,62 @@
 /* MessageText: MQTT Client Stack. */
 #define HIL_COMPONENT_ID_MQTT_CLIENT     ((uint32_t)0x01150000L)
 
+/***********************************************************************************/
+/* netPROXY package OPCUA TLV Parser */
+/***********************************************************************************/
+/* MessageId: HIL_COMPONENT_ID_NPXPACKAGE_OPCUATLVPARSER */
+/* MessageText: netPROXY package OPC UA TLV Parser. */
+#define HIL_COMPONENT_ID_NPXPACKAGE_OPCUATLVPARSER ((uint32_t)0x01160000L)
+
+/***********************************************************************************/
+/* netPROXY package OPCUA AddOn */
+/***********************************************************************************/
+/* MessageId: HIL_COMPONENT_ID_NPXPACKAGE_OPCUA_ADDON */
+/* MessageText: netPROXY package OPC AddOn. */
+#define HIL_COMPONENT_ID_NPXPACKAGE_OPCUA_ADDON ((uint32_t)0x01170000L)
+
+/***********************************************************************************/
+/* Driver Phy */
+/***********************************************************************************/
+/* MessageId: _HIL_UNQ_COMPONENT_ID_DRV_PHY */
+/* MessageText: Driver Phy. */
+#define _HIL_UNQ_COMPONENT_ID_DRV_PHY    ((uint32_t)0x01180000L)
+
+/***********************************************************************************/
+/* DeviceNet Core */
+/***********************************************************************************/
+/* MessageId: HIL_COMPONENT_ID_DEVNET_CORE */
+/* MessageText: DeviceNet Core. */
+#define HIL_COMPONENT_ID_DEVNET_CORE     ((uint32_t)0x01190000L)
+
+/***********************************************************************************/
+/* DeviceNet Object Library */
+/***********************************************************************************/
+/* MessageId: HIL_COMPONENT_ID_DEVNET_OBJECT */
+/* MessageText: DeviceNet Object Library. */
+#define HIL_COMPONENT_ID_DEVNET_OBJECT   ((uint32_t)0x011A0000L)
+
+/***********************************************************************************/
+/* DeviceNet GCI Adapter Slave */
+/***********************************************************************************/
+/* MessageId: HIL_COMPONENT_ID_DEVNET_GCI_SLAVE */
+/* MessageText: DeviceNet GCI Adapter Slave. */
+#define HIL_COMPONENT_ID_DEVNET_GCI_SLAVE ((uint32_t)0x011B0000L)
+
+/***********************************************************************************/
+/* HTTP Web Server */
+/***********************************************************************************/
+/* MessageId: HIL_COMPONENT_ID_HTTP_SERVER */
+/* MessageText: HTTP and HTTPS Web Server. */
+#define HIL_COMPONENT_ID_HTTP_SERVER     ((uint32_t)0x011C0000L)
+
+/***********************************************************************************/
+/* netPROXY package GCI */
+/***********************************************************************************/
+/* MessageId: HIL_COMPONENT_ID_NPXPACKAGE_GCI */
+/* MessageText: netPROXY package GCI. */
+#define HIL_COMPONENT_ID_NPXPACKAGE_GCI  ((uint32_t)0x011D0000L)
+
 /************************************************************************************
   Deprecated task identifiers defines. Do not use them for new development
 ************************************************************************************/
@@ -1840,5 +1900,5 @@
 #define HIL_TASK_ID_CONFIG_MANAGER                    HIL_COMPONENT_ID_CONFIG_MANAGER
 #define HIL_TASK_ID_NPXPACKAGE_REMANENT               HIL_COMPONENT_ID_NPXPACKAGE_REMANENT
 
-#endif  /*HIL_COMPONENT_ID_H_ */
+#endif /* HIL_COMPONENT_ID_H_ */
 

@@ -1,7 +1,7 @@
 /**************************************************************************************
  Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ***************************************************************************************
-$Id: OdV3_Public.h 4095 2019-04-04 13:49:12Z Sven $:
+$Id: OdV3_Public.h 4785 2021-07-15 11:51:02Z SBormann $:
 
 
 Changes:
@@ -250,7 +250,7 @@ Changes:
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_OBJECT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_OBJECT_REQ_DATA_Ttag
 {
   /* non-fragmentable part */
   uint16_t                                                usIndex;
@@ -276,26 +276,26 @@ typedef __HIL_PACKED_PRE struct ODV3_CREATE_OBJECT_REQ_DATA_Ttag
    * - Initial Value (TLR_UINT32 ulInitialValueLength, TLR_UINT8 abData[ulInitialValueLength])
    * - Default Value (TLR_UINT32 ulDefaultValueLength, TLR_UINT8 abData[ulDefaultValueLength])
    */
-} __HIL_PACKED_POST ODV3_CREATE_OBJECT_REQ_DATA_T;
+} ODV3_CREATE_OBJECT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_OBJECT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_OBJECT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_CREATE_OBJECT_REQ_DATA_T                           tData;
-} __HIL_PACKED_POST ODV3_CREATE_OBJECT_REQ_T;
+} ODV3_CREATE_OBJECT_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_OBJECT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_OBJECT_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_CREATE_OBJECT_CNF_DATA_T;
+} ODV3_CREATE_OBJECT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_OBJECT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_OBJECT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_CREATE_OBJECT_CNF_DATA_T                           tData;
-} __HIL_PACKED_POST ODV3_CREATE_OBJECT_CNF_T;
+} ODV3_CREATE_OBJECT_CNF_T;
 
 
 /* packet union */
@@ -322,7 +322,7 @@ typedef union ODV3_CREATE_OBJECT_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_SUBOBJECT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_REQ_DATA_Ttag
 {
   /* non-fragmentable part */
   uint16_t                                                usIndex;
@@ -343,27 +343,27 @@ typedef __HIL_PACKED_PRE struct ODV3_CREATE_SUBOBJECT_REQ_DATA_Ttag
    * - Initial Value (TLR_UINT32 ulInitialValueLength, TLR_UINT8 abData[ulInitialValueLength])
    * - Default Value (TLR_UINT32 ulDefaultValueLength, TLR_UINT8 abData[ulDefaultValueLength])
    */
-} __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_REQ_DATA_T;
+} ODV3_CREATE_SUBOBJECT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_SUBOBJECT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_CREATE_SUBOBJECT_REQ_DATA_T                        tData;
-} __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_REQ_T;
+} ODV3_CREATE_SUBOBJECT_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_SUBOBJECT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_CNF_DATA_T;
+} ODV3_CREATE_SUBOBJECT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_SUBOBJECT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_CREATE_SUBOBJECT_CNF_DATA_T                        tData;
-} __HIL_PACKED_POST ODV3_CREATE_SUBOBJECT_CNF_T;
+} ODV3_CREATE_SUBOBJECT_CNF_T;
 
 
 /* packet union */
@@ -379,29 +379,29 @@ typedef union ODV3_CREATE_SUBOBJECT_PCK_Ttag
  * Packet:  ODV3_DELETE_OBJECT_REQ/ODV3_DELETE_OBJECT_CNF
  */
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_OBJECT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_OBJECT_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_DELETE_OBJECT_REQ_DATA_T;
+} ODV3_DELETE_OBJECT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_OBJECT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_OBJECT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_DELETE_OBJECT_REQ_DATA_T                           tData;
-} __HIL_PACKED_POST ODV3_DELETE_OBJECT_REQ_T;
+} ODV3_DELETE_OBJECT_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_OBJECT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_OBJECT_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_DELETE_OBJECT_CNF_DATA_T;
+} ODV3_DELETE_OBJECT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_OBJECT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_OBJECT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_DELETE_OBJECT_CNF_DATA_T                           tData;
-} __HIL_PACKED_POST ODV3_DELETE_OBJECT_CNF_T;
+} ODV3_DELETE_OBJECT_CNF_T;
 
 
 /* packet union */
@@ -418,31 +418,31 @@ typedef union ODV3_DELETE_OBJECT_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_SUBOBJECT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_REQ_DATA_T;
+} ODV3_DELETE_SUBOBJECT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_SUBOBJECT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_DELETE_SUBOBJECT_REQ_DATA_T                        tData;
-} __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_REQ_T;
+} ODV3_DELETE_SUBOBJECT_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_SUBOBJECT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_CNF_DATA_T;
+} ODV3_DELETE_SUBOBJECT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_SUBOBJECT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_DELETE_SUBOBJECT_CNF_DATA_T                        tData;
-} __HIL_PACKED_POST ODV3_DELETE_SUBOBJECT_CNF_T;
+} ODV3_DELETE_SUBOBJECT_CNF_T;
 
 
 /* packet union */
@@ -471,25 +471,25 @@ typedef union ODV3_DELETE_SUBOBJECT_PCK_Ttag
  */
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_READ_OBJECT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_OBJECT_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint16_t                                                usMaxSegLength;     /* max seg length in bytes or 0 for field not used */
-} __HIL_PACKED_POST ODV3_READ_OBJECT_REQ_DATA_T;
+} ODV3_READ_OBJECT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_OBJECT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_OBJECT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_READ_OBJECT_REQ_DATA_T                             tData;
-} __HIL_PACKED_POST ODV3_READ_OBJECT_REQ_T;
+} ODV3_READ_OBJECT_REQ_T;
 
 typedef ODV3_READ_OBJECT_REQ_DATA_T ODV3_READ_OBJECT_IND_DATA_T;
 typedef ODV3_READ_OBJECT_REQ_T ODV3_READ_OBJECT_IND_T;
 
 
 /* response/confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_READ_OBJECT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_OBJECT_CNF_DATA_Ttag
 {
   /* unfragmentable part, part of every fragment */
   uint16_t                                                usIndex;
@@ -499,13 +499,13 @@ typedef __HIL_PACKED_PRE struct ODV3_READ_OBJECT_CNF_DATA_Ttag
 
   /* fragmentable part */
   uint8_t                                                 abData[1024];
-} __HIL_PACKED_POST ODV3_READ_OBJECT_CNF_DATA_T;
+} ODV3_READ_OBJECT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_OBJECT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_OBJECT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_READ_OBJECT_CNF_DATA_T                             tData;
-} __HIL_PACKED_POST ODV3_READ_OBJECT_CNF_T;
+} ODV3_READ_OBJECT_CNF_T;
 
 typedef ODV3_READ_OBJECT_CNF_DATA_T ODV3_READ_OBJECT_RES_DATA_T;
 typedef ODV3_READ_OBJECT_CNF_T ODV3_READ_OBJECT_RES_T;
@@ -577,7 +577,7 @@ typedef union ODV3_READ_OBJECT_NO_IND_PCK_Ttag
  */
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_REQ_DATA_Ttag
 {
   /* unfragmentable part, part of every fragment */
   uint16_t                                                usIndex;
@@ -590,13 +590,13 @@ typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_REQ_DATA_Ttag
   uint32_t                                                fValidationIsImplicit;
   /* fragmentable part */
   uint8_t                                                 abData[1024];
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_REQ_DATA_T;
+} ODV3_WRITE_OBJECT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_OBJECT_REQ_DATA_T                            tData;
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_REQ_T;
+} ODV3_WRITE_OBJECT_REQ_T;
 
 typedef ODV3_WRITE_OBJECT_REQ_DATA_T ODV3_WRITE_OBJECT_IND_DATA_T;
 typedef ODV3_WRITE_OBJECT_REQ_T ODV3_WRITE_OBJECT_IND_T;
@@ -607,18 +607,18 @@ typedef ODV3_WRITE_OBJECT_REQ_T ODV3_WRITE_OBJECT_IND_T;
 #define ODV3_WRITE_OBJECT_IND_TOTAL_DATA_BYTES_NOT_SPECIFIED      0xFFFFFFFF
 
 /* response/confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_CNF_DATA_Ttag
 {
   /* unfragmentable part, part of every fragment */
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_CNF_DATA_T;
+} ODV3_WRITE_OBJECT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_OBJECT_CNF_DATA_T                            tData;
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_CNF_T;
+} ODV3_WRITE_OBJECT_CNF_T;
 
 typedef ODV3_WRITE_OBJECT_CNF_DATA_T ODV3_WRITE_OBJECT_RES_DATA_T;
 typedef ODV3_WRITE_OBJECT_CNF_T ODV3_WRITE_OBJECT_RES_T;
@@ -645,31 +645,31 @@ typedef union ODV3_WRITE_OBJECT_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint8_t                                                 fSuccessful;
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_DATA_T;
+} ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_DATA_T        tData;
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_T;
+} ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_IND_T;
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_DATA_T;
+} ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_DATA_T        tData;
-} __HIL_PACKED_POST ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_T;
+} ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_RES_T;
 
 
 /* packet union */
@@ -691,24 +691,24 @@ typedef union ODV3_WRITE_OBJECT_VALIDATION_COMPLETE_PCK_Ttag
  */
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_ACCESS_INFO_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bStartSubIndex;
   uint8_t                                                 bNumSubIndex; /* 0 ~ 256 entries */
-} __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_REQ_DATA_T;
+} ODV3_GET_OBJECT_ACCESS_INFO_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_ACCESS_INFO_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_ACCESS_INFO_REQ_DATA_T                  tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_REQ_T;
+} ODV3_GET_OBJECT_ACCESS_INFO_REQ_T;
 
 typedef ODV3_GET_OBJECT_ACCESS_INFO_REQ_DATA_T ODV3_GET_OBJECT_ACCESS_INFO_IND_DATA_T;
 typedef ODV3_GET_OBJECT_ACCESS_INFO_REQ_T ODV3_GET_OBJECT_ACCESS_INFO_IND_T;
 
 /* response/confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_ACCESS_INFO_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bStartSubIndex;
@@ -720,13 +720,13 @@ typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_ACCESS_INFO_CNF_DATA_Ttag
   uint8_t                                                 bMaxSubIndex;
   uint8_t                                                 abReserved[3];
   uint16_t                                                ausAccessRights[256];  /* actual amount of elements controlled by MAX(bNumSubIndex) */
-} __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_CNF_DATA_T;
+} ODV3_GET_OBJECT_ACCESS_INFO_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_ACCESS_INFO_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_ACCESS_INFO_CNF_DATA_T                  tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_ACCESS_INFO_CNF_T;
+} ODV3_GET_OBJECT_ACCESS_INFO_CNF_T;
 
 #define ODV3_GET_OBJECT_ACCESS_INFO_RES_MIN_DATA_SIZE     (1 * sizeof(TLR_UINT16) + 6 * sizeof(TLR_UINT8))
 
@@ -754,25 +754,25 @@ typedef union ODV3_GET_OBJECT_ACCESS_INFO_PCK_Ttag
  */
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_SIZE_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bStartSubIndex;
   uint8_t                                                 bNumSubIndex;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_REQ_DATA_T;
+} ODV3_GET_OBJECT_SIZE_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_SIZE_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_SIZE_REQ_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_REQ_T;
+} ODV3_GET_OBJECT_SIZE_REQ_T;
 
 typedef ODV3_GET_OBJECT_SIZE_REQ_DATA_T ODV3_GET_OBJECT_SIZE_IND_DATA_T;
 typedef ODV3_GET_OBJECT_SIZE_REQ_T ODV3_GET_OBJECT_SIZE_IND_T;
 
 
 /* response/confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_SIZE_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bStartSubIndex;
@@ -783,13 +783,13 @@ typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_SIZE_CNF_DATA_Ttag
    */
   uint8_t                                                 bNumSubIndex;
   uint32_t                                                aulSubObjDataBitSize[256];    /* only actual size defined by bNumSubIndex needs to be used */
-} __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_CNF_DATA_T;
+} ODV3_GET_OBJECT_SIZE_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_SIZE_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_SIZE_CNF_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_SIZE_CNF_T;
+} ODV3_GET_OBJECT_SIZE_CNF_T;
 
 typedef ODV3_GET_OBJECT_SIZE_CNF_DATA_T ODV3_GET_OBJECT_SIZE_RES_DATA_T;
 typedef ODV3_GET_OBJECT_SIZE_CNF_T ODV3_GET_OBJECT_SIZE_RES_T;
@@ -827,24 +827,24 @@ typedef union ODV3_GET_OBJECT_SIZE_PCK_Ttag
  */
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_LIST_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_REQ_DATA_Ttag
 {
   uint16_t                                                usObjAccessMask;
   uint16_t                                                usObjAccessCompare;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_REQ_DATA_T;
+} ODV3_GET_OBJECT_LIST_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_LIST_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_LIST_REQ_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_REQ_T;
+} ODV3_GET_OBJECT_LIST_REQ_T;
 
 typedef ODV3_GET_OBJECT_LIST_REQ_DATA_T ODV3_GET_OBJECT_LIST_IND_DATA_T;
 typedef ODV3_GET_OBJECT_LIST_REQ_T ODV3_GET_OBJECT_LIST_IND_T;
 
 
 /* response/confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_LIST_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_CNF_DATA_Ttag
 {
   /* unfragmentable part */
   uint16_t                                                usObjAccessMask;
@@ -853,13 +853,13 @@ typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_LIST_CNF_DATA_Ttag
 
   /* fragmentable part */
   uint16_t                                                ausIndexes[512];
-} __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_CNF_DATA_T;
+} ODV3_GET_OBJECT_LIST_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_LIST_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_LIST_CNF_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_LIST_CNF_T;
+} ODV3_GET_OBJECT_LIST_CNF_T;
 
 typedef ODV3_GET_OBJECT_LIST_CNF_DATA_T ODV3_GET_OBJECT_LIST_RES_DATA_T;
 typedef ODV3_GET_OBJECT_LIST_CNF_T ODV3_GET_OBJECT_LIST_RES_T;
@@ -896,22 +896,22 @@ typedef union ODV3_GET_OBJECT_LIST_PCK_Ttag
 #define ODV3_GET_OBJECT_COUNT_MAX_ENTRIES     20
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_COUNT_REQ_DATA_ENTRY_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_REQ_DATA_ENTRY_Ttag
 {
   uint16_t                                                usObjAccessMask;
   uint16_t                                                usObjAccessCompare;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_REQ_DATA_ENTRY_T;
+} ODV3_GET_OBJECT_COUNT_REQ_DATA_ENTRY_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_COUNT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_REQ_DATA_Ttag
 {
   ODV3_GET_OBJECT_COUNT_REQ_DATA_ENTRY_T                  atEntries[20];
-} __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_REQ_DATA_T;
+} ODV3_GET_OBJECT_COUNT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_COUNT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_COUNT_REQ_DATA_T                        tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_REQ_T;
+} ODV3_GET_OBJECT_COUNT_REQ_T;
 
 typedef ODV3_GET_OBJECT_COUNT_REQ_DATA_ENTRY_T ODV3_GET_OBJECT_COUNT_IND_DATA_ENTRY_T;
 typedef ODV3_GET_OBJECT_COUNT_REQ_DATA_T ODV3_GET_OBJECT_COUNT_IND_DATA_T;
@@ -919,16 +919,16 @@ typedef ODV3_GET_OBJECT_COUNT_REQ_T ODV3_GET_OBJECT_COUNT_IND_T;
 
 
 /* response/confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_COUNT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_CNF_DATA_Ttag
 {
   uint16_t                                                ausCounts[20];
-} __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_CNF_DATA_T;
+} ODV3_GET_OBJECT_COUNT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_COUNT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_COUNT_CNF_DATA_T                        tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_COUNT_CNF_T;
+} ODV3_GET_OBJECT_COUNT_CNF_T;
 
 typedef ODV3_GET_OBJECT_COUNT_CNF_DATA_T ODV3_GET_OBJECT_COUNT_RES_DATA_T;
 typedef ODV3_GET_OBJECT_COUNT_CNF_T ODV3_GET_OBJECT_COUNT_RES_T;
@@ -965,23 +965,23 @@ typedef union ODV3_GET_OBJECT_COUNT_PCK_Ttag
  */
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_INFO_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_REQ_DATA_T;
+} ODV3_GET_OBJECT_INFO_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_INFO_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_INFO_REQ_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_REQ_T;
+}  ODV3_GET_OBJECT_INFO_REQ_T;
 
 typedef ODV3_GET_OBJECT_INFO_REQ_DATA_T ODV3_GET_OBJECT_INFO_IND_DATA_T;
 typedef ODV3_GET_OBJECT_INFO_REQ_T ODV3_GET_OBJECT_INFO_IND_T;
 
 
 /* confirmation/response packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_INFO_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_CNF_DATA_Ttag
 {
   /* unfragmentable part */
   uint16_t                                                usIndex;
@@ -992,13 +992,13 @@ typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_INFO_CNF_DATA_Ttag
   uint32_t                                                ulTotalDataBytes;   /* needed for fragmentation support */
   /* fragmentable part */
   uint8_t                                                 abName[1024];
-} __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_CNF_DATA_T;
+} ODV3_GET_OBJECT_INFO_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_INFO_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_INFO_CNF_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_INFO_CNF_T;
+} ODV3_GET_OBJECT_INFO_CNF_T;
 
 typedef ODV3_GET_OBJECT_INFO_CNF_DATA_T ODV3_GET_OBJECT_INFO_RES_DATA_T;
 typedef ODV3_GET_OBJECT_INFO_CNF_T ODV3_GET_OBJECT_INFO_RES_T;
@@ -1035,18 +1035,18 @@ typedef union ODV3_GET_OBJECT_INFO_PCK_Ttag
  */
 
 /* request/indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_SUBOBJECT_INFO_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint8_t                                                 bRequestedValueInfo;
-} __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_REQ_DATA_T;
+} ODV3_GET_SUBOBJECT_INFO_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_SUBOBJECT_INFO_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_SUBOBJECT_INFO_REQ_DATA_T                      tData;
-} __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_REQ_T;
+} ODV3_GET_SUBOBJECT_INFO_REQ_T;
 
 typedef ODV3_GET_SUBOBJECT_INFO_REQ_DATA_T ODV3_GET_SUBOBJECT_INFO_IND_DATA_T;
 typedef ODV3_GET_SUBOBJECT_INFO_REQ_T ODV3_GET_SUBOBJECT_INFO_IND_T;
@@ -1060,7 +1060,7 @@ typedef ODV3_GET_SUBOBJECT_INFO_REQ_T ODV3_GET_SUBOBJECT_INFO_IND_T;
 
 
 /* confirmation/response packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_SUBOBJECT_INFO_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_CNF_DATA_Ttag
 {
   /* unfragmentable part */
   uint16_t                                                usIndex;
@@ -1074,7 +1074,7 @@ typedef __HIL_PACKED_PRE struct ODV3_GET_SUBOBJECT_INFO_CNF_DATA_Ttag
   /* fragmentable part */
   uint8_t                                                 abData[1024];
   /* order of fragmentable part is Unit Type, Default Value, Minimum Value, Maximum Value, Name */
-} __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_CNF_DATA_T;
+} ODV3_GET_SUBOBJECT_INFO_CNF_DATA_T;
 
 #define ODV3_GET_SUBOBJECT_INFO_CNF_VALUE_INFO_NAME           0x01
 #define ODV3_GET_SUBOBJECT_INFO_CNF_VALUE_INFO_ECAT_UNIT      0x10
@@ -1082,11 +1082,11 @@ typedef __HIL_PACKED_PRE struct ODV3_GET_SUBOBJECT_INFO_CNF_DATA_Ttag
 #define ODV3_GET_SUBOBJECT_INFO_CNF_VALUE_INFO_MINIMUM_VALUE  0x40  /* always uses max length */
 #define ODV3_GET_SUBOBJECT_INFO_CNF_VALUE_INFO_MAXIMUM_VALUE  0x80  /* always uses max length */
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_SUBOBJECT_INFO_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_SUBOBJECT_INFO_CNF_DATA_T                      tData;
-} __HIL_PACKED_POST ODV3_GET_SUBOBJECT_INFO_CNF_T;
+} ODV3_GET_SUBOBJECT_INFO_CNF_T;
 
 typedef ODV3_GET_SUBOBJECT_INFO_CNF_DATA_T ODV3_GET_SUBOBJECT_INFO_RES_DATA_T;
 typedef ODV3_GET_SUBOBJECT_INFO_CNF_T ODV3_GET_SUBOBJECT_INFO_RES_T;
@@ -1120,25 +1120,25 @@ typedef union ODV3_GET_SUBOBJECT_INFO_PCK_Ttag
  */
 
 /* indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_REQUEST_ABORTED_IND_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REQUEST_ABORTED_IND_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_REQUEST_ABORTED_IND_T;
+} ODV3_REQUEST_ABORTED_IND_T;
 
 
 /* response packet */
-typedef __HIL_PACKED_PRE struct ODV3_REQUEST_ABORTED_RES_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REQUEST_ABORTED_RES_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_REQUEST_ABORTED_RES_T;
+} ODV3_REQUEST_ABORTED_RES_T;
 
 /* packet union */
-typedef __HIL_PACKED_PRE union ODV3_REQUEST_ABORTED_PCK_Ttag
+typedef __HIL_PACKED_PRE union __HIL_PACKED_POST ODV3_REQUEST_ABORTED_PCK_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_REQUEST_ABORTED_IND_T                              tInd;
   ODV3_REQUEST_ABORTED_RES_T                              tRes;
-} __HIL_PACKED_POST ODV3_REQUEST_ABORTED_PCK_T;
+} ODV3_REQUEST_ABORTED_PCK_T;
 
 
 /******************************************************************************
@@ -1158,25 +1158,25 @@ typedef __HIL_PACKED_PRE union ODV3_REQUEST_ABORTED_PCK_Ttag
  */
 
 /* indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_ABORT_REQUEST_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_ABORT_REQUEST_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_ABORT_REQUEST_REQ_T;
+} ODV3_ABORT_REQUEST_REQ_T;
 
 
 /* response packet */
-typedef __HIL_PACKED_PRE struct ODV3_ABORT_REQUEST_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_ABORT_REQUEST_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_ABORT_REQUEST_CNF_T;
+} ODV3_ABORT_REQUEST_CNF_T;
 
 /* packet union */
-typedef __HIL_PACKED_PRE union ODV3_ABORT_REQUEST_PCK_Ttag
+typedef __HIL_PACKED_PRE union __HIL_PACKED_POST ODV3_ABORT_REQUEST_PCK_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_ABORT_REQUEST_REQ_T                                tInd;
   ODV3_ABORT_REQUEST_CNF_T                                tRes;
-} __HIL_PACKED_POST ODV3_ABORT_REQUEST_PCK_T;
+} ODV3_ABORT_REQUEST_PCK_T;
 
 
 /******************************************************************************
@@ -1185,38 +1185,38 @@ typedef __HIL_PACKED_PRE union ODV3_ABORT_REQUEST_PCK_Ttag
  */
 
 /* indication packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_PROPERTIES_IND_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_IND_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_IND_DATA_T;
+} ODV3_GET_OBJECT_PROPERTIES_IND_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_PROPERTIES_IND_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_IND_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_PROPERTIES_IND_DATA_T                   tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_IND_T;
+} ODV3_GET_OBJECT_PROPERTIES_IND_T;
 
 
 /* response packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_PROPERTIES_RES_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_RES_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint32_t                                                ulFlags;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_RES_DATA_T;
+} ODV3_GET_OBJECT_PROPERTIES_RES_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_OBJECT_PROPERTIES_RES_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_RES_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_PROPERTIES_RES_DATA_T                   tData;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_RES_T;
+} ODV3_GET_OBJECT_PROPERTIES_RES_T;
 
 /* packet union */
-typedef __HIL_PACKED_PRE union ODV3_GET_OBJECT_PROPERTIES_PCK_Ttag
+typedef __HIL_PACKED_PRE union __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_PCK_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_OBJECT_PROPERTIES_IND_T                        tInd;
   ODV3_GET_OBJECT_PROPERTIES_RES_T                        tRes;
-} __HIL_PACKED_POST ODV3_GET_OBJECT_PROPERTIES_PCK_T;
+} ODV3_GET_OBJECT_PROPERTIES_PCK_T;
 
 
 /******************************************************************************
@@ -1226,30 +1226,30 @@ typedef __HIL_PACKED_PRE union ODV3_GET_OBJECT_PROPERTIES_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_OBJECT_NOTIFY_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bIndicationFlags;
-} __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_REQ_DATA_T;
+} ODV3_REGISTER_OBJECT_NOTIFY_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_OBJECT_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_REGISTER_OBJECT_NOTIFY_REQ_DATA_T                  tData;
-} __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_REQ_T;
+} ODV3_REGISTER_OBJECT_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_OBJECT_NOTIFY_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_CNF_DATA_T;
+} ODV3_REGISTER_OBJECT_NOTIFY_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_OBJECT_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_REGISTER_OBJECT_NOTIFY_CNF_DATA_T                  tData;
-} __HIL_PACKED_POST ODV3_REGISTER_OBJECT_NOTIFY_CNF_T;
+} ODV3_REGISTER_OBJECT_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1268,29 +1268,29 @@ typedef union ODV3_REGISTER_OBJECT_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_DATA_T;
+} ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_DATA_T                tData;
-} __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_T;
+} ODV3_UNREGISTER_OBJECT_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_DATA_T;
+} ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_DATA_T                tData;
-} __HIL_PACKED_POST ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_T;
+} ODV3_UNREGISTER_OBJECT_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1311,32 +1311,32 @@ typedef union ODV3_UNREGISTER_OBJECT_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint8_t                                                 bIndicationFlags;
-} __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_DATA_T;
+} ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_DATA_T               tData;
-} __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_T;
+} ODV3_REGISTER_SUBOBJECT_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_DATA_T;
+} ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_DATA_T               tData;
-} __HIL_PACKED_POST ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_T;
+} ODV3_REGISTER_SUBOBJECT_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1355,31 +1355,31 @@ typedef union ODV3_REGISTER_SUBOBJECT_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_DATA_T;
+} ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_DATA_T             tData;
-} __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_T;
+} ODV3_UNREGISTER_SUBOBJECT_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_DATA_T;
+} ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_DATA_T             tData;
-} __HIL_PACKED_POST ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_T;
+} ODV3_UNREGISTER_SUBOBJECT_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1398,17 +1398,17 @@ typedef union ODV3_UNREGISTER_SUBOBJECT_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_UNDEFINED_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_UNDEFINED_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_REGISTER_UNDEFINED_NOTIFY_REQ_T;
+} ODV3_REGISTER_UNDEFINED_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_UNDEFINED_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_UNDEFINED_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_REGISTER_UNDEFINED_NOTIFY_CNF_T;
+} ODV3_REGISTER_UNDEFINED_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1427,17 +1427,17 @@ typedef union ODV3_REGISTER_UNDEFINED_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_UNDEFINED_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_UNDEFINED_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_UNREGISTER_UNDEFINED_NOTIFY_REQ_T;
+} ODV3_UNREGISTER_UNDEFINED_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_UNDEFINED_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_UNDEFINED_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_UNREGISTER_UNDEFINED_NOTIFY_CNF_T;
+} ODV3_UNREGISTER_UNDEFINED_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1456,17 +1456,17 @@ typedef union ODV3_UNREGISTER_UNDEFINED_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_OBJINFO_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_OBJINFO_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_REGISTER_OBJINFO_NOTIFY_REQ_T;
+} ODV3_REGISTER_OBJINFO_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_REGISTER_OBJINFO_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_REGISTER_OBJINFO_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_REGISTER_OBJINFO_NOTIFY_CNF_T;
+} ODV3_REGISTER_OBJINFO_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1485,17 +1485,17 @@ typedef union ODV3_REGISTER_OBJINFO_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_OBJINFO_NOTIFY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_OBJINFO_NOTIFY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_UNREGISTER_OBJINFO_NOTIFY_REQ_T;
+} ODV3_UNREGISTER_OBJINFO_NOTIFY_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNREGISTER_OBJINFO_NOTIFY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNREGISTER_OBJINFO_NOTIFY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_UNREGISTER_OBJINFO_NOTIFY_CNF_T;
+} ODV3_UNREGISTER_OBJINFO_NOTIFY_CNF_T;
 
 
 /* packet union */
@@ -1514,17 +1514,17 @@ typedef union ODV3_UNREGISTER_OBJINFO_NOTIFY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_LOCK_OBJECT_DELETION_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_LOCK_OBJECT_DELETION_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_LOCK_OBJECT_DELETION_REQ_T;
+} ODV3_LOCK_OBJECT_DELETION_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_LOCK_OBJECT_DELETION_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_LOCK_OBJECT_DELETION_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_LOCK_OBJECT_DELETION_CNF_T;
+} ODV3_LOCK_OBJECT_DELETION_CNF_T;
 
 
 /* packet union */
@@ -1543,17 +1543,17 @@ typedef union ODV3_LOCK_OBJECT_DELETION_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNLOCK_OBJECT_DELETION_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNLOCK_OBJECT_DELETION_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_UNLOCK_OBJECT_DELETION_REQ_T;
+} ODV3_UNLOCK_OBJECT_DELETION_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_UNLOCK_OBJECT_DELETION_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_UNLOCK_OBJECT_DELETION_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_UNLOCK_OBJECT_DELETION_CNF_T;
+} ODV3_UNLOCK_OBJECT_DELETION_CNF_T;
 
 
 /* packet union */
@@ -1580,7 +1580,7 @@ typedef union ODV3_UNLOCK_OBJECT_DELETION_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_ALL_BY_INDEX_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_REQ_DATA_Ttag
 {
   /* unfragmentable part */
   uint16_t                                                usIndex;
@@ -1589,31 +1589,31 @@ typedef __HIL_PACKED_PRE struct ODV3_WRITE_ALL_BY_INDEX_REQ_DATA_Ttag
   uint32_t                                                ulTotalDataBytes;
   /* fragmentable part */
   uint8_t                                                 abData[1024];
-} __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_REQ_DATA_T;
+} ODV3_WRITE_ALL_BY_INDEX_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_ALL_BY_INDEX_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_ALL_BY_INDEX_REQ_DATA_T                      tData;
-} __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_REQ_T;
+} ODV3_WRITE_ALL_BY_INDEX_REQ_T;
 
 /* special value for ulTotalDataBytes */
 #define ODV3_WRITE_ALL_BY_INDEX_REQ_TOTAL_DATA_BYTES_NOT_SPECIFIED      0xFFFFFFFF
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_ALL_BY_INDEX_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_CNF_DATA_Ttag
 {
   /* unfragmentable part */
   uint16_t                                                usIndex;
   uint8_t                                                 bStartSubIndex; /* 0 or 1 valid */
-} __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_CNF_DATA_T;
+} ODV3_WRITE_ALL_BY_INDEX_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_ALL_BY_INDEX_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_ALL_BY_INDEX_CNF_DATA_T                      tData;
-} __HIL_PACKED_POST ODV3_WRITE_ALL_BY_INDEX_CNF_T;
+} ODV3_WRITE_ALL_BY_INDEX_CNF_T;
 
 
 /* packet union */
@@ -1640,7 +1640,7 @@ typedef union ODV3_WRITE_ALL_BY_INDEX_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_REQ_DATA_Ttag
 {
   /* unfragmentable part */
   /* first five bytes must be identical to ODV3_READ_OBJECT_REQ_DATA_T */
@@ -1648,17 +1648,17 @@ typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_REQ_DATA_Ttag
   uint8_t                                                 bStartSubIndex; /* 0 or 1 valid */
   uint8_t                                                 bMultipleParaAccessFlags; /* access flags for multiple parameter access */
   uint16_t                                                usMaxSegLength;     /* max seg length in bytes or 0 for field not used */
-} __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_REQ_DATA_T;
+} ODV3_READ_ALL_BY_INDEX_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_READ_ALL_BY_INDEX_REQ_DATA_T                       tData;
-} __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_REQ_T;
+} ODV3_READ_ALL_BY_INDEX_REQ_T;
 
 
 /* request packet (when enabling access mask check) */
-typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_DATA_Ttag
 {
   /* unfragmentable part */
   /* first five bytes must be identical to ODV3_READ_OBJECT_REQ_DATA_T */
@@ -1667,17 +1667,17 @@ typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_DATA_Ttag
   uint8_t                                                 bMultipleParaAccessFlags; /* access flags for multiple parameter access */
   uint16_t                                                usMaxSegLength;     /* max seg length in bytes or 0 for field not used */
   uint16_t                                                usAccessMask;
-} __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_DATA_T;
+} ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_DATA_T           tData;
-} __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_T;
+} ODV3_READ_ALL_BY_INDEX_ACCESS_MASK_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_CNF_DATA_Ttag
 {
   /* unfragmentable part (must be identical to ODV3_READ_OBJECT_CNF_DATA_T) */
   uint16_t                                                usIndex;
@@ -1686,13 +1686,13 @@ typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_CNF_DATA_Ttag
 
   /* fragmentable part */
   uint8_t                                                 abData[1024];
-} __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_CNF_DATA_T;
+} ODV3_READ_ALL_BY_INDEX_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_ALL_BY_INDEX_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_READ_ALL_BY_INDEX_CNF_DATA_T                       tData;
-} __HIL_PACKED_POST ODV3_READ_ALL_BY_INDEX_CNF_T;
+} ODV3_READ_ALL_BY_INDEX_CNF_T;
 
 
 /* packet union */
@@ -1722,47 +1722,47 @@ typedef union ODV3_READ_ALL_BY_INDEX_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint8_t                                                 bMultipleParaAccessFlags; /* access flags for multiple parameter access */
   uint32_t                                                ulDataByteSize;   /* if ulDataByteSize is not a multiple of 4, abData is padded to 4 byte border */
   uint8_t                                                 abData[1];        /* variable size */
-} __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_T;
+} ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_Ttag
 {
   uint32_t                                                ulTotalDataBytes;
   ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_T      atEntries[1];
-} __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_T;
+} ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_T       tData;
-} __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_T;
+} ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint32_t                                                ulAbortcode;
-} __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_T;
+} ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_Ttag
 {
   uint32_t                                                ulTotalDataBytes;
   ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_T      atEntries[1];
-} __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_T;
+} ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_T       tData;
-} __HIL_PACKED_POST ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_T;
+} ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_CNF_T;
 
 
 /* packet union */
@@ -1791,47 +1791,47 @@ typedef union ODV3_WRITE_MULTIPLE_PARAMETER_BY_INDEX_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint8_t                                                 bMultipleParaAccessFlags; /* access flags for multiple parameter access */
-} __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_T;
+} ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_Ttag
 {
   uint32_t                                                ulTotalDataBytes;
   ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_ENTRY_T       atEntries[1];
-} __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_T;
+} ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_DATA_T        tData;
-} __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_T;
+} ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint32_t                                                ulAbortcode;      /* if != 0, ulDataByteSize = 0 */
   uint32_t                                                ulDataByteSize;   /* if ulDataByteSize is not a multiple of 4, abData is padded to 4 byte border */
   uint8_t                                                 abData[1];        /* variable size */
-} __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_T;
+} ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_Ttag
 {
   uint32_t                                                ulTotalDataBytes;
   ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_ENTRY_T       atEntries[1];
-} __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_T;
+} ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_DATA_T        tData;
-} __HIL_PACKED_POST ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_T;
+} ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_CNF_T;
 
 
 /* packet union */
@@ -1850,22 +1850,22 @@ typedef union ODV3_READ_MULTIPLE_PARAMETER_BY_INDEX_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_RESET_OBJECTS_REQ_RANGE_ENTRIES_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_RESET_OBJECTS_REQ_RANGE_ENTRIES_Ttag
 {
   uint16_t                                                usRangeStart;
   uint16_t                                                usRangeCount;   /* 0 = 65536 objects */
-} __HIL_PACKED_POST ODV3_RESET_OBJECTS_REQ_RANGE_ENTRIES_T;
+} ODV3_RESET_OBJECTS_REQ_RANGE_ENTRIES_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_RESET_OBJECTS_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_RESET_OBJECTS_REQ_DATA_Ttag
 {
   ODV3_RESET_OBJECTS_REQ_RANGE_ENTRIES_T                  atEntries[1];
-} __HIL_PACKED_POST ODV3_RESET_OBJECTS_REQ_DATA_T;
+} ODV3_RESET_OBJECTS_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_RESET_OBJECTS_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_RESET_OBJECTS_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_RESET_OBJECTS_REQ_DATA_T                           tData;
-} __HIL_PACKED_POST ODV3_RESET_OBJECTS_REQ_T;
+} ODV3_RESET_OBJECTS_REQ_T;
 
 
 /* indication packet */
@@ -1875,10 +1875,10 @@ typedef ODV3_RESET_OBJECTS_REQ_T ODV3_RESET_OBJECTS_IND_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_RESET_OBJECTS_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_RESET_OBJECTS_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_RESET_OBJECTS_CNF_T;
+} ODV3_RESET_OBJECTS_CNF_T;
 
 
 /* response packet */
@@ -1903,30 +1903,30 @@ typedef union ODV3_RESET_OBJECTS_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_SET_OBJECT_NAME_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 szName[200];  /* must be NUL-terminated */
-} __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_REQ_DATA_T;
+} ODV3_SET_OBJECT_NAME_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_SET_OBJECT_NAME_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_SET_OBJECT_NAME_REQ_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_REQ_T;
+} ODV3_SET_OBJECT_NAME_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_SET_OBJECT_NAME_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
-} __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_CNF_DATA_T;
+} ODV3_SET_OBJECT_NAME_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_SET_OBJECT_NAME_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_SET_OBJECT_NAME_CNF_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_SET_OBJECT_NAME_CNF_T;
+} ODV3_SET_OBJECT_NAME_CNF_T;
 
 
 /* packet union */
@@ -1945,32 +1945,32 @@ typedef union ODV3_SET_OBJECT_NAME_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_SET_SUBOBJECT_NAME_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_REQ_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
   uint8_t                                                 szName[200];  /* must be NUL-terminated */
-} __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_REQ_DATA_T;
+} ODV3_SET_SUBOBJECT_NAME_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_SET_SUBOBJECT_NAME_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_SET_SUBOBJECT_NAME_REQ_DATA_T                      tData;
-} __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_REQ_T;
+} ODV3_SET_SUBOBJECT_NAME_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_SET_SUBOBJECT_NAME_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_CNF_DATA_Ttag
 {
   uint16_t                                                usIndex;
   uint8_t                                                 bSubIndex;
-} __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_CNF_DATA_T;
+} ODV3_SET_SUBOBJECT_NAME_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_SET_SUBOBJECT_NAME_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_SET_SUBOBJECT_NAME_CNF_DATA_T                      tData;
-} __HIL_PACKED_POST ODV3_SET_SUBOBJECT_NAME_CNF_T;
+} ODV3_SET_SUBOBJECT_NAME_CNF_T;
 
 
 /* packet union */
@@ -1989,30 +1989,30 @@ typedef union ODV3_SET_SUBOBJECT_NAME_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_DATATYPE_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_DATATYPE_REQ_DATA_Ttag
 {
   uint16_t                                                usDatatype;
   uint32_t                                                ulDatatypeBitLength;
-} __HIL_PACKED_POST ODV3_CREATE_DATATYPE_REQ_DATA_T;
+} ODV3_CREATE_DATATYPE_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_DATATYPE_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_DATATYPE_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_CREATE_DATATYPE_REQ_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_CREATE_DATATYPE_REQ_T;
+} ODV3_CREATE_DATATYPE_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_DATATYPE_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_DATATYPE_CNF_DATA_Ttag
 {
   uint16_t                                                usDatatype;
-} __HIL_PACKED_POST ODV3_CREATE_DATATYPE_CNF_DATA_T;
+} ODV3_CREATE_DATATYPE_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_CREATE_DATATYPE_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_CREATE_DATATYPE_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_CREATE_DATATYPE_CNF_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_CREATE_DATATYPE_CNF_T;
+} ODV3_CREATE_DATATYPE_CNF_T;
 
 
 /* packet union */
@@ -2031,29 +2031,29 @@ typedef union ODV3_CREATE_DATATYPE_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_DATATYPE_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_DATATYPE_REQ_DATA_Ttag
 {
   uint16_t                                                usDatatype;
-} __HIL_PACKED_POST ODV3_DELETE_DATATYPE_REQ_DATA_T;
+} ODV3_DELETE_DATATYPE_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_DATATYPE_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_DATATYPE_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_DELETE_DATATYPE_REQ_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_DELETE_DATATYPE_REQ_T;
+} ODV3_DELETE_DATATYPE_REQ_T;
 
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_DATATYPE_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_DATATYPE_CNF_DATA_Ttag
 {
   uint16_t                                                usDatatype;
-} __HIL_PACKED_POST ODV3_DELETE_DATATYPE_CNF_DATA_T;
+} ODV3_DELETE_DATATYPE_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_DELETE_DATATYPE_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_DELETE_DATATYPE_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_DELETE_DATATYPE_CNF_DATA_T                         tData;
-} __HIL_PACKED_POST ODV3_DELETE_DATATYPE_CNF_T;
+} ODV3_DELETE_DATATYPE_CNF_T;
 
 
 /* packet union */
@@ -2071,26 +2071,26 @@ typedef union ODV3_DELETE_DATATYPE_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_RESET_OBJECT_DICTIONARY_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_RESET_OBJECT_DICTIONARY_REQ_DATA_Ttag
 {
   uint16_t                                                ausIndexes[500];
   /*
    * ausIndexes: dynamic list => tHead.ulLen = numentries * sizeof(TLR_UINT16)
    * list must be sorted
    */
-} __HIL_PACKED_POST ODV3_RESET_OBJECT_DICTIONARY_REQ_DATA_T;
+} ODV3_RESET_OBJECT_DICTIONARY_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_RESET_OBJECT_DICTIONARY_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_RESET_OBJECT_DICTIONARY_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_RESET_OBJECT_DICTIONARY_REQ_DATA_T                 tData;
-} __HIL_PACKED_POST ODV3_RESET_OBJECT_DICTIONARY_REQ_T;
+} ODV3_RESET_OBJECT_DICTIONARY_REQ_T;
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_RESET_OBJECT_DICTIONARY_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_RESET_OBJECT_DICTIONARY_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_RESET_OBJECT_DICTIONARY_CNF_T;
+} ODV3_RESET_OBJECT_DICTIONARY_CNF_T;
 
 
 /* packet union */
@@ -2109,22 +2109,22 @@ typedef union ODV3_RESET_OBJECT_DICTIONARY_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_SET_TIMEOUT_REQ_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_TIMEOUT_REQ_DATA_Ttag
 {
   uint32_t ulTimeoutMs;
-} __HIL_PACKED_POST ODV3_SET_TIMEOUT_REQ_DATA_T;
+} ODV3_SET_TIMEOUT_REQ_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_SET_TIMEOUT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_TIMEOUT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_SET_TIMEOUT_REQ_DATA_T                             tData;
-} __HIL_PACKED_POST ODV3_SET_TIMEOUT_REQ_T;
+} ODV3_SET_TIMEOUT_REQ_T;
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_SET_TIMEOUT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_SET_TIMEOUT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_SET_TIMEOUT_CNF_T;
+} ODV3_SET_TIMEOUT_CNF_T;
 
 /* packet union */
 typedef union ODV3_SET_TIMEOUT_PCK_Ttag
@@ -2142,22 +2142,22 @@ typedef union ODV3_SET_TIMEOUT_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_TIMEOUT_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_TIMEOUT_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_GET_TIMEOUT_REQ_T;
+} ODV3_GET_TIMEOUT_REQ_T;
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_TIMEOUT_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_TIMEOUT_CNF_DATA_Ttag
 {
   uint32_t ulTimeoutMs;
-} __HIL_PACKED_POST ODV3_GET_TIMEOUT_CNF_DATA_T;
+} ODV3_GET_TIMEOUT_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_TIMEOUT_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_TIMEOUT_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_TIMEOUT_CNF_DATA_T                             tData;
-} __HIL_PACKED_POST ODV3_GET_TIMEOUT_CNF_T;
+} ODV3_GET_TIMEOUT_CNF_T;
 
 /* packet union */
 typedef union ODV3_GET_TIMEOUT_PCK_Ttag
@@ -2173,31 +2173,31 @@ typedef union ODV3_GET_TIMEOUT_PCK_Ttag
  */
 
 /* request packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_VERSION_REQ_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_VERSION_REQ_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
-} __HIL_PACKED_POST ODV3_GET_VERSION_REQ_T;
+} ODV3_GET_VERSION_REQ_T;
 
 /* confirmation packet */
-typedef __HIL_PACKED_PRE struct ODV3_GET_VERSION_CNF_DATA_ENTRY_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_VERSION_CNF_DATA_ENTRY_Ttag
 {
   uint16_t usMajor;
   uint16_t usMinor;
   uint16_t usBuild;
   uint16_t usRevision;
-} __HIL_PACKED_POST ODV3_GET_VERSION_CNF_DATA_ENTRY_T;
+} ODV3_GET_VERSION_CNF_DATA_ENTRY_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_VERSION_CNF_DATA_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_VERSION_CNF_DATA_Ttag
 {
   ODV3_GET_VERSION_CNF_DATA_ENTRY_T tApi;
   ODV3_GET_VERSION_CNF_DATA_ENTRY_T tPacketIf;
-} __HIL_PACKED_POST ODV3_GET_VERSION_CNF_DATA_T;
+} ODV3_GET_VERSION_CNF_DATA_T;
 
-typedef __HIL_PACKED_PRE struct ODV3_GET_VERSION_CNF_Ttag
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST ODV3_GET_VERSION_CNF_Ttag
 {
   HIL_PACKET_HEADER_T                                     tHead;
   ODV3_GET_VERSION_CNF_DATA_T                             tData;
-} __HIL_PACKED_POST ODV3_GET_VERSION_CNF_T;
+} ODV3_GET_VERSION_CNF_T;
 
 /* packet union */
 typedef union ODV3_GET_VERSION_PCK_Ttag

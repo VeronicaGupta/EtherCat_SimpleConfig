@@ -22,25 +22,29 @@ typedef enum ETHERNET_IF_CMD_Etag
   /* Commands from 0x00003B00 to 0x00003B21, are occupied by older implementations.  */
 
   /*! Send ethernet frame request */
-  ETHERNET_IF_SEND_ETH_FRAME_REQ        = 0x00003B22,
+  ETHERNET_IF_SEND_ETH_FRAME_REQ         = 0x00003B22,
   /*! Send ethernet frame confirmation */
-  ETHERNET_IF_SEND_ETH_FRAME_CNF        = 0x00003B23,
+  ETHERNET_IF_SEND_ETH_FRAME_CNF         = 0x00003B23,
 
   /*! Received ethernet frame indication */
-  ETHERNET_IF_RECV_ETH_FRAME_IND        = 0x00003B24,
+  ETHERNET_IF_RECV_ETH_FRAME_IND         = 0x00003B24,
   /*! Received ethernet frame response */
-  ETHERNET_IF_RECV_ETH_FRAME_RSP        = 0x00003B25,
+  ETHERNET_IF_RECV_ETH_FRAME_RSP         = 0x00003B25,
 
   /*! Register for multicast reception for certain group address request */
-  ETHERNET_IF_SET_MULTICAST_ADDR_REQ    = 0x00003B26,
+  ETHERNET_IF_SET_MULTICAST_ADDR_REQ     = 0x00003B26,
   /*! Register for multicast reception for certain group address confirmation */
-  ETHERNET_IF_SET_MULTICAST_ADDR_CNF    = 0x00003B27,
+  ETHERNET_IF_SET_MULTICAST_ADDR_CNF     = 0x00003B27,
 
   /*! Unregister for multicast reception for certain group address request */
-  ETHERNET_IF_CLR_MULTICAST_ADDR_REQ    = 0x00003B28,
+  ETHERNET_IF_CLR_MULTICAST_ADDR_REQ     = 0x00003B28,
   /*! Unregister for multicast reception for certain group address confirmation */
-  ETHERNET_IF_CLR_MULTICAST_ADDR_CNF    = 0x00003B29,
+  ETHERNET_IF_CLR_MULTICAST_ADDR_CNF     = 0x00003B29,
 
+  /*! Unregister for multicast reception for all group address request */
+  ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_REQ = 0x00003B2A,
+  /*! Unregister for multicast reception for all group address confirmation */
+  ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_CNF = 0x00003B2B,
 
   /* The following commands are usually disabled and not indent to be used by
    * host application.
@@ -218,6 +222,32 @@ typedef union ETHERNET_IF_CLR_MULTICAST_ADDR_PCK_Ttag
 
 /*! @} */
 
+
+/*! \defgroup doc_ETHERNET_IF_CLR_ALL_MULTICAST_ADDR Clear All Multicast Address Service.
+ *
+ * This service is used by the host application to stop receiving traffic of all
+ * previously enabled multicast group MAC addresses. However, it is possible
+ * to receive multicast frames even if explicitly disabled.
+ *
+ * @{
+ */
+
+/*! Unregister all multicast group request packet */
+typedef HIL_EMPTY_PACKET_T  ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_REQ_T;
+
+/*! Unregister all multicast group confirmation packet */
+typedef HIL_EMPTY_PACKET_T  ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_CNF_T;
+
+/*! Unregister all multicast group reception packet union */
+typedef union ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_PCK_Ttag
+{
+  /*! Request */
+  ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_REQ_T tReq;
+  /*! Confirmation */
+  ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_CNF_T tCnf;
+} ETHERNET_IF_CLR_ALL_MULTICAST_ADDR_PCK_T;
+
+/*! @} */
 
 
 

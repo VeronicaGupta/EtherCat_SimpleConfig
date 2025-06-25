@@ -2,7 +2,7 @@
   Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ***************************************************************************************
 
-  $Id: Hil_CommandRange.h 300 2019-12-02 13:28:45Z AndreasB $:
+  $Id: Hil_CommandRange.h 339 2020-10-08 11:47:49Z MKroll $:
 
   Description:
     The file is the central point where Hilscher packet commands numbers, or
@@ -698,6 +698,8 @@ enum HIL_COMMAND_Etag
   /** Authentication manager service commands  */
   AUTH_INTERFACE_COMMAND_START                        = 0x0000B000,
 
+  /** DeviceNet Slave V4/V5 service commands  */
+  DNS_COMMAND_START                                   = 0x0000B100,
 
 
 

@@ -34,6 +34,8 @@ Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserv
 #define DEFTYPE_RECORD              0x002A
 #define PDOMAPPING(Idx, SubIdx, BitSize)  (Idx<<16 | (SubIdx & 0xFF)<<8 | (BitSize & 0xFF)<<0)
 
+#define INDEX_OF_MY_ENUM 0x0800
+
 typedef struct SUBOBJECT_DESCRIPTION_Ttag
 {
    uint8_t               bSubIndex;
@@ -151,16 +153,37 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_1600[] =
     .pvInitialValue = &s_ab1600_Elements[5],
     .ulInitialValueLength = sizeof(s_ab1600_Elements[5]),
   },
-//  {
-//    .bSubIndex = 1,
-//    .bIndicationFlags = 0,
-//    .usAccessRights = ECAT_OD_READ_ALL,
-//    .usDatatype = ECAT_OD_DTYPE_UNSIGNED32,
-//    .ulMaxFieldUnits = 1,
-//    .pszName = 0,
-//    .pvInitialValue = &s_ab1600_Elements[0],
-//    .ulInitialValueLength = sizeof(s_ab1600_Elements[0]),
-//  },
+};
+
+static const uint32_t s_ab1601_Elements[] =
+{
+  PDOMAPPING(0x2001, 1, 8),
+};
+
+static const uint8_t s_b1601_NumElements = ARRCNT(s_ab1601_Elements);
+
+SUBOBJECT_DESCRIPTION_T g_tSiObj_1601[] =
+{
+  {
+    .bSubIndex = 0,
+    .bIndicationFlags = 0,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
+    .ulMaxFieldUnits = 1,
+    .pszName = "Number of elements",
+    .pvInitialValue = &s_b1601_NumElements,
+    .ulInitialValueLength = sizeof(s_b1601_NumElements),
+  },
+  {
+    .bSubIndex = 1,
+    .bIndicationFlags = 0,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .usDatatype = ECAT_OD_DTYPE_UNSIGNED32,
+    .ulMaxFieldUnits = 1,
+    .pszName = 0,
+    .pvInitialValue = &s_ab1601_Elements[0],
+    .ulInitialValueLength = sizeof(s_ab1601_Elements[0]),
+  },
 };
 
 static const uint32_t s_ab1A00_Elements[] =
@@ -350,7 +373,7 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_1C00[] =
 };
 
 
-static const uint16_t s_aus1C12_Entries[] = { 0x1600 };
+static const uint16_t s_aus1C12_Entries[] = { 0x1600,0x1601 };
 static const uint8_t s_b1C12_NumElements = ARRCNT(s_aus1C12_Entries);
 
 SUBOBJECT_DESCRIPTION_T tSiObj_1C12[] =
@@ -374,6 +397,16 @@ SUBOBJECT_DESCRIPTION_T tSiObj_1C12[] =
     .pszName = 0,
     .pvInitialValue = &s_aus1C12_Entries[0],
     .ulInitialValueLength = sizeof(s_aus1C12_Entries[0]),
+  },
+  {
+      .bSubIndex = 2,
+      .bIndicationFlags = 0,
+      .usAccessRights = ECAT_OD_READ_ALL,
+      .usDatatype = ECAT_OD_DTYPE_UNSIGNED16,
+      .ulMaxFieldUnits = 1,
+      .pszName = 0,
+      .pvInitialValue = &s_aus1C12_Entries[1],
+      .ulInitialValueLength = sizeof(s_aus1C12_Entries[1]),
   },
 };
 
@@ -479,19 +512,36 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_2000[] =
     .pvInitialValue = 0,
     .ulInitialValueLength = 0,
   },
-//  {
-//    .bSubIndex = 1,
-//    .bIndicationFlags = 0,
-//    .usAccessRights = ECAT_OD_ACCESS_ALL,
-//    .usDatatype = ECAT_OD_DTYPE_UNSIGNED32,
-//    .ulMaxFieldUnits = 1,
-//    .pszName = "Outputdata0",
-//    .pvInitialValue = 0,
-//    .ulInitialValueLength = 0,
-//  },
 };
 static const uint8_t s_b2000_NumElements = ARRCNT(g_tSiObj_2000) - 1; /* SI 00 does not counts */
 
+static const uint8_t s_b2001_NumElements;
+
+SUBOBJECT_DESCRIPTION_T g_tSiObj_2001[] =
+{
+  {
+    .bSubIndex = 0,
+    .bIndicationFlags = 0,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
+    .ulMaxFieldUnits = 1,
+    .pszName = "Number of elements",
+    .pvInitialValue = &s_b2001_NumElements,
+    .ulInitialValueLength = sizeof(s_b2001_NumElements),
+  },
+  {
+    .bSubIndex = 1,
+    .bIndicationFlags = 0,
+    .usAccessRights = ECAT_OD_ACCESS_ALL,
+    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
+    .ulMaxFieldUnits = 1,
+    .pszName = "Outputdata0",
+    .pvInitialValue = 0,
+    .ulInitialValueLength = 0,
+  },
+};
+
+static const uint8_t s_b2001_NumElements = ARRCNT(g_tSiObj_2001) - 1; /* SI 00 does not counts */
 
 static const uint8_t s_b3000_NumElements;
 
@@ -595,6 +645,20 @@ static const uint8_t s_b4000_NumElements;
 static const uint8_t s_bBooleanInitTrueValue = 1;
 static const uint32_t s_ulValue12345678 = 0x12345678;
 
+typedef struct{ /* As described in ETG1000.6 V1.0.3 Table 65 */
+  uint32_t ulIntegerValue;
+  unsigned char szVisibleString[20]; /* assumption: string has 19 letters + zero*/
+}ENUM_ELEMENT_T;
+
+#define FIRST_ENUM_VALUE   (0)
+#define SECOND_ENUM_VALUE  (1)
+
+static const ENUM_ELEMENT_T  s_EnumElements[] =
+{
+    { FIRST_ENUM_VALUE, "EnumElement0" },
+    { SECOND_ENUM_VALUE, "EnumElement1" },
+};
+
 SUBOBJECT_DESCRIPTION_T g_tSiObj_4000[] =
 {
   {
@@ -635,13 +699,149 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_4000[] =
    .ulInitialValueLength = sizeof(s_ulValue12345678),
    .pvInitialValue = &s_ulValue12345678
  },
+ {
+   .bSubIndex = 4,
+   .bIndicationFlags = 0,
+   .usAccessRights = ECAT_OD_ACCESS_ALL,
+   .usDatatype = INDEX_OF_MY_ENUM,
+   .ulMaxFieldUnits = 1,
+   .pszName = "Enum Value1",
+   .ulInitialValueLength = sizeof(s_EnumElements[0].ulIntegerValue),
+   .pvInitialValue = &s_EnumElements[0].ulIntegerValue,
+ },
+ {
+   .bSubIndex = 5,
+   .bIndicationFlags = 0,
+   .usAccessRights = ECAT_OD_ACCESS_ALL,
+   .usDatatype = INDEX_OF_MY_ENUM,
+   .ulMaxFieldUnits = 1,
+   .pszName = "Enum Value2",
+   .ulInitialValueLength = sizeof(s_EnumElements[1].ulIntegerValue),
+   .pvInitialValue = &s_EnumElements[1].ulIntegerValue,
+ },
 };
 
 static const uint8_t s_b4000_NumElements = ARRCNT(g_tSiObj_4000) - 1; /* SI 00 does not counts */
 
+static const uint8_t s_b4001_NumElements;
+
+SUBOBJECT_DESCRIPTION_T g_tSiObj_4001[] =
+{
+  {
+    .bSubIndex = 0,
+    .bIndicationFlags = 0,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
+    .ulMaxFieldUnits = 1,
+    .pszName = "Number of elements",
+    .pvInitialValue = &s_b4001_NumElements,
+    .ulInitialValueLength = sizeof(s_b4000_NumElements),
+  },
+  {
+   .bSubIndex = 1,
+   .bIndicationFlags = ODV3_INDICATION_FLAGS_ALLOWED_ON_SUBOBJ,
+   .usAccessRights = ECAT_OD_ACCESS_ALL,
+   .usDatatype = ECAT_OD_DTYPE_BOOLEAN,
+   .ulMaxFieldUnits = 1,
+   .pszName = "Flag 1",
+  },
+};
+
+static const uint8_t s_b4001_NumElements = ARRCNT(g_tSiObj_4001) - 1; /* SI 00 does not counts */
+
+static const uint8_t ManufacturerDeviceName[8] = {"Hilscher"};
+static const uint8_t HardwareVersion[1] = {"1"};
+static const uint8_t SoftwareVersion[3] = {"5.2"};
+
+SUBOBJECT_DESCRIPTION_T g_tSiObj_0800[] =
+{
+  {
+   .bSubIndex = 1,
+   .bIndicationFlags = 0,
+   .usAccessRights = ECAT_OD_READ_ALL,
+   .usDatatype = ECAT_OD_DTYPE_OCTET_STRING,
+   .ulMaxFieldUnits = sizeof(s_EnumElements[0]),
+   .pszName = "Enum1",
+   .ulInitialValueLength = sizeof(s_EnumElements[0]),
+   .pvInitialValue = &s_EnumElements[0]
+  },
+  {
+   .bSubIndex = 2,
+   .bIndicationFlags = 0,
+   .usAccessRights = ECAT_OD_READ_ALL,
+   .usDatatype = ECAT_OD_DTYPE_OCTET_STRING,
+   .ulMaxFieldUnits = sizeof(s_EnumElements[1]),
+   .pszName = "Enum2",
+   .ulInitialValueLength = sizeof(s_EnumElements[1]),
+   .pvInitialValue = &s_EnumElements[1]
+ },
+};
+
+static const uint8_t s_b0800_NumElements = 2;
+
+OBJECT_DESCRIPTION_T g_tDatatypeObjects[] =
+{
+  {
+    .usIndex = INDEX_OF_MY_ENUM,
+    .bMaxNumOfSubObjs = ARRCNT(g_tSiObj_0800),
+    .ulMaxFieldUnits = 1,
+    .bObjectCode = ODV3_OBJCODE_RECORD,
+    .usAccessFlags = ODV3_ACCESS_FLAGS_CREATE_SUBINDEX_0,
+    .bIndicationFlags = 0,
+    .usDatatype = ECAT_OD_DTYPE_ENUM,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .pszName = "MyEnum",
+    .ptSi00 = &g_tSiObj_0800[0],
+    .ptSiBreak = &g_tSiObj_0800[ ARRCNT(g_tSiObj_0800)],
+    .pvInitialValue = &s_b0800_NumElements,
+    .ulInitialValueLength = sizeof(s_b0800_NumElements),
+  },
+};
 
 OBJECT_DESCRIPTION_T g_tObjects[] =
 {
+  {
+    .usIndex = 0x1008,
+    .bMaxNumOfSubObjs = 0,
+    .bObjectCode = ODV3_OBJCODE_VAR,
+    .usAccessFlags = 0,
+    .bIndicationFlags = 0,
+    .usDatatype = ECAT_OD_DTYPE_VISIBLE_STRING,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .pszName = "Manufacturer Device Name",
+    .ptSi00 = 0,
+    .ulMaxFieldUnits = 8,
+    .pvInitialValue = ManufacturerDeviceName,
+    .ulInitialValueLength = 8,
+  },
+  {
+    .usIndex = 0x1009,
+    .bMaxNumOfSubObjs = 0,
+    .bObjectCode = ODV3_OBJCODE_VAR,
+    .usAccessFlags = 0,
+    .bIndicationFlags = 0,
+    .usDatatype = ECAT_OD_DTYPE_VISIBLE_STRING,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .pszName = "Manufacturer Hardware Version",
+    .ptSi00 = 0,
+    .ulMaxFieldUnits = 1,
+    .pvInitialValue = HardwareVersion,
+    .ulInitialValueLength = 1,
+  },
+  {
+    .usIndex = 0x100A,
+    .bMaxNumOfSubObjs = 0,
+    .bObjectCode = ODV3_OBJCODE_VAR,
+    .usAccessFlags = 0,
+    .bIndicationFlags = 0,
+    .usDatatype = ECAT_OD_DTYPE_VISIBLE_STRING,
+    .usAccessRights = ECAT_OD_READ_ALL,
+    .pszName = "Manufacturer Software Version",
+    .ptSi00 = 0,
+    .ulMaxFieldUnits = 3,
+    .pvInitialValue = SoftwareVersion,
+    .ulInitialValueLength = 3,
+  },
   {
     .usIndex = 0x1600,
     .bMaxNumOfSubObjs = ARRCNT(s_ab1600_Elements),
@@ -655,6 +855,20 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
     /* no SimpleVar, therefore no initial value */
     .ptSi00 = &g_tSiObj_1600[0],
     .ptSiBreak = &g_tSiObj_1600[ ARRCNT(g_tSiObj_1600) ],
+  },
+  {
+    .usIndex = 0x1601,
+    .bMaxNumOfSubObjs = ARRCNT(s_ab1601_Elements),
+    .bObjectCode = ODV3_OBJCODE_RECORD,
+    .usAccessFlags = 0,
+    .bIndicationFlags = 0,
+    .usDatatype = ECAT_OD_DTYPE_PDO_MAPPING,
+    .usAccessRights = ECAT_OD_ACCESS_ALL,
+    /* no SimpleVar, therefore no ulMaxFieldUnits value */
+    .pszName = "1. RxPDO",
+    /* no SimpleVar, therefore no initial value */
+    .ptSi00 = &g_tSiObj_1601[0],
+    .ptSiBreak = &g_tSiObj_1601[ ARRCNT(g_tSiObj_1601) ],
   },
   {
     .usIndex = 0x1A00,
@@ -714,7 +928,7 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
 //  },
   {
     .usIndex = 0x1C12,
-    .bMaxNumOfSubObjs = 1,
+    .bMaxNumOfSubObjs = ARRCNT(tSiObj_1C12) - 1,
     .bObjectCode = ODV3_OBJCODE_ARRAY,
     .usAccessFlags = 0,
     .bIndicationFlags = 0,
@@ -755,6 +969,20 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
     .ptSiBreak = &g_tSiObj_2000[ ARRCNT(g_tSiObj_2000) ],
   },
   {
+    .usIndex = 0x2001,
+    .bMaxNumOfSubObjs = ARRCNT(g_tSiObj_2001) - 1,
+    .bObjectCode = ODV3_OBJCODE_RECORD,
+    .usAccessFlags = ODV3_ACCESS_FLAGS_RXPDO_MAPPABLE,
+    .bIndicationFlags = 0,
+    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,/**< \todo what exactly shall be used here */
+    .usAccessRights = ECAT_OD_READ_ALL,
+    /* no SimpleVar, therefore no ulMaxFieldUnits value */
+    .pszName = "Outputs",
+    /* no SimpleVar, therefore no initial value */
+    .ptSi00 = &g_tSiObj_2001[0],
+    .ptSiBreak = &g_tSiObj_2001[ ARRCNT(g_tSiObj_2001) ],
+  },
+  {
     .usIndex = 0x3000,
     .bMaxNumOfSubObjs = ARRCNT(g_tSiObj_3000) - 1,
     .bObjectCode = ODV3_OBJCODE_RECORD,
@@ -781,6 +1009,19 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
     .ptSi00 = &g_tSiObj_4000[0],
     .ptSiBreak = &g_tSiObj_4000[ ARRCNT(g_tSiObj_4000) ],
   },
+  {
+      .usIndex = 0x4001,
+      .bMaxNumOfSubObjs = ARRCNT(g_tSiObj_4001) - 1,
+      .ulMaxFieldUnits = 1,
+      .bObjectCode = ODV3_OBJCODE_RECORD,
+      .usAccessFlags = 0,
+      .bIndicationFlags = 0,
+      .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
+      .usAccessRights = ECAT_OD_READ_ALL,
+      .pszName = "Hello World",
+      .ptSi00 = &g_tSiObj_4001[0],
+      .ptSiBreak = &g_tSiObj_4001[ ARRCNT(g_tSiObj_4001) ],
+    },
 };
 
 #endif /* COMPONENTS_CIFXAPPLICATIONDEMOECS_INCLUDES_APPECS_DEMO_OBJECT_DICTIONARY_H_ */

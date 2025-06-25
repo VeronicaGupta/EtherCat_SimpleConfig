@@ -4,7 +4,7 @@ Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserv
 
 ***************************************************************************************
 
-  $Id: Hil_SystemCmd.h 301 2020-02-05 12:04:14Z Robert $:
+  $Id: Hil_SystemCmd.h 380 2021-04-15 07:26:50Z AMinor $:
 
   Description:
     Hilscher Packet Command Codes Handled by the System
@@ -12,6 +12,7 @@ Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserv
   Changes:
     Date        Description
     -----------------------------------------------------------------------------------
+    2021-01-18  Added BOOTSWITCH definition
     2020-02-05  Added DDP DATATYPE masks
     2017-01-31  File created.
 
@@ -398,22 +399,25 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST HIL_SET_MAC_ADDR_CNF_Ttag
  *          This packet executes a RESET on the netX
  */
 
-#define HIL_RESET_MODE_COLDSTART      0
-#define HIL_RESET_MODE_WARMSTART      1
-#define HIL_RESET_MODE_BOOTSTART      2
-#define HIL_RESET_MODE_UPDATESTART    3
-#define HIL_RESET_MODE_CONSOLESTART   4
+#define HIL_RESET_MODE_COLDSTART        0
+#define HIL_RESET_MODE_WARMSTART        1
+#define HIL_RESET_MODE_BOOTSTART        2
+#define HIL_RESET_MODE_UPDATESTART      3
+#define HIL_RESET_MODE_CONSOLESTART     4
 
-#define HIL_RESET_MODE_CMD_MSK        0x0000000F
-#define HIL_RESET_MODE_CMD_SRT        0
-#define HIL_RESET_PARAM_MSK           0x000000F0
-#define HIL_RESET_PARAM_SRT           4
-#define HIL_RESET_CLEAR_REMANENT_MSK  0x00000100
-#define HIL_RESET_CLEAR_REMANENT_SRT  5
+#define HIL_RESET_MODE_CMD_MSK          0x0000000F
+#define HIL_RESET_MODE_CMD_SRT          0
+#define HIL_RESET_PARAM_MSK             0x000000F0
+#define HIL_RESET_PARAM_SRT             4
+#define HIL_RESET_CLEAR_REMANENT_MSK    0x00000100
+#define HIL_RESET_CLEAR_REMANENT_SRT    8
 
-#define HIL_RESET_PARAM_CONSOLE_ETH   0x00000000
-#define HIL_RESET_PARAM_CONSOLE_UART  0x00000001
-#define HIL_RESET_PARAM_CONSOLE_USB   0x00000002
+#define HIL_RESET_PARAM_CONSOLE_ETH     0x00000000
+#define HIL_RESET_PARAM_CONSOLE_UART    0x00000001
+#define HIL_RESET_PARAM_CONSOLE_USB     0x00000002
+#define HIL_RESET_PARAM_CONSOLE_DPM     0x00000003  /* Reserved / Unused */
+#define HIL_RESET_PARAM_CONSOLE_DEFAULT 0x0000000F
+
 
 /***** request packet *****/
 

@@ -4,7 +4,7 @@
 
 ***************************************************************************************
 
-  $Id: Hil_Taglist.h 303 2020-02-18 16:00:42Z AndreasB $:
+  $Id: Hil_Taglist.h 392 2021-04-29 12:28:06Z ABessler $:
 
   Description:
     The Hilscher tag list is a data structure which can be added to the binary firmware
@@ -140,8 +140,15 @@
 #define HIL_TAG_NETPLC_IO_HANDLER_DIGITAL                 0x10a30001 /* tag structure description is not available */
 #define HIL_TAG_NETPLC_IO_HANDLER_ANALOG                  0x10a30002 /* tag structure description is not available */
 
+                                                       /* 0x10e00000 Tag id is worn out */
+#define HIL_TAG_NF_GEN_DIAG_RESOURCES                     0x10e00001
+#define HIL_TAG_NF_PROFI_ENERGY_MODES                     0x10e00002
+#define HIL_TAG_NF_PN_IOL_PROFILE_PADDING                 0x10e00003
+#define HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM             0x10e00004
+
 #define HIL_TAG_LWIP_PORTS_FOR_IP_ZERO                    0x10e90000
 #define HIL_TAG_LWIP_NETIDENT_BEHAVIOUR                   0x10e90001
+#define HIL_TAG_LWIP_QUANTITY_STRUCTURE                   0x10e90002
 
 /* Tag types from the user defined tag code range */
 
@@ -149,9 +156,9 @@
 
 /* Tag types from the protocol tag code range */
 /* TagID is 0x3ppppnn where pppp is the protocol class and nnn is the identifier of the specific tag */
-#define HIL_TAG_CO_DEVICEID                               0x30004000 /* tag structure description is not available */
+#define HIL_TAG_CO_DEVICEID                               0x30004000
 
-#define HIL_TAG_CCL_DEVICEID                              0x30005000 /* tag structure description is not available */
+#define HIL_TAG_CCL_DEVICEID                              0x30005000
 
 #define HIL_TAG_COMPONET_DEVICEID                         0x30006000 /* tag structure description is not available */
 
@@ -168,7 +175,8 @@
 #define HIL_TAG_EIP_DEVICEID                              0x3000A000
 #define HIL_TAG_EIP_EDD_CONFIGURATION                     0x3000A001 /* Tag is obsolete */
 #define HIL_TAG_EIP_DLR_PROTOCOL                          0x3000A002
-#define HIL_TAG_EIP_EIS_CONFIG                            0x3000A003
+#define HIL_TAG_EIP_EIS_CONFIG                            0x3000A003 /* Tag ID shall only be internal, not exposed through tag list editor */
+#define HIL_TAG_EIP_EIS_RESOURCES                         0x3000A004
 
 #define HIL_TAG_DP_DEVICEID                               0x30013000 /* tag structure description is not available */
 
@@ -214,17 +222,62 @@
  * ".taglist" section (needed for NXFs) */
 #define __SEC_TAGLIST__       __attribute__ ((section (".taglist")))
 
+#define HIL_TAGLIST_START_TOKEN  "TagList>"
+#define HIL_TAGLIST_END_TOKEN    "<TagList"
+
+/** Taglist header.
+ * Taglist for netX90/netX4000 based firmwares have a proper header and footer.
+ * This enclosure don't exist in nxf firmware files.
+ *
+ * File header of nxf files HIL_FILE_COMMON_HEADER_V3_0_T.ulTagListOffset points
+ * to the first tag structure.
+ * |  File header of nxi files HIL_FILE_COMMON_HEADER_V3_0_T.ulTagListOffset points
+ * |  to this header structure.
+ * |  |
+ * |  \-> [Header] - HIL_TAGLIST_HEADER_T   <- not present in nxf files (this structure)
+ * \----> [Tag]    - HIL_TAG_*
+ *        [Tag]    - HIL_TAG_*
+ *        ...      - ...
+ *        [Tag]    - HIL_TAG_END_OF_LIST_T  <- Always required
+ *        [Footer] - HIL_TAGLIST_FOOTER_T   <- Not present in nxf files
+ */
+typedef struct
+{
+  /*! Start token of the taglist data area.
+   * This field must contain the token sting defined by HIL_TAGLIST_START_TOKEN. */
+  uint8_t abStartToken[8];
+
+  /*! Size of the taglist data area.
+   * \note This includes the Header and Footer and possible padding/ spare space */
+  uint16_t  usTagListSize;
+
+  /*! Size of the filled taglist data.
+   * \note This is the size of all tags in the taglist without header,footer and spare space*/
+  uint16_t  usContentSize;
+} HIL_TAGLIST_HEADER_T;
+
+/** Taglist footer.
+ * Taglist footer for use with netX90/netX4000 based firmwares.
+ */
+typedef struct
+{
+  /*! Reserved for future usage */
+  uint32_t  ulReserved;
+
+  /*! End token of the taglist data area.
+   * This field must contain the token string defined by HIL_TAGLIST_END_TOKEN. */
+  uint8_t abEndToken[8];
+} HIL_TAGLIST_FOOTER_T;
 
 /* Tag header with type code and length of following tag data */
-typedef struct HIL_TAG_HEADER_Ttag
+typedef struct __HIL_ALIGNED_DWORD__
 {
   uint32_t ulTagType;
   uint32_t ulTagDataLength;
-
-} __HIL_ALIGNED_DWORD__  HIL_TAG_HEADER_T;
+} HIL_TAG_HEADER_T;
 
 /* Identifier string for named resources */
-typedef struct HIL_TAG_IDENTIFIER_Ttag
+typedef struct
 {
   char abName[16];
 } HIL_TAG_IDENTIFIER_T;
@@ -235,7 +288,7 @@ typedef struct HIL_TAG_IDENTIFIER_Ttag
   End of tag list tag definitions.
   Tag codes: HIL_TAG_END_OF_LIST
 **************************************************************************************/
-typedef struct HIL_TAG_END_OF_LIST_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T tHeader;
 } HIL_TAG_END_OF_LIST_T;
@@ -247,12 +300,12 @@ typedef struct HIL_TAG_END_OF_LIST_Ttag
   Tag codes: HIL_TAG_MEMSIZE, HIL_TAG_MIN_PERSISTENT_STORAGE_SIZE,
              HIL_TAG_MIN_CHIP_REV, HIL_TAG_MAX_CHIP_REV
 **************************************************************************************/
-typedef struct HIL_TAG_UINT32_DATA_Ttag
+typedef struct
 {
   uint32_t ulValue;
 } HIL_TAG_UINT32_DATA_T;
 
-typedef struct HIL_TAG_UINT32_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T      tHeader;
   HIL_TAG_UINT32_DATA_T tData;
@@ -264,7 +317,7 @@ typedef struct HIL_TAG_UINT32_Ttag
   Version tag definitions.
   Tag codes: HIL_TAG_MIN_OS_VERSION, HIL_TAG_MAX_OS_VERSION
 **************************************************************************************/
-typedef struct HIL_TAG_VERSION_DATA_Ttag
+typedef struct
 {
   uint16_t usMajor;
   uint16_t usMinor;
@@ -272,7 +325,7 @@ typedef struct HIL_TAG_VERSION_DATA_Ttag
   uint16_t usRevision;
 } HIL_TAG_VERSION_DATA_T;
 
-typedef struct HIL_TAG_VERSION_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T       tHeader;
   HIL_TAG_VERSION_DATA_T tData;
@@ -296,7 +349,7 @@ typedef struct HIL_TAG_VERSION_Ttag
 #define HIL_TAG_LED_POLARITY_NORMAL                 0
 #define HIL_TAG_LED_POLARITY_INVERTED               1
 
-typedef struct HIL_TAG_LED_DATA_Ttag
+typedef struct
 {
   HIL_TAG_IDENTIFIER_T tIdentifier;         /* rcX LED object identifier, read-only */
   uint32_t             ulUsesResourceType;  /* RX_PERIPHERAL_TYPE_PIO or RX_PERIPHERAL_TYPE_GPIO (see rX_Config.h) */
@@ -304,7 +357,7 @@ typedef struct HIL_TAG_LED_DATA_Ttag
   uint32_t             ulPolarity;          /* control code for GPIO polarity (see rX_Config.h) */
 } HIL_TAG_LED_DATA_T;
 
-typedef struct HIL_TAG_LED_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T   tHeader;
   HIL_TAG_LED_DATA_T tData;
@@ -319,7 +372,7 @@ typedef struct HIL_TAG_LED_Ttag
   Used to modify the priority of an group of task with the same group reference number.
   The priority and token values are added to the statically defined values.
 **************************************************************************************/
-typedef struct HIL_TAG_TASK_GROUP_DATA_Ttag
+typedef struct
 {
   char      szTaskListName[64];   /* group name, read-only */
   uint32_t  ulBasePriority;       /* base priority for the tasks in the group */
@@ -328,7 +381,7 @@ typedef struct HIL_TAG_TASK_GROUP_DATA_Ttag
   uint32_t  ulTaskGroupRef;       /* group reference number (common to all tasks in the group), read-only */
 } HIL_TAG_TASK_GROUP_DATA_T;
 
-typedef struct HIL_TAG_TASK_GROUP_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T          tHeader;
   HIL_TAG_TASK_GROUP_DATA_T tData;
@@ -343,14 +396,14 @@ typedef struct HIL_TAG_TASK_GROUP_Ttag
   Used to modify an individual task priority. The priority value replaces the defined
   values.
 **************************************************************************************/
-typedef struct HIL_TAG_TASK_DATA_Ttag
+typedef struct
 {
   HIL_TAG_IDENTIFIER_T  tIdentifier;        /* rcX task object identifier, read-only */
   uint32_t              ulPriority;         /* task priority offset */
   uint32_t              ulToken;            /* task token offset */
 } HIL_TAG_TASK_DATA_T;
 
-typedef struct HIL_TAG_TASK_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T      tHeader;
   HIL_TAG_TASK_DATA_T   tData;
@@ -365,7 +418,7 @@ typedef struct HIL_TAG_TASK_Ttag
   Used to modify the priority of an group of interrupts with the same group reference
   number. The priority and token values are added to the statically defined values.
 **************************************************************************************/
-typedef struct HIL_TAG_INTERRUPT_GROUP_DATA_Ttag
+typedef struct
 {
   char      szInterruptListName[64];          /* group name, read-only */
   uint32_t  ulBaseIntPriority;                /* base interrupt priority for the interrupts in the group */
@@ -376,7 +429,7 @@ typedef struct HIL_TAG_INTERRUPT_GROUP_DATA_Ttag
   uint32_t  ulInterruptGroupRef;              /* group reference number (common to all interrupts in the group), read-only */
 } HIL_TAG_INTERRUPT_GROUP_DATA_T;
 
-typedef struct HIL_TAG_INTERRUPT_GROUP_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T               tHeader;
   HIL_TAG_INTERRUPT_GROUP_DATA_T tData;
@@ -391,7 +444,7 @@ typedef struct HIL_TAG_INTERRUPT_GROUP_Ttag
   Used to modify an individual interrupt priority. The priority value replaces the
   defined values.
 **************************************************************************************/
-typedef struct HIL_TAG_INTERRUPT_DATA_Ttag
+typedef struct
 {
   HIL_TAG_IDENTIFIER_T  tIdentifier;          /* rcX interrupt object identifier, read-only */
   uint32_t              ulInterruptPriority;  /* interrupt priority offset */
@@ -399,7 +452,7 @@ typedef struct HIL_TAG_INTERRUPT_DATA_Ttag
   uint32_t              ulTaskToken;          /* interrupt handler task token offset */
 } HIL_TAG_INTERRUPT_DATA_T;
 
-typedef struct HIL_TAG_INTERRUPT_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T         tHeader;
   HIL_TAG_INTERRUPT_DATA_T tData;
@@ -413,13 +466,13 @@ typedef struct HIL_TAG_INTERRUPT_Ttag
 
   Used to change a timer number.
 **************************************************************************************/
-typedef struct HIL_TAG_TIMER_DATA_Ttag
+typedef struct
 {
   HIL_TAG_IDENTIFIER_T  tIdentifier;  /* rcX timer object identifier, read-only */
   uint32_t              ulTimNum;     /* netX hardware timer number */
 } HIL_TAG_TIMER_DATA_T;
 
-typedef struct HIL_TAG_TIMER_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T     tHeader;
   HIL_TAG_TIMER_DATA_T tData;
@@ -433,7 +486,7 @@ typedef struct HIL_TAG_TIMER_Ttag
 
   Used to set UART configuration settings.
 **************************************************************************************/
-typedef struct HIL_TAG_UART_DATA_Ttag
+typedef struct
 {
   HIL_TAG_IDENTIFIER_T  tIdentifier;       /* rcX UART object identifier, read-only */
   uint32_t              ulUrtNumber;       /* netX UART number (see rX_Config.h) */
@@ -451,7 +504,7 @@ typedef struct HIL_TAG_UART_DATA_Ttag
   uint32_t              ulCtsPolarity;     /* control code for CTS signal polarity (see rX_Config.h) */
 } HIL_TAG_UART_DATA_T;
 
-typedef struct HIL_TAG_UART_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T    tHeader;
   HIL_TAG_UART_DATA_T tData;
@@ -465,13 +518,13 @@ typedef struct HIL_TAG_UART_Ttag
 
   Used to modify the XC unit which should be used.
 **************************************************************************************/
-typedef struct HIL_TAG_XC_DATA_Ttag
+typedef struct
 {
   HIL_TAG_IDENTIFIER_T  tIdentifier;  /* rcX xC object identifier, read-only */
   uint32_t              ulXcId;       /* netX xC unit number */
 } HIL_TAG_XC_DATA_T;
 
-typedef struct HIL_TAG_XC_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T  tHeader;
   HIL_TAG_XC_DATA_T tData;
@@ -492,7 +545,7 @@ typedef struct HIL_TAG_XC_Ttag
 /* Maximum number of communication channels for DPM communication channels tag */
 #define DPM_MAX_COMM_CHANNELS                   4
 
-typedef struct HIL_TAG_DPM_COMM_CHANNEL_DATA_Ttag
+typedef struct
 {
   uint32_t ulNumCommChannels;                 /* number of communication channels to be instantiated (1 .. DPM_MAX_COMM_CHANNELS) */
   struct
@@ -504,7 +557,7 @@ typedef struct HIL_TAG_DPM_COMM_CHANNEL_DATA_Ttag
 
 
 
-typedef struct HIL_TAG_DPM_COMM_CHANNEL_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                  tHeader;
   HIL_TAG_DPM_COMM_CHANNEL_DATA_T   tData;
@@ -518,7 +571,7 @@ typedef struct HIL_TAG_DPM_COMM_CHANNEL_Ttag
   Used to modify the RX_HIF_SET_T describing DPM location and access. The values
   replaces the statically defined values at system startup time.
 **************************************************************************************/
-typedef struct HIL_TAG_DPM_SETTINGS_DATA_Ttag
+typedef struct
 {
   uint32_t ulDpmMode;                  /* DPM mode, 2 (8-bit) / 3 (16-bit) / 5 (PCI), default: 5) */
   uint32_t ulDpmSize;                  /* DPM size in bytes, default: 16384 for comX, 32768 for other targets) */
@@ -526,7 +579,7 @@ typedef struct HIL_TAG_DPM_SETTINGS_DATA_Ttag
 } HIL_TAG_DPM_SETTINGS_DATA_T;
 
 
-typedef struct HIL_TAG_DPM_SETTINGS_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T            tHeader;
   HIL_TAG_DPM_SETTINGS_DATA_T tData;
@@ -538,14 +591,14 @@ typedef struct HIL_TAG_DPM_SETTINGS_Ttag
   UART interface of netX Diagnostics and Remote Access component tag definitions.
   Tag code: HIL_TAG_DIAG_IF_CTRL_UART
 **************************************************************************************/
-typedef struct HIL_TAG_DIAG_IF_CTRL_UART_DATA_Ttag
+typedef struct
 {
   uint8_t bEnableFlag;                        /* TRUE: activate this interface, FALSE: do not use this interface */
   uint8_t bIfNumber;                          /* netX UART number to use */
   uint8_t abReserved[2];
 } HIL_TAG_DIAG_IF_CTRL_UART_DATA_T;
 
-typedef struct HIL_TAG_DIAG_IF_CTRL_UART_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                 tHeader;
   HIL_TAG_DIAG_IF_CTRL_UART_DATA_T tData;
@@ -557,14 +610,14 @@ typedef struct HIL_TAG_DIAG_IF_CTRL_UART_Ttag
   USB interface of netX Diagnostics and Remote Access component tag definitions.
   Tag code: HIL_TAG_DIAG_IF_CTRL_USB
 **************************************************************************************/
-typedef struct HIL_TAG_DIAG_IF_CTRL_USB_DATA_Ttag
+typedef struct
 {
   uint8_t bEnableFlag;                        /* TRUE: activate this interface, FALSE: do not use this interface */
   uint8_t bIfNumber;                          /* netX USB interface number to use (currently, 0 is the only valid value) */
   uint8_t abReserved[2];
 } HIL_TAG_DIAG_IF_CTRL_USB_DATA_T;
 
-typedef struct HIL_TAG_DIAG_IF_CTRL_USB_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                tHeader;
   HIL_TAG_DIAG_IF_CTRL_USB_DATA_T tData;
@@ -576,14 +629,14 @@ typedef struct HIL_TAG_DIAG_IF_CTRL_USB_Ttag
   TCP interface of netX Diagnostics and Remote Access component tag definitions.
   Tag code: HIL_TAG_DIAG_IF_CTRL_TCP
 **************************************************************************************/
-typedef struct HIL_TAG_DIAG_IF_CTRL_TCP_DATA_Ttag
+typedef struct
 {
   uint8_t bEnableFlag;                        /* TRUE: activate this interface, FALSE: do not use this interface */
   uint8_t bReserved;
   uint16_t usPortNumber;                      /* TCP port number, typically HIL_TRANSPORT_IP_PORT (50111, see HilTransport.h) */
 } HIL_TAG_DIAG_IF_CTRL_TCP_DATA_T;
 
-typedef struct HIL_TAG_DIAG_IF_CTRL_TCP_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                tHeader;
   HIL_TAG_DIAG_IF_CTRL_TCP_DATA_T tData;
@@ -596,13 +649,13 @@ typedef struct HIL_TAG_DIAG_IF_CTRL_TCP_Ttag
   definitions.
   Tag code: HIL_TAG_DIAG_TRANSPORT_CTRL_CIFX
 **************************************************************************************/
-typedef struct HIL_TAG_DIAG_TRANSPORT_CTRL_CIFX_DATA_Ttag
+typedef struct
 {
   uint8_t bEnableFlag;                        /* TRUE: activate support for this transport type, FALSE: do not use this transport type */
   uint8_t abReserved[3];
 } HIL_TAG_DIAG_TRANSPORT_CTRL_CIFX_DATA_T;
 
-typedef struct HIL_TAG_DIAG_TRANSPORT_CTRL_CIFX_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                        tHeader;
   HIL_TAG_DIAG_TRANSPORT_CTRL_CIFX_DATA_T tData;
@@ -615,13 +668,13 @@ typedef struct HIL_TAG_DIAG_TRANSPORT_CTRL_CIFX_Ttag
   definitions.
   Tag code: HIL_TAG_DIAG_TRANSPORT_CTRL_PACKET
 **************************************************************************************/
-typedef struct HIL_TAG_DIAG_TRANSPORT_CTRL_PACKET_DATA_Ttag
+typedef struct
 {
   uint8_t bEnableFlag;                        /* TRUE: activate support for this transport type, FALSE: do not use this transport type */
   uint8_t abReserved[3];
 } HIL_TAG_DIAG_TRANSPORT_CTRL_PACKET_DATA_T;
 
-typedef struct HIL_TAG_DIAG_TRANSPORT_CTRL_PACKET_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                          tHeader;
   HIL_TAG_DIAG_TRANSPORT_CTRL_PACKET_DATA_T tData;
@@ -748,6 +801,37 @@ typedef struct
   HIL_TAG_LWIP_NETIDENT_BEHAVIOUR_DATA_T  tData;
 } HIL_TAG_LWIP_NETIDENT_BEHAVIOUR_T;
 
+/**************************************************************************************
+  LWIP quantity structure.
+  Tag code: HIL_TAG_LWIP_QUANTITY_STRUCTURE
+
+  With this tag, you can adjust the resources allocated and provided by the
+  build-in IP stack integrated in the firmware.
+
+  The number of Socket API services at DPM via Mailbox can be configured.
+  The number of sockets for Socket API usage inside the IP stack can be configured.
+
+**************************************************************************************/
+typedef struct
+{
+  /** number of Socket API services at DPM level.*/
+  uint8_t      bNumberDpmSocketServices;
+  /** number of handled socket (for Socket API usage) in IP stack. */
+  uint8_t      bNumberSockets;
+
+  /** Reserved field for future use
+   * Set to 0 to avoid unwanted behavior with upcoming version. */
+  uint8_t      abReserved[2];
+
+} HIL_TAG_LWIP_QUANTITY_STRUCTURE_DATA_T;
+
+typedef struct
+{
+  HIL_TAG_HEADER_T                        tHeader;
+  HIL_TAG_LWIP_QUANTITY_STRUCTURE_DATA_T  tData;
+} HIL_TAG_LWIP_QUANTITY_STRUCTURE_T;
+
+
 
 /**************************************************************************************
   DeviceNet CAN Sample point.
@@ -791,6 +875,47 @@ typedef struct
   HIL_TAG_HEADER_T                       tHeader;
   HIL_TAG_DEVICENET_CAN_SAMPLING_DATA_T  tData;
 } HIL_TAG_DEVICENET_CAN_SAMPLING_T;
+
+/**************************************************************************************
+  CANopen Device Identification
+  Tag code: HIL_TAG_CO_DEVICEID
+**************************************************************************************/
+typedef  struct
+{
+  uint32_t ulVendorId;
+  uint32_t ulProductCode;
+  uint16_t usMajRev;
+  uint16_t usMinRev;
+  uint16_t usDeviceProfileNumber;
+  uint16_t usAdditionalInfo;
+
+} HIL_CO_DEVICEID_ID_DATA_T;
+
+typedef struct
+{
+  HIL_TAG_HEADER_T          tHeader;
+  HIL_CO_DEVICEID_ID_DATA_T tData;
+
+} HIL_CO_DEVICEID_ID_T;
+
+/**************************************************************************************
+  CCLink Device Identification
+  Tag code: HIL_TAG_CCL_DEVICEID
+**************************************************************************************/
+typedef struct
+{
+  uint32_t ulVendorId;
+  uint32_t ulModelType;
+  uint32_t ulSwVersion;
+
+} HIL_CCL_DEVICEID_ID_DATA_T;
+
+typedef struct
+{
+  HIL_TAG_HEADER_T          tHeader;
+  HIL_CCL_DEVICEID_ID_DATA_T tData;
+
+} HIL_CCL_DEVICEID_ID_T;
 
 
 /**************************************************************************************
@@ -889,13 +1014,13 @@ typedef struct
   Ethernet interface EDD instance settings tag definitions.
   Tag code: HIL_TAG_EIF_EDD_INSTANCE
 **************************************************************************************/
-typedef struct HIL_TAG_EIF_EDD_INSTANCE_DATA_Ttag
+typedef struct
 {
   uint32_t ulEddInstanceNo;                   /* instance number of the EDD (0 .. (DPM_MAX_COMM_CHANNELS - 1)) */
 } HIL_TAG_EIF_EDD_INSTANCE_DATA_T;
 
 
-typedef struct HIL_TAG_EIF_EDD_INSTANCE_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                  tHeader;
   HIL_TAG_EIF_EDD_INSTANCE_DATA_T   tData;
@@ -915,14 +1040,14 @@ typedef struct HIL_TAG_EIF_EDD_INSTANCE_Ttag
 #define RX_EIF_EDD_TYPE_2PORT_HUB               3   /* 2-port hub */
 
 /* Ethernet Interface component when used without run-time linking to an RTE communication stack */
-typedef struct HIL_TAG_EIF_EDD_CONFIG_DATA_Ttag
+typedef struct
 {
   uint32_t ulEddType;                         /* type of the EDD (see EDD type definitions for Ethernet Interface configuration) */
   uint32_t ulFirstXcNumber;                   /* number of the first (or the only) xC used */
 } HIL_TAG_EIF_EDD_CONFIG_DATA_T;
 
 
-typedef struct HIL_TAG_EIF_EDD_CONFIG_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                  tHeader;
   HIL_TAG_EIF_EDD_CONFIG_DATA_T     tData;
@@ -934,12 +1059,12 @@ typedef struct HIL_TAG_EIF_EDD_CONFIG_Ttag
   Ethernet interface NDIS settings tag definitions.
   Tag code: HIL_TAG_EIF_NDIS_ENABLE
 **************************************************************************************/
-typedef struct HIL_TAG_EIF_NDIS_ENABLE_DATA_Ttag
+typedef struct
 {
   uint32_t      ulNDISEnable;  /* 0: NDIS is disabled, 1: NDIS is enabled */
 } HIL_TAG_EIF_NDIS_ENABLE_DATA_T;
 
-typedef struct HIL_TAG_EIF_NDIS_ENABLE_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                tHeader;
   HIL_TAG_EIF_NDIS_ENABLE_DATA_T  tData;
@@ -955,7 +1080,7 @@ typedef struct HIL_TAG_EIF_NDIS_ENABLE_Ttag
 #define HIL_TAG_ETHINTF_TCPUDP_PORT_NUMBERS_RANGE_START_DEFAULT     (1024) /* Default value for start port (ulPortStart) */
 #define HIL_TAG_ETHINTF_TCPUDP_PORT_NUMBERS_RANGE_END_DEFAULT       (2048) /* Default value for end port   (ulPortEnd)   */
 
-typedef struct HIL_TAG_TCP_PORT_NUMBERS_DATA_Ttag
+typedef struct
 {
   /* Note: The range which is (ulPortEnd - ulPortStart) must not go below a limit of 1024 */
 
@@ -967,13 +1092,109 @@ typedef struct HIL_TAG_TCP_PORT_NUMBERS_DATA_Ttag
 } HIL_TAG_TCP_PORT_NUMBERS_DATA_T;
 
 
-typedef struct HIL_TAG_ETHINTF_TCPUDP_PORT_NUMBERS_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                tHeader;
   HIL_TAG_TCP_PORT_NUMBERS_DATA_T tData;
 
 } HIL_TAG_ETHINTF_TCPUDP_PORT_NUMBERS_T;
 
+
+/**************************************************************************************
+  netFIELD generic diagnosis resources configuration.
+  Tag code: HIL_TAG_NF_GEN_DIAG_RESOURCES
+**************************************************************************************/
+typedef struct
+{
+  /* Number of additional netPROXY Generic Diagnosis instances required by the OEM
+   * application for own diagnosis functions. Allowed values 32...256 in steps of 8  */
+  uint16_t usNumOfDiagnosisInstances;
+
+  /* Reserved, set to zero */
+  uint8_t abReserved[2];
+
+} HIL_TAG_NF_GEN_DIAG_RESOURCES_DATA_T;
+
+typedef struct
+{
+  HIL_TAG_HEADER_T                     tHeader;
+  HIL_TAG_NF_GEN_DIAG_RESOURCES_DATA_T tData;
+} HIL_TAG_NF_GEN_DIAG_RESOURCES_T;
+
+
+/**************************************************************************************
+  netFIELD PROFIenergy support.
+  Tag code: HIL_TAG_NF_PROFI_ENERGY_MODES
+**************************************************************************************/
+typedef struct
+{
+  /* Activation of PROFIenergy feature and setting the number of supported PROFIenergy
+   * modes. Allowed values:
+   *  - 0    == PROFIenergy is disabled
+   *  - 1..8 == PROFIenergy is supported with 1..8 modes */
+  uint8_t bPROFIenergyMode;
+
+  /* Reserved, set to zero */
+  uint8_t abReserved[3];
+
+} HIL_TAG_NF_PROFI_ENERGY_MODES_DATA_T;
+
+typedef struct
+{
+  HIL_TAG_HEADER_T                     tHeader;
+  HIL_TAG_NF_PROFI_ENERGY_MODES_DATA_T tData;
+} HIL_TAG_NF_PROFI_ENERGY_MODES_T;
+
+
+/**************************************************************************************
+  netFIELD PROFINET IO-Link profile submodule padding.
+  Tag code: HIL_TAG_NF_PN_IOL_PROFILE_PADDING
+**************************************************************************************/
+#define HIL_TAG_NF_PN_IOL_PROFILE_PADDING_PADMODE_UNALIGNMENT     0
+#define HIL_TAG_NF_PN_IOL_PROFILE_PADDING_PADMODE_2BYTE_ALIGNMENT 1
+#define HIL_TAG_NF_PN_IOL_PROFILE_PADDING_PADMODE_4BYTE_ALIGNMENT 2
+
+typedef struct
+{
+  /* PROFINET IO-Link profile submodule padding.
+   * Allowed values: All HIL_TAG_NF_PN_IOL_PROFILE_PADDING_PADMODE_* defines */
+  uint8_t bProfilePaddingMode;
+
+  /* Reserved, set to zero */
+  uint8_t abReserved[3];
+
+} HIL_TAG_NF_PN_IOL_PROFILE_PADDING_DATA_T;
+
+typedef struct
+{
+  HIL_TAG_HEADER_T                        tHeader;
+  HIL_TAG_NF_PN_IOL_PROFILE_PADDING_DATA_T tData;
+} HIL_TAG_NF_PN_IOL_PROFILE_PADDING_T;
+
+
+/**************************************************************************************
+  netFIELD PROFINET IO-Link profile DIO in IOLM.
+  Tag code: HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM
+**************************************************************************************/
+#define HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM_DISABLED    0
+#define HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM_ENABLED     1
+
+typedef struct
+{
+  /* PROFINET IO-Link profile submodule DIO in IOLM.
+   * Allowed values: All HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM_* defines */
+  uint8_t bDioInIolm;
+
+  /* Reserved, set to zero */
+  uint8_t abReserved[3];
+
+} HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM_DATA_T;
+
+typedef struct
+{
+  HIL_TAG_HEADER_T                             tHeader;
+  HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM_DATA_T tData;
+} HIL_TAG_NF_PN_IOL_PROFILE_DIO_IN_IOLM_T;
 
 
 /**************************************************************************************
@@ -985,14 +1206,14 @@ typedef struct HIL_TAG_ETHINTF_TCPUDP_PORT_NUMBERS_Ttag
 #define HIL_TAG_PNS_ETHERNET_FIBEROPTICMODE_PORT0_ONLY_ON  (2)
 #define HIL_TAG_PNS_ETHERNET_FIBEROPTICMODE_PORT1_ONLY_ON  (3)
 
-typedef struct HIL_TAG_PNS_ETHERNET_PARAMS_DATA_Ttag
+typedef struct
 {
   uint8_t       bActivePortsBf;  /* each bit for one port */
   uint8_t       bFiberOpticMode; /* see defines above */
   uint8_t       abReserved[2];
 } HIL_TAG_PNS_ETHERNET_PARAMS_DATA_T;
 
-typedef struct HIL_TAG_PNS_ETHERNET_PARAMS_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                    tHeader;
   HIL_TAG_PNS_ETHERNET_PARAMS_DATA_T  tData;
@@ -1012,7 +1233,7 @@ typedef struct
   uint8_t      bReserved;
 } HIL_TAG_PNS_FIBER_OPTIC_IF_DMI_NETX50_PARAMS_DATA_T;
 
-typedef struct HIL_TAG_PNS_FIBER_OPTIC_IF_DMI_NETX50_PARAMS_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                                     tHeader;
   HIL_TAG_PNS_FIBER_OPTIC_IF_DMI_NETX50_PARAMS_DATA_T  tData;
@@ -1027,7 +1248,7 @@ typedef struct HIL_TAG_PNS_FIBER_OPTIC_IF_DMI_NETX50_PARAMS_Ttag
 #define HIL_TAG_PNS_FIBER_OPTIC_IF_DMI_PINTYPE_GPIO   (1)
 #define HIL_TAG_PNS_FIBER_OPTIC_IF_DMI_PINTYPE_PIO    (2)
 
-typedef struct HIL_TAG_PNS_FIBER_OPTIC_IF_DMI_NETX100_PARAMS_DATA_Ttag
+typedef struct
 {
   uint8_t      bSelectPinType;   /* see value definitions above */
   uint8_t      bSelectPinInvert; /* 0: non invert, 1: invert */
@@ -1104,8 +1325,8 @@ typedef struct
 
 
 /**************************************************************************************
-  Ethernet/IP configuration.
-  Tag code: HIL_TAG_EIP_EIS_CONFIG
+  Ethernet/IP resources configuration.
+  Tag code: HIL_TAG_EIP_EIS_RESOURCES
 **************************************************************************************/
 typedef struct
 {
@@ -1133,12 +1354,23 @@ typedef struct
 
   /** Maximum number of parallel IO connections, default = 5 */
   uint16_t usMaxIOConnections;
-} HIL_TAG_EIP_EIS_CONFIG_DATA_T;
+} HIL_TAG_EIP_EIS_RESOURCES_DATA_T;
 
 typedef struct
 {
-  HIL_TAG_HEADER_T              tHeader;
-  HIL_TAG_EIP_EIS_CONFIG_DATA_T tData;
+  HIL_TAG_HEADER_T                  tHeader;
+  HIL_TAG_EIP_EIS_RESOURCES_DATA_T  tData;
+} HIL_TAG_EIP_EIS_RESOURCES_T;
+
+
+/**************************************************************************************
+  Ethernet/IP configuration. (For internal use only)
+  Tag code: HIL_TAG_EIP_EIS_CONFIG
+**************************************************************************************/
+typedef struct
+{
+  HIL_TAG_HEADER_T                 tHeader;
+  HIL_TAG_EIP_EIS_RESOURCES_DATA_T tData;
 } HIL_TAG_EIP_EIS_CONFIG_T;
 
 
@@ -1146,7 +1378,7 @@ typedef struct
   PROFINET ProductID settings tag definitions.
   Tag code: HIL_TAG_PN_DEVICEID
 **************************************************************************************/
-typedef struct HIL_TAG_PN_DEVICEID_DATA_Ttag
+typedef struct
 {
   uint32_t ulVendorId;  /* the PROFINET VendorID to use */
   uint32_t ulDeviceId;  /* the PROFINET DeviceID to use */
@@ -1163,7 +1395,7 @@ typedef struct
   PROFINET IO-Device Feature settings tag definitions.
   Tag code: HIL_TAG_PROFINET_FEATURES
 **************************************************************************************/
-typedef struct HIL_TAG_PROFINET_FEATURES_DATA_Ttag
+typedef struct
 {
   uint8_t      bNumAdditionalIoAR;     /* 0: only 1 cyclic Profinet connection is possible, for allowed values refer to PNS API Manual for details */
   uint8_t      bIoSupervisorSupported; /* 0: IO Supervisor communication is not accepted by firmware / 1: IO Supervisor communication is accepted by firmware */
@@ -1173,7 +1405,7 @@ typedef struct HIL_TAG_PROFINET_FEATURES_DATA_Ttag
   uint8_t      abReserved[2];
 } HIL_TAG_PROFINET_FEATURES_DATA_T;
 
-typedef struct HIL_TAG_PROFINET_FEATURES_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                      tHeader;
   HIL_TAG_PROFINET_FEATURES_DATA_T      tData;
@@ -1184,7 +1416,7 @@ typedef struct HIL_TAG_PROFINET_FEATURES_Ttag
   PROFINET IO-Device Feature V2 settings tag definitions.
   Tag code: HIL_TAG_PROFINET_FEATURES_V2
 **************************************************************************************/
-typedef struct HIL_TAG_PROFINET_FEATURES_V2_DATA_Ttag
+typedef struct
 {
   /** Maximum number of user submodules supported by the product. Allowed values [1, 1000] */
   uint16_t     usNumSubmodules;
@@ -1200,7 +1432,7 @@ typedef struct HIL_TAG_PROFINET_FEATURES_V2_DATA_Ttag
   uint16_t     usNumSubmDiagnosis;
 } HIL_TAG_PROFINET_FEATURES_V2_DATA_T;
 
-typedef struct HIL_TAG_PROFINET_FEATURES_V2_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                         tHeader;
   HIL_TAG_PROFINET_FEATURES_V2_DATA_T      tData;
@@ -1211,7 +1443,7 @@ typedef struct HIL_TAG_PROFINET_FEATURES_V2_Ttag
   PROFINET IO-Device SystemRedundancy Feature tag definitions.
   Tag code: HIL_TAG_PROFINET_SYSTEM_REDUNDANCY_FEATURES
 **************************************************************************************/
-typedef struct HIL_TAG_PROFINET_SYSTEM_REDUNDANCY_FEATURES_DATA_Ttag
+typedef struct
 {
   /** Number of AR Sets supported by the device. Set to non-zero value to allow SR type connections. Allowed values [0, 1]. */
   uint8_t      bNumberOfARSets;
@@ -1219,7 +1451,7 @@ typedef struct HIL_TAG_PROFINET_SYSTEM_REDUNDANCY_FEATURES_DATA_Ttag
   uint8_t      abPadding[3];
 } HIL_TAG_PROFINET_SYSTEM_REDUNDANCY_FEATURES_DATA_T;
 
-typedef struct HIL_TAG_PROFINET_SYSTEM_REDUNDANCY_FEATURES_Ttag
+typedef struct
 {
   HIL_TAG_HEADER_T                                        tHeader;
   HIL_TAG_PROFINET_SYSTEM_REDUNDANCY_FEATURES_DATA_T      tData;
@@ -1294,7 +1526,7 @@ typedef struct
   typedef HIL_TAG_XC_DATA_T                           HIL_MOD_TAG_IT_XC_T;
   typedef HIL_TAG_XC_T                                HIL_MOD_TAG_IT_XC_TAG_T;
 
-  typedef struct HIL_MOD_TAG_IT_STATIC_TASK_ENTRY_Ttag
+  typedef struct
   {
     char szTaskName[16];      /* task name, read-only */
     uint32_t ulTaskGroupRef;  /* group reference number (common to all tasks in the group), read-only */
@@ -1302,14 +1534,14 @@ typedef struct
     uint32_t ulToken;         /* task token (offset) relative to task group's base task token */
   } HIL_MOD_TAG_IT_STATIC_TASK_ENTRY_T;
 
-  typedef struct HIL_MOD_TAG_IT_STATIC_TASK_ENTRY_TAG_Ttag
+  typedef struct
   {
     HIL_MODULE_TAG_ENTRY_HEADER_T      tHeader;
     HIL_MOD_TAG_IT_STATIC_TASK_ENTRY_T tData;
   } HIL_MOD_TAG_IT_STATIC_TASK_ENTRY_TAG_T;
 
   /* generic task parameter block / substructure referenced by index */
-  typedef struct HIL_MOD_TAG_IT_STATIC_TASK_PARAMETER_BLOCK_Ttag
+  typedef struct
   {
     uint32_t ulSubstructureIdx;  /* read-only */
     uint32_t ulTaskIdentifier;   /* read-only, Task identifier as specified in TLR_TaskIdentifier.h */

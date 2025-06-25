@@ -223,6 +223,11 @@
 #define HIL_HW_DEV_CLASS_NETFIELD_COM                       0x0046
 #define HIL_HW_DEV_CLASS_NETFIELD_APP_FOR_NETFIELD_COM      HIL_HW_DEV_CLASS_NETFIELD_COM
 #define HIL_HW_DEV_CLASS_COMX_52                            0x0047
+#define HIL_HW_DEV_CLASS_NETFIELD_DEV_IOLM_W                0x0048
+/*                                                          0x0049 device class is worn out */
+/*                                                          0x004A device class is worn out */
+/*                                                          0x004B device class is worn out */
+#define HIL_HW_DEV_CLASS_NETJACK_52                         0x004C
 
 /* NOTE: The device class will be assigned by TD department. */
 
@@ -335,6 +340,7 @@
 #define HIL_PROT_CLASS_CCLINK_IE_FIELD                      0x002D
 #define HIL_PROT_CLASS_NETWORK_SERVICES                     0x002E
 #define HIL_PROT_CLASS_NETPROXY                             0x002F
+#define HIL_PROT_CLASS_PROTOCOL_DETECT                      0x0030
 
 /* NOTE: The protocol class will be assigned by TD department. */
 

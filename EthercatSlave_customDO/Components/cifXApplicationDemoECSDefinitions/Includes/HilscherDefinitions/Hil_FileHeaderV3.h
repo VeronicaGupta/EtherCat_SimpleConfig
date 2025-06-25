@@ -4,7 +4,7 @@ Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserv
 
 ***************************************************************************************
 
-  $Id: Hil_FileHeaderV3.h 321 2020-05-13 14:18:33Z Robert $:
+  $Id: Hil_FileHeaderV3.h 388 2021-04-27 14:48:04Z AMinor $:
 
   Description:
     Hilscher File Header V3.0
@@ -66,6 +66,10 @@ Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserv
 /* Obsolete Hilscher file extensions */
 #define HIL_FILE_EXTENSION_FIRMWARE         ".NXF"
 #define HIL_FILE_EXTENSION_NXM_FIRMWARE     ".NXM"  /**< Firmware File (obsolete)       */
+
+/* Structure/Header version constants */
+#define HIL_VERSION_MAJOR_MSK               0xFFFF0000 /**< Mask for version/structure fields (major) */
+#define HIL_VERSION_MINOR_MSK               0x0000FFFF /**< Mask for version/structure fields (minor) */
 
 /* Common Header version constants */
 #define HIL_VERSION_COMMON_HEADER_0_0       0x00000000 /**< V0.0, default initialization value */
@@ -323,7 +327,21 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST HIL_FILE_BOOT_HEADER_NAI_NAE_V
   uint32_t     ulBootHeaderChecksum;       /**< sums up all previous 15 DWORDs and multiplies result by -1 */
 } HIL_FILE_BOOT_HEADER_NAI_NAE_V1_0_T, *PHIL_FILE_BOOT_HEADER_NAI_NAE_V1_0_T;
 
-/** NAI file header */
+/** NAI header
+  This structure is used in the application core to generated new NAI or NAE header.
+  The Cortex M4 Vector table and the Hboot header (M4 reset vector) are generated
+  in a later build step, to obtain the complete file header (HIL_FILE_NAI_HEADER_V3_0_T)
+  can't be used. */
+typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST HIL_FILE_NAI_NAE_APP_HEADER_V3_0_Ttag
+{
+  HIL_FILE_BOOT_HEADER_NAI_NAE_V1_0_T tBootHeader;          /**< NAI Boot header                      */
+  HIL_FILE_COMMON_HEADER_V3_0_T       tCommonHeader;        /**< common header                        */
+  HIL_FILE_DEVICE_INFO_V1_0_T         tDeviceInfo;          /**< device-specific information          */
+} HIL_FILE_NAI_NAE_APP_HEADER_V3_0_T, *PHIL_FILE_NAI_NAE_APP_HEADER_V3_0_T;
+
+/** NAI file header
+  This structure contains the complete NAI file header as it can be found as binary file.
+  It can be directly flashed into the application processes flash (INTFLASH2). */
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST HIL_FILE_NAI_HEADER_V3_0_Ttag
 {
   uint32_t                            aulVectorTable[112];  /**< Reserved for Cortex M4 Vector table  */
@@ -333,7 +351,10 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST HIL_FILE_NAI_HEADER_V3_0_Ttag
   HIL_FILE_DEVICE_INFO_V1_0_T         tDeviceInfo;          /**< device-specific information          */
 } HIL_FILE_NAI_HEADER_V3_0_T, *PHIL_FILE_NAI_HEADER_V3_0_T;
 
-/** NAE file header */
+/** NAE file header
+  This structure contains the complete NAE file header as it can be found as binary file.
+  The content will be stored in the SQI flash and will be copied by the rom loader to the SDRAM,
+  before the application processor is started */
 typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST HIL_FILE_NAE_HEADER_V3_0_Ttag
 {
   HIL_HBOOT_HEADER_NX90_T             tHbootHeader;         /**< netX90 APP CPU Hboot header          */

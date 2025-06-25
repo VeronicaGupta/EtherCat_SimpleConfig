@@ -56,7 +56,6 @@ typedef struct CUSTOM_OD_Ttag{
   SUBOBJECT_DESCRIPTION_T* ptCurrSubObj;
 }CUSTOM_OD_T;
 
-
 typedef __HIL_PACKED_PRE struct
 {
   uint32_t ulLength;
@@ -76,11 +75,19 @@ CUSTOM_OD_T g_customOd =
   .ptCurrSubObj = 0,
 };
 
+CUSTOM_OD_T g_datatype =
+{
+  .ptCurrObj = &g_tDatatypeObjects[0],
+  .ptBreakObj = &g_tDatatypeObjects[ ARRCNT(g_tDatatypeObjects) ], /* pointer to one after last object which is taken as break condition in a loop */
+  .ptCurrSubObj = 0,
+};
+
 static uint32_t AppECS_OD_SendCreateObjectReq(APP_DATA_T*, CUSTOM_OD_T*);
 static uint32_t AppECS_OD_SendCreateSubObjectReq(APP_DATA_T*, CUSTOM_OD_T*);
 static uint8_t Object_4000_1=0x01;
 static uint8_t Object_4000_2=0x01;
 static uint32_t Object_4000_3=0x12345678;
+static uint8_t Object_4001_1=0x01;
 
 static void AppECS_OD_AddName(CIFX_PACKET* ptPkt, const char* pbName)
 {
@@ -93,7 +100,7 @@ static void AppECS_OD_AddName(CIFX_PACKET* ptPkt, const char* pbName)
       FRAG_NAME* ptFrag = (FRAG_NAME*)(&ptReq->tData.abData[ptReq->tData.ulTotalDataBytes]);
 
       /*set length of name and copy it*/
-      ptFrag->ulLength = strlen(pbName) +1 ;
+      ptFrag->ulLength = strlen(pbName)+1;
       memcpy(&ptFrag->abName, pbName, ptFrag->ulLength);
 
       ptReq->tData.bValueInfo       |= ODV3_VALUE_INFO_NAME;
@@ -107,7 +114,7 @@ static void AppECS_OD_AddName(CIFX_PACKET* ptPkt, const char* pbName)
       FRAG_NAME* ptFrag = (FRAG_NAME*)(&ptReq->tData.abData[ptReq->tData.ulTotalDataBytes]);
 
       /*set length of name and copy it*/
-      ptFrag->ulLength = strlen(pbName) +1 ;
+      ptFrag->ulLength = strlen(pbName)+1;
       memcpy(&ptFrag->abName, pbName, ptFrag->ulLength);
 
       ptReq->tData.bValueInfo       |= ODV3_VALUE_INFO_NAME;
@@ -163,10 +170,9 @@ static uint32_t AppECS_OD_HandleNextObject(APP_DATA_T *ptAppData, CUSTOM_OD_T* p
   return lRet;
 }
 
-static uint32_t AppECS_OD_HandleCreateObjectCnf(APP_DATA_T *ptAppData)
+static uint32_t AppECS_OD_HandleCreateObjectCnf(APP_DATA_T *ptAppData, CUSTOM_OD_T* ptCustOd)
 {
   uint32_t lRet = CIFX_NO_ERROR;
-  CUSTOM_OD_T* ptCustOd = &g_customOd;
   OBJECT_DESCRIPTION_T* ptCurrObj = ptCustOd->ptCurrObj;
 
   if(ptCurrObj->ptSi00)
@@ -178,6 +184,22 @@ static uint32_t AppECS_OD_HandleCreateObjectCnf(APP_DATA_T *ptAppData)
     lRet = AppECS_OD_HandleNextObject(ptAppData, ptCustOd);
   }
   return lRet;
+}
+
+static uint32_t AppECS_CreateDatatypeReq(CIFX_PACKET* ptPkt )
+{
+  uint32_t ulRet = CIFX_NO_ERROR;
+  ODV3_CREATE_DATATYPE_REQ_T* ptReq = (ODV3_CREATE_DATATYPE_REQ_T*)ptPkt;
+
+  memset(ptReq, 0x00, sizeof(*ptReq));
+
+  ptReq->tHead.ulCmd  = ODV3_CREATE_DATATYPE_REQ;
+  ptReq->tHead.ulDest = HIL_PACKET_DEST_DEFAULT_CHANNEL;
+  ptReq->tHead.ulLen = 6;
+  ptReq->tData.ulDatatypeBitLength=sizeof(uint32_t) * 8;
+  ptReq->tData.usDatatype= INDEX_OF_MY_ENUM;
+
+  return ulRet;
 }
 
 static uint32_t AppECS_OD_SendCreateObjectReq(APP_DATA_T *ptAppData, CUSTOM_OD_T* ptCustOd)
@@ -212,16 +234,15 @@ static uint32_t AppECS_OD_SendCreateObjectReq(APP_DATA_T *ptAppData, CUSTOM_OD_T
 
   Pkt_SendReceivePacket( ptAppData,ECS_DEMO_CHANNEL_INDEX, &ptAppData->aptChannels[ECS_DEMO_CHANNEL_INDEX]->tPacket, TXRX_TIMEOUT );
 
-  AppECS_OD_HandleCreateObjectCnf(ptAppData);
+  AppECS_OD_HandleCreateObjectCnf(ptAppData, ptCustOd);
 
   return ulRet;
 }
 
 
-static uint32_t AppECS_OD_HandleCreateSubObjectCnf(APP_DATA_T *ptAppData)
+static uint32_t AppECS_OD_HandleCreateSubObjectCnf(APP_DATA_T *ptAppData, CUSTOM_OD_T* ptCustOd)
 {
   uint32_t lRet = CIFX_NO_ERROR;
-  CUSTOM_OD_T* ptCustOd = &g_customOd;
 
   ++ptCustOd->ptCurrSubObj;
 
@@ -263,7 +284,7 @@ static uint32_t AppECS_OD_SendCreateSubObjectReq(APP_DATA_T *ptAppData, CUSTOM_O
 
   Pkt_SendReceivePacket( ptAppData,ECS_DEMO_CHANNEL_INDEX, &ptAppData->aptChannels[ECS_DEMO_CHANNEL_INDEX]->tPacket, TXRX_TIMEOUT );
 
-  AppECS_OD_HandleCreateSubObjectCnf(ptAppData);
+  AppECS_OD_HandleCreateSubObjectCnf(ptAppData, ptCustOd);
 
   return lRet;
 }
@@ -309,6 +330,20 @@ uint32_t AppECS_Read_ObjectInd(APP_DATA_T *ptAppData, CIFX_PACKET* ptPkt)
     default:
       ptRes->tHead.ulLen = 9;
       ptRes->tData.ulTotalDataBytes=0;
+    case 0x4001:
+      switch ( ptInd->tData.bSubIndex )
+       {
+       case 0x0001:
+          ptRes->tHead.ulLen = 9+1;
+          ptRes->tData.ulTotalDataBytes=1;
+          ptRes->tData.abData[0]= Object_4001_1;
+          break;
+       default:
+          ptRes->tHead.ulLen = 9;
+          ptRes->tData.ulTotalDataBytes=0;
+          break;
+       }
+      break;
   }
 
   Pkt_SendPacket(ptAppData, ECS_DEMO_CHANNEL_INDEX , ptPkt, TX_TIMEOUT);
@@ -340,6 +375,16 @@ uint32_t AppECS_Write_ObjectInd(APP_DATA_T *ptAppData, CIFX_PACKET* ptPkt)
         break;
       default:
       break;
+      case 0x4001:
+        switch ( ptInd->tData.bSubIndex )
+         {
+         case 0x0001:
+            Object_4001_1 = ptInd->tData.abData[0] ;
+            break;
+         default:
+            break;
+         }
+        break;
     }
 
   ptRes->tHead.ulCmd   |= 0x01;
@@ -417,7 +462,7 @@ uint32_t AppECS_ConfigureStack(APP_DATA_T *ptAppData)
   ptConfigReq->tData.tBasicCfg.ulProductCode = ECS_PRODUCTCODE; /** Creates Product Code in Sii Image in accordance to ESI file */
   ptConfigReq->tData.tBasicCfg.ulRevisionNumber = ECS_REVISIONNUMBER; /** Creates Revision Number in in Sii Image accordance to ESI file: increments with every released change of ESI file */
   ptConfigReq->tData.tBasicCfg.ulSerialNumber = ptAppData->tBoardInfo.tSystemInfo.ulSerialNumber;
-  ptConfigReq->tData.tBasicCfg.ulProcessDataOutputSize = sizeof(APP_PROCESS_DATA_INPUT_T); /**< Process Data Output Size from master view */
+  ptConfigReq->tData.tBasicCfg.ulProcessDataOutputSize = sizeof(APP_PROCESS_DATA_INPUT_T)+1; /**< Process Data Output Size from master view */
   ptConfigReq->tData.tBasicCfg.ulProcessDataInputSize = sizeof(APP_PROCESS_DATA_OUTPUT_T); /**< Process Data Input Size from master view */
 
   /** ECAT_SET_CONFIG_DEVICEINFO configuration ***************************************/
@@ -457,9 +502,19 @@ uint32_t AppECS_ConfigureStack(APP_DATA_T *ptAppData)
   if( ulRet != CIFX_NO_ERROR )
 	  return ulRet;
 
+  /* Create datatypeObjects */
+  AppECS_OD_SendCreateObjectReq(ptAppData, &g_datatype);
+    if( ulRet != CIFX_NO_ERROR )
+      return ulRet;
+
+  /* Create datatypeObjects */
+  AppECS_CreateDatatypeReq(ptPacket);
+  ulRet = Pkt_SendReceivePacket(ptAppData, ECS_DEMO_CHANNEL_INDEX, ptPacket, TXRX_TIMEOUT);
+    if( ulRet != CIFX_NO_ERROR )
+      return ulRet;
+
   /* Create Objects */
   AppECS_OD_SendCreateObjectReq(ptAppData, &g_customOd);
-  //ulRet = Pkt_SendReceivePacket( ptAppData->hChannel, &ptAppData->tPacket, TXRX_TIMEOUT );
     if( ulRet != CIFX_NO_ERROR )
       return ulRet;
 

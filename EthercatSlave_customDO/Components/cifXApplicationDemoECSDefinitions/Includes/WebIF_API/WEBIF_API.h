@@ -18,7 +18,7 @@ description:
 /*
  * The following values are defined according the internal implementations:
  * - WEBIF_PCK_CONTENT_SIZE is maximally set to the sum of TX Buffer sizes (defined TcpBuf_MemPool.h).
- * - WEBIF_FIELD_MAX_SIZE is dependent of string storage implemented in Http.c and Http_HashMap.c.
+ * - WEBIF_FIELD_MAX_SIZE is dependent of string storage implemented in Http.c and Utils_HashMap.c.
  * These values can be bigger, but there is no concret benefit.
  */
 
@@ -72,14 +72,25 @@ description:
 #define WEBIF_FINISH_GENERATION_HTTP_RESPONSE_CNF 0x0000AF0F
 
 /*! Request to be registered */
-#define WEBIF_REGISTER_REQ 0x0000AF10
-/*! Confirmation to WEBIF_REGISTER_REQ */
-#define WEBIF_REGISTER_CNF 0x0000AF11
+#define WEBIF_ENABLE_REQUEST_HANDLING_REQ 0x0000AF10
+/*! Confirmation to WEBIF_ENABLE_REQ */
+#define WEBIF_ENABLE_REQUEST_HANDLING_CNF 0x0000AF11
+/*! Retrocompatibility definitions */
+#define WEBIF_REGISTER_REQ WEBIF_ENABLE_REQUEST_HANDLING_REQ
+#define WEBIF_REGISTER_CNF WEBIF_ENABLE_REQUEST_HANDLING_CNF
 
 /*! Request to be registered */
-#define WEBIF_UNREGISTER_REQ 0x0000AF20
-/*! Confirmation to WEBIF_REGISTER_REQ */
-#define WEBIF_UNREGISTER_CNF 0x0000AF21
+#define WEBIF_DISABLE_REQUEST_HANDLING_REQ 0x0000AF20
+/*! Confirmation to WEBIF_DISABLE_REQ */
+#define WEBIF_DISABLE_REQUEST_HANDLING_CNF 0x0000AF21
+/*! Retrocompatibility definitions */
+#define WEBIF_UNREGISTER_REQ WEBIF_DISABLE_REQUEST_HANDLING_REQ
+#define WEBIF_UNREGISTER_CNF WEBIF_DISABLE_REQUEST_HANDLING_CNF
+
+/*! WebServer Start Request*/
+#define WEBIF_START_REQ                             0x0000AF22
+#define WEBIF_START_CNF                             0x0000AF23
+
 
 /*!  \} */
 
@@ -166,6 +177,14 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST
   uint32_t ulDataSize;
   uint8_t aData[WEBIF_PCK_CONTENT_SIZE]; /*! Data */
 } WEBIF_GENERATE_HTTP_RESPONSE_CONTENT_REQ_DATA_T;
+
+
+/*! WebServer Start request packet. */
+typedef HIL_EMPTY_PACKET_T          WEBIF_START_REQ_T;
+
+/*! WebServer Start confirmation packet. */
+typedef HIL_EMPTY_PACKET_T          WEBIF_START_CNF_T;
+
 
 /*!  \} */
 

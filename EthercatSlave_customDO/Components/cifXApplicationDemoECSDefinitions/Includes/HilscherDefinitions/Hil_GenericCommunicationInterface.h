@@ -1023,14 +1023,68 @@ typedef HIL_EMPTY_PACKET_T      HIL_GCI_SET_IO_MIN_UPDATE_INTERVAL_RES_T;
 #define HIL_GCI_COM_LED_STATUS_SCS_HP0                            0x0408  /*!< Hot-plug mode 0. */
 #define HIL_GCI_COM_LED_STATUS_SCS_HP1                            0x0409  /*!< Hot-plug mode 1. */
 #define HIL_GCI_COM_LED_STATUS_SCS_HP2                            0x040A  /*!< Hot-plug mode 2. */
-#define HIL_GCI_COM_LED_STATUS_SCS_HP3                            0x040B  /*!< Hot-plug mode 3. */
-#define HIL_GCI_COM_LED_STATUS_SCS_HP4                            0x040C  /*!< Hot-plug mode 4. */
 
 #define HIL_GCI_COM_LED_STATUS_SCS_IDENTIFICATION                 0x040D  /*!< Remote address allocation or configuration errors between Master and Slaves. */
 #define HIL_GCI_COM_LED_STATUS_SCS_MST_LOSSES                     0x040E  /*!< Communication warning (Master SYNC telegrams not received). */
 #define HIL_GCI_COM_LED_STATUS_SCS_APPLICATION_ERROR              0x040F  /*!< See GDP & FSP Status codes class error (API manual). */
 #define HIL_GCI_COM_LED_STATUS_SCS_COMMUNICATION_ERROR            0x0410  /*!< See SCP Status codes class error (API manual). */
+#define HIL_GCI_COM_LED_STATUS_SCS_WATCHDOG_ERROR                 0x0411  /*!< A watch dog error has been detected */
 /*! \} */
+
+/*! \defgroup HIL_GCI_COM_LED_STATUS_IND_PLS POWERLINK Controlled Node status indications
+ * \{*/
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_OFF                        0x0501  /*!< The device is not initialized yet */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_INITIALISATION             0x0502  /*!< The device is in initialization state */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_NOT_ACTIVE                 0x0503  /*!< The device is in initialized and waiting for EPL communication */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_BASIC_ETHERNET             0x0504  /*!< The device is running in Basic Ethernet mode */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_PRE_OPERATIONAL_1          0x0505  /*!< The device is in pre-operational 1 state. EPL communication with SoA cycle is established */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_PRE_OPERATIONAL_2          0x0506  /*!< The device is in pre-operational 2 state. EPL communication with SoC cycle is established */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_READY_TO_OPERATE           0x0507  /*!< The device is in ready to operate state. EPL communication is established, the configuration was done and the device is ready for cyclic data exchange */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_OPERATIONAL                0x0508  /*!< The device is in operational state. EPL communication is established and cyclic data exchange is running */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_STOPPED                    0x0509  /*!< The device is in stopped state. EPL communication is established and cyclic data exchange is stopped */
+#define HIL_GCI_COM_LED_STATUS_PLS_NMT_ERROR                      0x050A  /*!< The device has an error */
+/*! \} */
+
+/*! \defgroup HIL_GCI_COM_LED_STATUS_IND_COS CANopen Slave status indications
+* \{*/
+
+/* Definitions if RUN and ERROR LEDs are visually separated from each other */
+#define HIL_GCI_COM_LED_STATUS_COS_RUN_NMT_RESET                                        0x0601 /*!< NMT is in reset state. */
+#define HIL_GCI_COM_LED_STATUS_COS_RUN_NMT_OPERATIONAL                                  0x0602 /*!< NMT is in operational state. */
+#define HIL_GCI_COM_LED_STATUS_COS_RUN_NMT_PREOPERATIONAL                               0x0603 /*!< NMT is in pre-operational state. */
+#define HIL_GCI_COM_LED_STATUS_COS_RUN_NMT_STOP                                         0x0604 /*!< NMT is in stop state. */
+#define HIL_GCI_COM_LED_STATUS_COS_RUN_NMT_BAUD_DETECTION                               0x060F /*!< CAN auto baud detection is in progress. */
+
+#define HIL_GCI_COM_LED_STATUS_COS_ERROR_NOERROR                                        0x0610 /*!< No CAN error detected. */
+#define HIL_GCI_COM_LED_STATUS_COS_ERROR_CAN_WARNING_LEVEL_REACHED                      0x0620 /*!< CAN warning level reached. */
+#define HIL_GCI_COM_LED_STATUS_COS_ERROR_CO_ERROR_CONTROL_EVENT                         0x0630 /*!< CANopen error event occurred. */
+#define HIL_GCI_COM_LED_STATUS_COS_ERROR_CAN_BUSOFF                                     0x0640 /*!< CAN is in bus-off state. */
+#define HIL_GCI_COM_LED_STATUS_COS_ERROR_BAUD_DETECTION                                 0x06F0 /*!< CAN auto baud detection is in progress. */
+
+/* Definitions if only one STATUS LED exist */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_RESET_CAN_NO_ERROR                        0x0611 /*!< NMT is in reset state, no CAN error detected. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_RESET_CAN_WARNING_LEVEL_REACHED           0x0621 /*!< NMT is in reset state, CAN warning level reached. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_RESET_CO_ERROR_CONTROL_EVENT              0x0631 /*!< NMT is in reset state, CANopen error event occurred. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_RESET_CAN_BUSOFF                          0x0641 /*!< NMT is in reset state, CAN is in bus-off state. */
+
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_OPERATIONAL_CAN_NO_ERROR                  0x0612 /*!< NMT is in operational state, no CAN error detected. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_OPERATIONAL_CAN_WARNING_LEVEL_REACHED     0x0622 /*!< NMT is in operational state, CAN warning level reached. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_OPERATIONAL_CO_ERROR_CONTROL_EVENT        0x0632 /*!< NMT is in operational state, CANopen error event occurred. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_OPERATIONAL_CAN_BUSOFF                    0x0642 /*!< NMT is in operational state, CAN is in bus-off state. */
+
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_PREOPERATIONAL_CAN_NO_ERROR               0x0613 /*!< NMT is in pre-operational state, no CAN error detected. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_PREOPERATIONAL_CAN_WARNING_LEVEL_REACHED  0x0623 /*!< NMT is in pre-operational state, CAN warning level reached. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_PREOPERATIONAL_CO_ERROR_CONTROL_EVENT     0x0633 /*!< NMT is in pre-operational state, CANopen error event occurred. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_PREOPERATIONAL_CAN_BUSOFF                 0x0643 /*!< NMT is in pre-operational state, CAN is in bus-off state. */
+
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_STOP_CAN_NO_ERROR                         0x0614 /*!< NMT is in stop state, no CAN error detected. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_STOP_CAN_WARNING_LEVEL_REACHED            0x0624 /*!< NMT is in stop state, CAN warning level reached. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_STOP_CO_ERROR_CONTROL_EVENT               0x0634 /*!< NMT is in stop state, CANopen error event occurred. */
+#define HIL_GCI_COM_LED_STATUS_COS_STATUS_NMT_STOP_CAN_BUSOFF                           0x0644 /*!< NMT is in stop state, CAN is in bus-off state. */
+
+#define HIL_GCI_COM_LED_STATUS_CAN_STATUS_AUTO_BAUD_DETECTION                           0x06FF /*!< CAN auto baud detection is in progress. */
+/*! \} */
+
 
 #define HIL_GCI_COM_LED_COLOR_OFF                                   0x00  /*!< Disable all LEDs, off. */
 #define HIL_GCI_COM_LED_COLOR_RED                                   0x01  /*!< Red LED on. */
@@ -1094,6 +1148,7 @@ typedef __HIL_PACKED_PRE struct __HIL_PACKED_POST HIL_GCI_SET_COM_LEDS_IND_DATA_
 {
   /*! LED data for COM-LED 0 and COM-LED 1. */
   HIL_GCI_COM_LED_DATA_T atCOM[2];
+
 } HIL_GCI_SET_COM_LEDS_IND_DATA_T;
 
 /*! COM LED control indication packet. */

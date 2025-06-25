@@ -1,7 +1,7 @@
 /**************************************************************************************
  Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ***************************************************************************************
-$Id: OdV3_Defines.h 4095 2019-04-04 13:49:12Z Sven $:
+$Id: OdV3_Defines.h 4785 2021-07-15 11:51:02Z SBormann $:
 
 
 Changes:
@@ -18,6 +18,7 @@ Changes:
  * Access flags
  * usAccessFlags field
  */
+#define ODV3_ACCESS_FLAGS_IS_DATATYPE_AREA                0x0100      /* if set id is within data type area (id < 0x1000) otherwise in object area (id >= 0x1000) */
 #define ODV3_ACCESS_FLAGS_SUBINDEX_0_WRITE_0_FIRST        0x0200      /* on writing all subindexes starting from subindex 0, write 0 to subindex 0 first */
 #define ODV3_ACCESS_FLAGS_CREATE_SUBINDEX_0               0x0400      /* only on indexed objects, uses simple var bValueInfo fields (uses data type ODV3_DATATYPE_UNSIGNED8) */
 #define ODV3_ACCESS_FLAGS_FORCE_INDEXED                   0x0800

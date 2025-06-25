@@ -1,7 +1,7 @@
 /**************************************************************************************
 Copyright (c) Hilscher Gesellschaft fuer Systemautomation mbH. All Rights Reserved.
 ***************************************************************************************
-$Id: OdV3_Results.h 4095 2019-04-04 13:49:12Z Sven $:
+$Id: OdV3_Results.h 4785 2021-07-15 11:51:02Z SBormann $:
 
 Description:
   OdV3_Results.h
@@ -49,7 +49,7 @@ Description:
 //
 // MessageText:
 //
-// Object is read only.
+// Object is read-only.
 //
 #define ERR_ODV3_OBJECT_IS_READ_ONLY     ((uint32_t)0xC09B0004L)
 
@@ -112,7 +112,7 @@ Description:
 //
 // MessageText:
 //
-// Data type does not match, length of service parameter too high.
+// Data type does not match, service parameter too long.
 //
 #define ERR_ODV3_DATATYPE_LENGTH_IS_TOO_LONG ((uint32_t)0xC09B000BL)
 
@@ -121,7 +121,7 @@ Description:
 //
 // MessageText:
 //
-// Data type does not match, length of service parameter too short.
+// Data type does not match, service parameter too short.
 //
 #define ERR_ODV3_DATATYPE_LENGTH_IS_TOO_SHORT ((uint32_t)0xC09B000CL)
 
@@ -184,7 +184,7 @@ Description:
 //
 // MessageText:
 //
-// Data cannot be transferred or stored to the application.
+// Data cannot be transferred to or stored in the application.
 //
 #define ERR_ODV3_DATA_CANNOT_BE_TRANSFERRED_OR_STORED_TO_THE_APP ((uint32_t)0xC09B0013L)
 
@@ -193,7 +193,7 @@ Description:
 //
 // MessageText:
 //
-// Data cannot be transferred or stored to the application because of local control.
+// Data cannot be transferred to or stored in the application because of local control.
 //
 #define ERR_ODV3_DATA_NO_TRANSFER_DUE_TO_LOCAL_CONTROL ((uint32_t)0xC09B0014L)
 
@@ -202,7 +202,7 @@ Description:
 //
 // MessageText:
 //
-// Data cannot be transferred or stored to the application because of present device state.
+// Data cannot be transferred to or stored in the application because of present device state.
 //
 #define ERR_ODV3_DATA_NO_TRANSFER_DUE_TO_PRESENT_DEVICE_STATE ((uint32_t)0xC09B0015L)
 
@@ -233,6 +233,24 @@ Description:
 //
 #define ERR_ODV3_ALL_BY_INDEX_UNSUPPORTED ((uint32_t)0xC09B0018L)
 
+//
+// MessageId: ERR_ODV3_SUBINDEX_CANNOT_BE_WRITTEN_SI0_NZ
+//
+// MessageText:
+//
+// Subindex 0 is not zero so subindex can not be written.
+//
+#define ERR_ODV3_SUBINDEX_CANNOT_BE_WRITTEN_SI0_NZ ((uint32_t)0xC09B0019L)
+
+//
+// MessageId: ERR_ODV3_MODULE_LIST_DOES_NOT_MATCH
+//
+// MessageText:
+//
+// Configured module list does not match detected module list.
+//
+#define ERR_ODV3_MODULE_LIST_DOES_NOT_MATCH ((uint32_t)0xC09B001AL)
+
 // 0x8000-0xFFFF ObjDict range
 //
 // MessageId: ERR_ODV3_DELETION_LOCKED
@@ -240,6 +258,7 @@ Description:
 // MessageText:
 //
 // Deletion is locked.
+//
 //
 #define ERR_ODV3_DELETION_LOCKED         ((uint32_t)0xC09B8000L)
 
@@ -302,7 +321,7 @@ Description:
 //
 // MessageText:
 //
-// DestId does not match any fragmentation buffer.
+// Dest ID does not match any fragmentation buffer.
 //
 #define ERR_ODV3_DESTID_DOES_NOT_MATCH_ANY_FRAGMENTATION_BUFFER ((uint32_t)0xC09B8007L)
 
@@ -473,7 +492,7 @@ Description:
 //
 // MessageText:
 //
-// Only one read/write notify for non-existing subobject notify allowed.
+// Only one read/write notification allowed for a non-existing subobject notification.
 //
 #define ERR_ODV3_ONLY_ONE_RW_UNDEFINED_SUBOBJ_NOTIFY_ALLOWED ((uint32_t)0xC09B801AL)
 
@@ -482,7 +501,7 @@ Description:
 //
 // MessageText:
 //
-// Only one info notify for non-existing subobject notify allowed.
+// Only one info notification allowed for a non-existing subobject notification.
 //
 #define ERR_ODV3_ONLY_ONE_INFO_UNDEFINED_SUBOBJ_NOTIFY_ALLOWED ((uint32_t)0xC09B801BL)
 
@@ -518,7 +537,7 @@ Description:
 //
 // MessageText:
 //
-// Virtual cannot be combined with initial value.
+// Virtual value cannot be combined with initial value.
 //
 #define ERR_ODV3_VIRTUAL_CANNOT_BE_COMBINED_WITH_INITIAL_VALUE ((uint32_t)0xC09B801FL)
 
@@ -527,7 +546,7 @@ Description:
 //
 // MessageText:
 //
-// AllByIndex not possible due access rights.
+// AllByIndex not possible due to access rights.
 //
 #define ERR_ODV3_ALL_BY_INDEX_NOT_POSSIBLE_DUE_ACCESS_RIGHTS ((uint32_t)0xC09B8020L)
 
@@ -599,7 +618,7 @@ Description:
 //
 // MessageText:
 //
-// Unallowed callback combination.
+// Callback combination not allowed.
 //
 #define ERR_ODV3_UNALLOWED_CALLBACK_COMBINATION ((uint32_t)0xC09BE005L)
 

@@ -87,7 +87,6 @@ static uint32_t AppECS_OD_SendCreateSubObjectReq(APP_DATA_T*, CUSTOM_OD_T*);
 static uint8_t Object_4000_1=0x01;
 static uint8_t Object_4000_2=0x01;
 static uint32_t Object_4000_3=0x12345678;
-static uint8_t Object_4001_1=0x01;
 
 static void AppECS_OD_AddName(CIFX_PACKET* ptPkt, const char* pbName)
 {
@@ -330,20 +329,6 @@ uint32_t AppECS_Read_ObjectInd(APP_DATA_T *ptAppData, CIFX_PACKET* ptPkt)
     default:
       ptRes->tHead.ulLen = 9;
       ptRes->tData.ulTotalDataBytes=0;
-    case 0x4001:
-      switch ( ptInd->tData.bSubIndex )
-       {
-       case 0x0001:
-          ptRes->tHead.ulLen = 9+1;
-          ptRes->tData.ulTotalDataBytes=1;
-          ptRes->tData.abData[0]= Object_4001_1;
-          break;
-       default:
-          ptRes->tHead.ulLen = 9;
-          ptRes->tData.ulTotalDataBytes=0;
-          break;
-       }
-      break;
   }
 
   Pkt_SendPacket(ptAppData, ECS_DEMO_CHANNEL_INDEX , ptPkt, TX_TIMEOUT);
@@ -375,16 +360,6 @@ uint32_t AppECS_Write_ObjectInd(APP_DATA_T *ptAppData, CIFX_PACKET* ptPkt)
         break;
       default:
       break;
-      case 0x4001:
-        switch ( ptInd->tData.bSubIndex )
-         {
-         case 0x0001:
-            Object_4001_1 = ptInd->tData.abData[0] ;
-            break;
-         default:
-            break;
-         }
-        break;
     }
 
   ptRes->tHead.ulCmd   |= 0x01;
@@ -462,7 +437,7 @@ uint32_t AppECS_ConfigureStack(APP_DATA_T *ptAppData)
   ptConfigReq->tData.tBasicCfg.ulProductCode = ECS_PRODUCTCODE; /** Creates Product Code in Sii Image in accordance to ESI file */
   ptConfigReq->tData.tBasicCfg.ulRevisionNumber = ECS_REVISIONNUMBER; /** Creates Revision Number in in Sii Image accordance to ESI file: increments with every released change of ESI file */
   ptConfigReq->tData.tBasicCfg.ulSerialNumber = ptAppData->tBoardInfo.tSystemInfo.ulSerialNumber;
-  ptConfigReq->tData.tBasicCfg.ulProcessDataOutputSize = sizeof(APP_PROCESS_DATA_INPUT_T)+1; /**< Process Data Output Size from master view */
+  ptConfigReq->tData.tBasicCfg.ulProcessDataOutputSize = sizeof(APP_PROCESS_DATA_INPUT_T); /**< Process Data Output Size from master view */
   ptConfigReq->tData.tBasicCfg.ulProcessDataInputSize = sizeof(APP_PROCESS_DATA_OUTPUT_T); /**< Process Data Input Size from master view */
 
   /** ECAT_SET_CONFIG_DEVICEINFO configuration ***************************************/

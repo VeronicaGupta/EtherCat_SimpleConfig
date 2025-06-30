@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<hwconfig tool_version="3.0.17" peripherals_version="1.4.0.0" chip_type="netx90_rev1" board="default">
+<hwconfig tool_version="3.0.17" peripherals_version="1.4.0.0" chip_type="netx90_rev0" board="default">
     <peripherals>
         <peripheral id="general">
             <config id="default">
@@ -34,7 +34,7 @@
         </peripheral>
         <peripheral id="sdram_16_bit">
             <config id="IS45S16400J-7BLA2-NXHX-SDRSPM_R1">
-                <parameter id="timing_ctrl" value="0x01403251"/>
+                <parameter id="timing_ctrl" value="0x02403251"/>
                 <parameter id="general_ctrl" value="0x000d0011"/>
                 <parameter id="mode_register" value="0x22"/>
                 <parameter id="sdram_size" value="0x08"/>

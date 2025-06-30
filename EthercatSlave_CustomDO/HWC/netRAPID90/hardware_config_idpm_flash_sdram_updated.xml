@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<hwconfig tool_version="3.0.17" peripherals_version="1.4.0.0" chip_type="netx90_rev1" board="default">
+<hwconfig tool_version="4.1.7" peripherals_version="1.4.0.0" chip_type="netx90_rev1" board="nrp_h90-re_fxdx">
     <peripherals>
         <peripheral id="general">
             <config id="default">
@@ -11,7 +11,7 @@
                 <parameter id="firewall_eth_mac" value="app_only"/>
                 <parameter id="firewall_madc" value="app_only"/>
                 <parameter id="firewall_sdram" value="com_and_app"/>
-                <parameter id="firewall_uart" value="com_only"/>
+                <parameter id="firewall_uart" value="app_only"/>
                 <parameter id="firewall_debug_slave" value="no_access"/>
                 <parameter id="idpm_enable" value="true"/>
                 <parameter id="file_text" value=""/>
@@ -19,14 +19,6 @@
                 <parameter id="firewall_extmem" value="app_only"/>
             </config>
         </peripheral>
-        <peripheral id="mmio0"/>
-        <peripheral id="mmio1"/>
-        <peripheral id="mmio2"/>
-        <peripheral id="mmio3"/>
-        <peripheral id="mmio4"/>
-        <peripheral id="mmio5"/>
-        <peripheral id="mmio6"/>
-        <peripheral id="mmio7"/>
         <peripheral id="phy0_phy1">
             <config id="default">
                 <parameter id="hw_option" value="0x0080"/>
@@ -116,14 +108,6 @@
         <pin id="MLED1" peripheral="phy0_phy1" function="mled1"/>
         <pin id="MLED2" peripheral="phy0_phy1" function="mled2"/>
         <pin id="MLED3" peripheral="phy0_phy1" function="mled3"/>
-        <pin id="MMIO0" peripheral="mmio0" function="mmio0"/>
-        <pin id="MMIO1" peripheral="mmio1" function="mmio1"/>
-        <pin id="MMIO2" peripheral="mmio2" function="mmio2"/>
-        <pin id="MMIO3" peripheral="mmio3" function="mmio3"/>
-        <pin id="MMIO4" peripheral="mmio4" function="mmio4"/>
-        <pin id="MMIO5" peripheral="mmio5" function="mmio5"/>
-        <pin id="MMIO6" peripheral="mmio6" function="mmio6"/>
-        <pin id="MMIO7" peripheral="mmio7" function="mmio7"/>
         <pin id="PHY0_LED_LINK_IN" peripheral="sdram_16_bit" function="sd_d3"/>
         <pin id="PHY0_RXN" peripheral="phy0_phy1" function="phy0_rxn"/>
         <pin id="PHY0_RXP" peripheral="phy0_phy1" function="phy0_rxp"/>
@@ -143,10 +127,7 @@
         <pin id="UART_RXD" peripheral="uart" function="uart_rxd"/>
         <pin id="UART_TXD" peripheral="uart" function="uart_txd"/>
     </io_config>
-    <mmio_config>
-        <mmio id="mmio0" signal="uart_app_rxd"/>
-        <mmio id="mmio1" signal="uart_app_txd"/>
-    </mmio_config>
+    <mmio_config/>
     <pad_config>
         <pin id="HIF_A0" drive_strength="high" pull_enable="false"/>
         <pin id="HIF_A1" drive_strength="high" pull_enable="false"/>
@@ -188,14 +169,6 @@
         <pin id="MLED1" drive_strength="high" pull_enable="false"/>
         <pin id="MLED2" drive_strength="high" pull_enable="false"/>
         <pin id="MLED3" drive_strength="high" pull_enable="false"/>
-        <pin id="MMIO0" drive_strength="low" pull_enable="true"/>
-        <pin id="MMIO1" drive_strength="low" pull_enable="true"/>
-        <pin id="MMIO2" drive_strength="low" pull_enable="true"/>
-        <pin id="MMIO3" drive_strength="low" pull_enable="true"/>
-        <pin id="MMIO4" drive_strength="low" pull_enable="true"/>
-        <pin id="MMIO5" drive_strength="low" pull_enable="true"/>
-        <pin id="MMIO6" drive_strength="low" pull_enable="true"/>
-        <pin id="MMIO7" drive_strength="low" pull_enable="true"/>
         <pin id="PHY0_LED_LINK_IN" drive_strength="high" pull_enable="true"/>
         <pin id="PHY1_LED_LINK_IN" drive_strength="high" pull_enable="true"/>
         <pin id="SQI_CLK" drive_strength="high" pull_enable="true"/>

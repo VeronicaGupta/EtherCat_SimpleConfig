@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<hwconfig tool_version="3.0.17" peripherals_version="1.4.0.0" chip_type="netx90_rev1" board="default">
+<hwconfig tool_version="3.0.17" peripherals_version="1.4.0.0" chip_type="netx90_rev0" board="default">
     <peripherals>
         <peripheral id="dpm_16_bit">
             <config id="dpm16_nxhx90_jtag_r3">

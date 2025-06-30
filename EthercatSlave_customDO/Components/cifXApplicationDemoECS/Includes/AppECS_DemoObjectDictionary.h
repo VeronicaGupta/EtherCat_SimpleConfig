@@ -155,37 +155,6 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_1600[] =
   },
 };
 
-static const uint32_t s_ab1601_Elements[] =
-{
-  PDOMAPPING(0x2001, 1, 8),
-};
-
-static const uint8_t s_b1601_NumElements = ARRCNT(s_ab1601_Elements);
-
-SUBOBJECT_DESCRIPTION_T g_tSiObj_1601[] =
-{
-  {
-    .bSubIndex = 0,
-    .bIndicationFlags = 0,
-    .usAccessRights = ECAT_OD_READ_ALL,
-    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
-    .ulMaxFieldUnits = 1,
-    .pszName = "Number of elements",
-    .pvInitialValue = &s_b1601_NumElements,
-    .ulInitialValueLength = sizeof(s_b1601_NumElements),
-  },
-  {
-    .bSubIndex = 1,
-    .bIndicationFlags = 0,
-    .usAccessRights = ECAT_OD_READ_ALL,
-    .usDatatype = ECAT_OD_DTYPE_UNSIGNED32,
-    .ulMaxFieldUnits = 1,
-    .pszName = 0,
-    .pvInitialValue = &s_ab1601_Elements[0],
-    .ulInitialValueLength = sizeof(s_ab1601_Elements[0]),
-  },
-};
-
 static const uint32_t s_ab1A00_Elements[] =
 {
   PDOMAPPING(0x3000, 1, 8),
@@ -373,7 +342,7 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_1C00[] =
 };
 
 
-static const uint16_t s_aus1C12_Entries[] = { 0x1600,0x1601 };
+static const uint16_t s_aus1C12_Entries[] = { 0x1600 };
 static const uint8_t s_b1C12_NumElements = ARRCNT(s_aus1C12_Entries);
 
 SUBOBJECT_DESCRIPTION_T tSiObj_1C12[] =
@@ -397,16 +366,6 @@ SUBOBJECT_DESCRIPTION_T tSiObj_1C12[] =
     .pszName = 0,
     .pvInitialValue = &s_aus1C12_Entries[0],
     .ulInitialValueLength = sizeof(s_aus1C12_Entries[0]),
-  },
-  {
-      .bSubIndex = 2,
-      .bIndicationFlags = 0,
-      .usAccessRights = ECAT_OD_READ_ALL,
-      .usDatatype = ECAT_OD_DTYPE_UNSIGNED16,
-      .ulMaxFieldUnits = 1,
-      .pszName = 0,
-      .pvInitialValue = &s_aus1C12_Entries[1],
-      .ulInitialValueLength = sizeof(s_aus1C12_Entries[1]),
   },
 };
 
@@ -515,33 +474,6 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_2000[] =
 };
 static const uint8_t s_b2000_NumElements = ARRCNT(g_tSiObj_2000) - 1; /* SI 00 does not counts */
 
-static const uint8_t s_b2001_NumElements;
-
-SUBOBJECT_DESCRIPTION_T g_tSiObj_2001[] =
-{
-  {
-    .bSubIndex = 0,
-    .bIndicationFlags = 0,
-    .usAccessRights = ECAT_OD_READ_ALL,
-    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
-    .ulMaxFieldUnits = 1,
-    .pszName = "Number of elements",
-    .pvInitialValue = &s_b2001_NumElements,
-    .ulInitialValueLength = sizeof(s_b2001_NumElements),
-  },
-  {
-    .bSubIndex = 1,
-    .bIndicationFlags = 0,
-    .usAccessRights = ECAT_OD_ACCESS_ALL,
-    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
-    .ulMaxFieldUnits = 1,
-    .pszName = "Outputdata0",
-    .pvInitialValue = 0,
-    .ulInitialValueLength = 0,
-  },
-};
-
-static const uint8_t s_b2001_NumElements = ARRCNT(g_tSiObj_2001) - 1; /* SI 00 does not counts */
 
 static const uint8_t s_b3000_NumElements;
 
@@ -723,32 +655,6 @@ SUBOBJECT_DESCRIPTION_T g_tSiObj_4000[] =
 
 static const uint8_t s_b4000_NumElements = ARRCNT(g_tSiObj_4000) - 1; /* SI 00 does not counts */
 
-static const uint8_t s_b4001_NumElements;
-
-SUBOBJECT_DESCRIPTION_T g_tSiObj_4001[] =
-{
-  {
-    .bSubIndex = 0,
-    .bIndicationFlags = 0,
-    .usAccessRights = ECAT_OD_READ_ALL,
-    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
-    .ulMaxFieldUnits = 1,
-    .pszName = "Number of elements",
-    .pvInitialValue = &s_b4001_NumElements,
-    .ulInitialValueLength = sizeof(s_b4000_NumElements),
-  },
-  {
-   .bSubIndex = 1,
-   .bIndicationFlags = ODV3_INDICATION_FLAGS_ALLOWED_ON_SUBOBJ,
-   .usAccessRights = ECAT_OD_ACCESS_ALL,
-   .usDatatype = ECAT_OD_DTYPE_BOOLEAN,
-   .ulMaxFieldUnits = 1,
-   .pszName = "Flag 1",
-  },
-};
-
-static const uint8_t s_b4001_NumElements = ARRCNT(g_tSiObj_4001) - 1; /* SI 00 does not counts */
-
 static const uint8_t ManufacturerDeviceName[8] = {"Hilscher"};
 static const uint8_t HardwareVersion[1] = {"1"};
 static const uint8_t SoftwareVersion[3] = {"5.2"};
@@ -857,20 +763,6 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
     .ptSiBreak = &g_tSiObj_1600[ ARRCNT(g_tSiObj_1600) ],
   },
   {
-    .usIndex = 0x1601,
-    .bMaxNumOfSubObjs = ARRCNT(s_ab1601_Elements),
-    .bObjectCode = ODV3_OBJCODE_RECORD,
-    .usAccessFlags = 0,
-    .bIndicationFlags = 0,
-    .usDatatype = ECAT_OD_DTYPE_PDO_MAPPING,
-    .usAccessRights = ECAT_OD_ACCESS_ALL,
-    /* no SimpleVar, therefore no ulMaxFieldUnits value */
-    .pszName = "1. RxPDO",
-    /* no SimpleVar, therefore no initial value */
-    .ptSi00 = &g_tSiObj_1601[0],
-    .ptSiBreak = &g_tSiObj_1601[ ARRCNT(g_tSiObj_1601) ],
-  },
-  {
     .usIndex = 0x1A00,
     .bMaxNumOfSubObjs = ARRCNT(s_ab1A00_Elements),
     .bObjectCode = ODV3_OBJCODE_RECORD,
@@ -928,7 +820,7 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
 //  },
   {
     .usIndex = 0x1C12,
-    .bMaxNumOfSubObjs = ARRCNT(tSiObj_1C12) - 1,
+    .bMaxNumOfSubObjs = 1,
     .bObjectCode = ODV3_OBJCODE_ARRAY,
     .usAccessFlags = 0,
     .bIndicationFlags = 0,
@@ -969,20 +861,6 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
     .ptSiBreak = &g_tSiObj_2000[ ARRCNT(g_tSiObj_2000) ],
   },
   {
-    .usIndex = 0x2001,
-    .bMaxNumOfSubObjs = ARRCNT(g_tSiObj_2001) - 1,
-    .bObjectCode = ODV3_OBJCODE_RECORD,
-    .usAccessFlags = ODV3_ACCESS_FLAGS_RXPDO_MAPPABLE,
-    .bIndicationFlags = 0,
-    .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,/**< \todo what exactly shall be used here */
-    .usAccessRights = ECAT_OD_READ_ALL,
-    /* no SimpleVar, therefore no ulMaxFieldUnits value */
-    .pszName = "Outputs",
-    /* no SimpleVar, therefore no initial value */
-    .ptSi00 = &g_tSiObj_2001[0],
-    .ptSiBreak = &g_tSiObj_2001[ ARRCNT(g_tSiObj_2001) ],
-  },
-  {
     .usIndex = 0x3000,
     .bMaxNumOfSubObjs = ARRCNT(g_tSiObj_3000) - 1,
     .bObjectCode = ODV3_OBJCODE_RECORD,
@@ -1009,19 +887,6 @@ OBJECT_DESCRIPTION_T g_tObjects[] =
     .ptSi00 = &g_tSiObj_4000[0],
     .ptSiBreak = &g_tSiObj_4000[ ARRCNT(g_tSiObj_4000) ],
   },
-  {
-      .usIndex = 0x4001,
-      .bMaxNumOfSubObjs = ARRCNT(g_tSiObj_4001) - 1,
-      .ulMaxFieldUnits = 1,
-      .bObjectCode = ODV3_OBJCODE_RECORD,
-      .usAccessFlags = 0,
-      .bIndicationFlags = 0,
-      .usDatatype = ECAT_OD_DTYPE_UNSIGNED8,
-      .usAccessRights = ECAT_OD_READ_ALL,
-      .pszName = "Hello World",
-      .ptSi00 = &g_tSiObj_4001[0],
-      .ptSiBreak = &g_tSiObj_4001[ ARRCNT(g_tSiObj_4001) ],
-    },
 };
 
 #endif /* COMPONENTS_CIFXAPPLICATIONDEMOECS_INCLUDES_APPECS_DEMO_OBJECT_DICTIONARY_H_ */

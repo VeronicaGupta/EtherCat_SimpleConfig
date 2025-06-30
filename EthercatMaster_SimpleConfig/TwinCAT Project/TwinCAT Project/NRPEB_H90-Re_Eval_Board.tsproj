@@ -25,11 +25,6 @@
 						<Contexts>
 							<Context>
 								<Id>1</Id>
-								<ManualConfig>
-									<OTCID>#x03000011</OTCID>
-								</ManualConfig>
-								<Priority>11</Priority>
-								<CycleTime>1000000</CycleTime>
 							</Context>
 						</Contexts>
 						<Interfaces>
@@ -189,7 +184,7 @@
 						<InterfacePointerValues>
 							<Value>
 								<Name>CyclicCaller</Name>
-								<OTCID>#x03000011</OTCID>
+								<OTCID>#x00000000</OTCID>
 							</Value>
 						</InterfacePointerValues>
 					</TmcDesc>
@@ -278,7 +273,7 @@
 			<SystemAlias></SystemAlias>
 			<DataLogger Disabled="true" GUID="{2871417F-D7F4-8D0A-B3F5-D61C63E7D102}">
 				<Name>Data Logger 1</Name>
-				<Name></Name>
+				<Name>Data Logger 1</Name>
 				<ParameterValues>
 					<Value>
 						<Name>Data Format</Name>
@@ -317,7 +312,7 @@
 						<String></String>
 					</Value>
 				</ParameterValues>
-				<Stream Caller="#x03040010" Adi="#x03040010" Id="#x02040004" CntAds="#x00000020" CntFile="#x00000010" CntRing="#x00000002" SamplingDivider="1" DeviceStream="true">
+				<Stream Caller="#x03040010" Adi="#x03040010" Id="#x02040004" CntAds="#x00000020" CntFile="#x00000010" CntRing="#x00000002" SamplingDivider="1">
 					<Name>Device 2 (EtherCAT).Image</Name>
 					<DisplayName>DeviceStream1</DisplayName>
 					<LoggerObject Enabled="true">
